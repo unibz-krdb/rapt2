@@ -1,5 +1,5 @@
 from pyparsing import (alphanums, Regex, Word, alphas, quotedString,
-                       removeQuotes, Combine, Optional, downcaseTokens, ParserElement)
+                       removeQuotes, Combine, Optional, ParserElement, pyparsing_common)
 
 ParserElement.enablePackrat()
 
@@ -50,7 +50,7 @@ class ProtoGrammar:
         """
         identifier ::= letter | letter string
         """
-        return Word(alphas, self.character).setParseAction(downcaseTokens)
+        return Word(alphas, self.character).setParseAction(pyparsing_common.downcaseTokens)
 
     @property
     def relation_name(self):
