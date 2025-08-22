@@ -1,5 +1,5 @@
-from rapt.treebrd.grammars import CoreGrammar, GRAMMARS
-from rapt.treebrd.grammars.syntax import Syntax
+from .treebrd.grammars import CoreGrammar, GRAMMARS
+from .treebrd.grammars.syntax import Syntax
 from .treebrd.treebrd import TreeBRD
 from .transformers.sql import sql_translator
 from .transformers.qtree import qtree_translator

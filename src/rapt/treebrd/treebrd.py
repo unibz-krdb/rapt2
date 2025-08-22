@@ -1,4 +1,4 @@
-from rapt.treebrd.schema import Schema
+from .schema import Schema
 from .utility import flatten
 from .node import SelectNode, ProjectNode, RenameNode, \
     AssignNode, CrossJoinNode, NaturalJoinNode, UnionNode, DifferenceNode, \
