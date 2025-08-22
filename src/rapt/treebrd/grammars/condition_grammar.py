@@ -1,4 +1,4 @@
-from pyparsing import oneOf, CaselessKeyword, operatorPrecedence, opAssoc
+from pyparsing import oneOf, CaselessKeyword, infixNotation, opAssoc
 
 from .proto_grammar import ProtoGrammar
 from .syntax import Syntax
@@ -68,7 +68,7 @@ class ConditionGrammar(ProtoGrammar):
         """
         condition ::= operand comparator_op operand | not_op condition |
                   paren_left condition paren_right
-        not_op and grouping rules are defined using operatorPrecedence in
+        not_op and grouping rules are defined using infixNotation in
         conditions.
         """
         return self.operand + self.comparator_op + self.operand
@@ -79,9 +79,9 @@ class ConditionGrammar(ProtoGrammar):
         conditions ::= condition | condition logical_binary_op conditions
         Note: By default lpar and rpar arguments are suppressed.
         """
-        return operatorPrecedence(
-            baseExpr=self.condition,
-            opList=[(self.not_op, 1, opAssoc.RIGHT),
-                    (self.logical_binary_op, 2, opAssoc.LEFT)],
+        return infixNotation(
+            base_expr=self.condition,
+            op_list=[(self.not_op, 1, opAssoc.RIGHT),
+                     (self.logical_binary_op, 2, opAssoc.LEFT)],
             lpar=self.syntax.paren_left,
             rpar=self.syntax.paren_right)
