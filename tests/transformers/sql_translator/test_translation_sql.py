@@ -432,6 +432,7 @@ class TestThetaJoin(TestSQL):
 
 
 class TestSet:
+    __test__ = False
     def test_simple(self):
         ra = 'gamma {operator} gammatwin;'.format(operator=self.ra_operator)
 
