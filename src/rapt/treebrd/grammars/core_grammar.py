@@ -1,4 +1,15 @@
-from pyparsing import *
+from pyparsing import (
+    delimitedList,
+    Group,
+    Optional,
+    CaselessKeyword,
+    infixNotation,
+    opAssoc,
+    Keyword,
+    Suppress,
+    OneOrMore,
+    alphanums,
+)
 
 from .condition_grammar import ConditionGrammar
 
@@ -12,6 +23,7 @@ class CoreGrammar(ConditionGrammar):
     """
 
     def parse(self, instring):
+        instring = r"" + instring
         return self.statements.parseString(instring, parseAll=True)
 
     @property
@@ -123,7 +135,7 @@ class CoreGrammar(ConditionGrammar):
         combination of relations that uses the previously defined operators
         and follows precedence rules.
         """
-        return operatorPrecedence(self.relation, [
+        return infixNotation(self.relation, [
             (self.unary_op, 1, opAssoc.RIGHT),
             (self.binary_op_p1, 2, opAssoc.LEFT),
             (self.binary_op_p2, 2, opAssoc.LEFT)])

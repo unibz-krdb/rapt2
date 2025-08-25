@@ -1,4 +1,8 @@
-from pyparsing import *
+from pyparsing import (
+    CaselessKeyword,
+    infixNotation,
+    opAssoc,
+)
 
 from .core_grammar import CoreGrammar
 
@@ -45,7 +49,7 @@ class ExtendedGrammar(CoreGrammar):
 
     @property
     def expression(self):
-        return operatorPrecedence(self.relation, [
+        return infixNotation(self.relation, [
             (self.unary_op, 1, opAssoc.RIGHT),
             (self.binary_op_p1, 2, opAssoc.LEFT),
             (self.intersect, 2, opAssoc.LEFT),
