@@ -16,10 +16,10 @@ class TestTranslator(TestCase):
 
         cls.setup_database(cls.schema, cls.data)
 
-        cls.translate_bag = cls.translate_func(functools.partial(Rapt(
-            grammar='Extended Grammar').to_sql, use_bag_semantics=True))
-        cls.translate_set = cls.translate_func(functools.partial(Rapt(
-            grammar='Extended Grammar').to_sql))
+        cls.translate_bag = staticmethod(cls.translate_func(functools.partial(Rapt(
+            grammar='Extended Grammar').to_sql, use_bag_semantics=True)))
+        cls.translate_set = staticmethod(cls.translate_func(functools.partial(Rapt(
+            grammar='Extended Grammar').to_sql)))
 
 
     @classmethod

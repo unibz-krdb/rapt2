@@ -29,7 +29,7 @@ class TestRelation(TreeBRDTestCase):
         cls.definition = {'letters': ['position', 'value'],
                           'numbers': ['value', 'prime']}
         cls.schema = Schema(cls.definition)
-        cls.build = cls.create_build_function(cls.definition)
+        cls.build = staticmethod(cls.create_build_function(cls.definition))
 
     def test_build_when_instring_is_single_relation(self):
         forest = self.build('letters;')
@@ -54,7 +54,7 @@ class TestProject(TreeBRDTestCase):
         cls.definition = {'magic_wand': ['owner', 'manufacturer', 'wood',
                                          'core', 'length', 'rigidity']}
         cls.schema = Schema(cls.definition)
-        cls.build = cls.create_build_function(cls.definition)
+        cls.build = staticmethod(cls.create_build_function(cls.definition))
 
     def test_project_with_single_attr(self):
         instring = r"\project_{owner} magic_wand;"
@@ -105,7 +105,7 @@ class JoinTestCase(TreeBRDTestCase):
                           'beta': ['b1', 'b2'],
                           'gamma': ['c1', 'c2', 'c3']}
         cls.schema = Schema(cls.definition)
-        cls.build = cls.create_build_function(cls.definition)
+        cls.build = staticmethod(cls.create_build_function(cls.definition))
 
 
 class TestJoins(JoinTestCase):
