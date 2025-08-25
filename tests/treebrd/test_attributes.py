@@ -25,7 +25,7 @@ class TestAttribute(TestCase):
     def test_equality_when_name_and_attribute_are_different(self):
         attribute_a = Attribute('Name', 'Prefix')
         attribute_b = Attribute('Other', 'Other')
-        self.assertNotEquals(attribute_a, attribute_b)
+        self.assertNotEqual(attribute_a, attribute_b)
 
     def test_equality_when_name_is_different(self):
         attribute_a = Attribute('Name', 'Prefix')
