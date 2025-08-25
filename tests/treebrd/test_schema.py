@@ -16,14 +16,14 @@ class TestSchema(TestCase):
     def test_to_dict(self):
         expected = {'alpha': ['a1'], 'beta': ['b1']}
         actual = Schema(expected).to_dict()
-        self.assertNotEquals(id(expected), id(actual))
+        self.assertNotEqual(id(expected), id(actual))
         self.assertEqual(expected, actual)
 
     def test_get_attributes(self):
         raw = {'alpha': ['a1'], 'beta': ['b1']}
         expected = ['a1']
         actual = Schema(raw).get_attributes('alpha')
-        self.assertNotEquals(id(expected), id(raw['alpha']))
+        self.assertNotEqual(id(expected), id(raw['alpha']))
         self.assertEqual(expected, actual)
 
     def test_add(self):
