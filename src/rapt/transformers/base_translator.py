@@ -28,7 +28,42 @@ class BaseTranslator:
         :return: a node's translation to some format
         """
         _translate = self._translate_functions.get(node.operator)
+        if _translate is None:
+            raise NotImplementedError(f'No translator for operator: {node.operator}')
         return _translate(node)
+
+    def relation(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
+
+    def select(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
+
+    def project(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
+
+    def rename(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
+
+    def assign(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
+
+    def cross_join(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
+
+    def natural_join(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
+
+    def theta_join(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
+
+    def union(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
+
+    def difference(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
+
+    def intersect(self, node):
+        raise NotImplementedError('Must be implemented by translation modules.')
 
 
 def translate(roots):
