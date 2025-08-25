@@ -131,80 +131,80 @@ class TestProject(TestTranslator):
         super().setUpClass()
 
     def test_single_project_single_attr_set_no_duplicates(self):
-        instring = '\project_{a1} alpha;'
+        instring = r"\project_{a1} alpha;"
         translation = self.translate_set(instring)
         expected = [('1',), ('2',), ('3', )]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_project_single_attr_set_no_duplicates_cased(self):
-        instring = '\project_{a1} ALPHA;'
+        instring = r"\project_{a1} ALPHA;"
         translation = self.translate_set(instring)
         expected = [('1',), ('2',), ('3', )]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_project_single_attr_set_with_duplicates(self):
-        instring = '\project_{a2} alpha;'
+        instring = r"\project_{a2} alpha;"
         translation = self.translate_set(instring)
         expected = [('a',), ('b',)]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_project_single_attr_bag_no_duplicates(self):
-        instring = '\project_{a1} alpha;'
+        instring = r"\project_{a1} alpha;"
         translation = self.translate_bag(instring)
         expected = [('1',), ('2',), ('3', )]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_project_single_attr_bag_with_duplicates(self):
-        instring = '\project_{a2} alpha;'
+        instring = r"\project_{a2} alpha;"
         translation = self.translate_bag(instring)
         expected = [('a',), ('b',), ('b',)]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_project_two_attr_set_no_duplicates(self):
-        instring = '\project_{a1, a2} alpha;'
+        instring = r"\project_{a1, a2} alpha;"
         translation = self.translate_set(instring)
         expected = [('1', 'a',), ('2', 'b'), ('3', 'b')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_project_two_attr_set_with_duplicates(self):
-        instring = '\project_{a2, a3} alpha;'
+        instring = r"\project_{a2, a3} alpha;"
         translation = self.translate_set(instring)
         expected = [('a', '!',), ('b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_project_two_attr_bag_no_duplicates(self):
-        instring = '\project_{a1, a2} alpha;'
+        instring = r"\project_{a1, a2} alpha;"
         translation = self.translate_bag(instring)
         expected = [('1', 'a',), ('2', 'b'), ('3', 'b')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_project_two_attr_bag_with_duplicates(self):
-        instring = '\project_{a2, a3} alpha;'
+        instring = r"\project_{a2, a3} alpha;"
         translation = self.translate_bag(instring)
         expected = [('a', '!',), ('b', '!'), ('b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_project_all_attr(self):
-        instring = '\project_{a1, a2, a3} alpha;'
+        instring = r"\project_{a1, a2, a3} alpha;"
         translation = self.translate_set(instring)
         expected = self.data['alpha']
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_project_all_attr_out_of_order(self):
-        instring = '\project_{a2, a3, a1} alpha;'
+        instring = r"\project_{a2, a3, a1} alpha;"
         translation = self.translate_set(instring)
         expected = [('a', '!', '1'), ('b', '!', '2'), ('b', '!', '3')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_double_project(self):
-        instring = '\project_{a2} \project_{a2, a3} alpha;'
+        instring = r"\project_{a2} \project_{a2, a3} alpha;"
         translation = self.translate_set(instring)
         expected = [('a',), ('b',)]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_triple_project(self):
-        instring = '\project_{a1} \project_{a2, a1}' \
-                   '\project_{a2, a1, a3} alpha;'
+        instring = (r"\project_{a1} \project_{a2, a1}"
+                   r"\project_{a2, a1, a3} alpha;")
         translation = self.translate_set(instring)
         expected = [('1',), ('2',), ('3',)]
         self.assertCountEqual(expected, self.query_list(translation))
@@ -226,55 +226,55 @@ class TestSelect(TestTranslator):
         super().setUpClass()
 
     def test_single_select_with_no_attr_set(self):
-        instring = '\select_{1=1} alpha;'
+        instring = r"\select_{1=1} alpha;"
         translation = self.translate_set(instring)
         expected = [('1', 'a', '!'), ('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_select_with_no_attr_bag(self):
-        instring = '\select_{1=1} alpha;'
+        instring = r"\select_{1=1} alpha;"
         translation = self.translate_bag(instring)
         expected = self.data['alpha']
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_select_with_attr_all(self):
-        instring = '\select_{a1<>\'missing\'} alpha;'
+        instring = r"\select_{a1<>'missing'} alpha;"
         translation = self.translate_set(instring)
         expected = [('1', 'a', '!'), ('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_select_with_attr_subset_set(self):
-        instring = '\select_{a1<>\'1\'} alpha;'
+        instring = r"\select_{a1<>'1'} alpha;"
         translation = self.translate_set(instring)
         expected = [('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_select_with_attr_subset_bag(self):
-        instring = '\select_{a1<>\'1\'} alpha;'
+        instring = r"\select_{a1<>'1'} alpha;"
         translation = self.translate_bag(instring)
         expected = [('2', 'b', '!'), ('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_select_with_attr_none(self):
-        instring = '\select_{a1=\'1\' and a2=\'b\'} alpha;'
+        instring = r"\select_{a1='1' and a2='b'} alpha;"
         translation = self.translate_set(instring)
         expected = []
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_select_with_multiple_cond_attr_subset_set(self):
-        instring = '\select_{a1<>\'1\' and a2<>\'a\'} alpha;'
+        instring = r"\select_{a1<>'1' and a2<>'a'} alpha;"
         translation = self.translate_set(instring)
         expected = [('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_single_select_with_attr_case(self):
-        instring = '\select_{A1=\'1\' and A2=\'b\'} Alpha;'
+        instring = r"\select_{A1='1' and A2='b'} Alpha;"
         translation = self.translate_set(instring)
         expected = []
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_double_select_with_attr(self):
-        instring = '\select_{a1!=\'missing\'} \select_{A2!=\'missing\'} Alpha;'
+        instring = r"\select_{a1!='missing'} \select_{A2!='missing'} Alpha;"
         translation = self.translate_set(instring)
         expected = [('1', 'a', '!'), ('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
@@ -296,29 +296,29 @@ class TestRename(TestTranslator):
         super().setUpClass()
 
     def test_rename_relation(self):
-        instring = '\project_{AlphaPrime.a1, AlphaPrime.a2, AlphaPrime.a3} ' \
-                   '\\rename_{AlphaPrime} alpha;'
+        instring = (r"\project_{AlphaPrime.a1, AlphaPrime.a2, AlphaPrime.a3} "
+                   r"\rename_{AlphaPrime} alpha;")
         translation = self.translate_set(instring)
         expected = [('1', 'a', '!'), ('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_rename_relation_bag(self):
-        instring = '\project_{AlphaPrime.a1, AlphaPrime.a2, AlphaPrime.a3} ' \
-                   '\\rename_{AlphaPrime} alpha;'
+        instring = (r"\project_{AlphaPrime.a1, AlphaPrime.a2, AlphaPrime.a3} "
+                   r"\rename_{AlphaPrime} alpha;")
         translation = self.translate_bag(instring)
         expected = [('1', 'a', '!'), ('2', 'b', '!'), ('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_rename_attributes(self):
-        instring = '\project_{alpha.ap1, alpha.ap2, alpha.ap3} ' \
-                   '\\rename_{(ap1, ap2, ap3)} alpha;'
+        instring = (r"\project_{alpha.ap1, alpha.ap2, alpha.ap3} "
+                   r"\rename_{(ap1, ap2, ap3)} alpha;")
         translation = self.translate_set(instring)
         expected = [('1', 'a', '!'), ('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_rename_relation_and_attributes(self):
-        instring = '\project_{APrime.ap1, APrime.ap2, APrime.ap3} ' \
-                   '\\rename_{APrime(ap1, ap2, ap3)} alpha;'
+        instring = (r"\project_{APrime.ap1, APrime.ap2, APrime.ap3} "
+                   r"\rename_{APrime(ap1, ap2, ap3)} alpha;")
         translation = self.translate_set(instring)
         expected = [('1', 'a', '!'), ('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
@@ -355,8 +355,8 @@ class TestAssign(TestTranslator):
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_assign_relation_with_attr_rename(self):
-        instring = 'alpha_prime(ap1, ap2, ap3) := alpha;' \
-                   '\project_{alpha_prime.ap1, alpha_prime.ap2, alpha_prime.ap3} alpha_prime;'
+        instring = (r"alpha_prime(ap1, ap2, ap3) := alpha;"
+                   r"\project_{alpha_prime.ap1, alpha_prime.ap2, alpha_prime.ap3} alpha_prime;")
         translation = self.translate_set(instring)
         expected = [('1', 'a', '!'), ('2', 'b', '!')]
         self.assertCountEqual(expected, self.query_list(translation))
@@ -865,7 +865,7 @@ class TestUnary(TestTranslator):
 
 
     def test_select_project(self):
-        instring = '\select_{a2=\'b\'} \project_{a2 } alpha;'
+        instring = r"\select_{a2='b'} \project_{a2 } alpha;"
         translation = self.translate_set(instring)
         expected = [
             ('b',)
@@ -873,7 +873,7 @@ class TestUnary(TestTranslator):
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_project_select(self):
-        instring = ' \project_{a2} \select_{a2=\'b\'} alpha;'
+        instring = r" \project_{a2} \select_{a2='b'} alpha;"
         translation = self.translate_set(instring)
         expected = [
             ('b',)
@@ -881,7 +881,7 @@ class TestUnary(TestTranslator):
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_select_rename(self):
-        instring = '\select_{ap2=\'b\'} \\rename_{A(ap1, ap2)} alpha;'
+        instring = r"\select_{ap2='b'} \rename_{A(ap1, ap2)} alpha;"
         translation = self.translate_set(instring)
         expected = [
             ('2', 'b',)
@@ -889,7 +889,7 @@ class TestUnary(TestTranslator):
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_project_rename(self):
-        instring = '\project_{ap2} \\rename_{A(ap1, ap2)} alpha;'
+        instring = r"\project_{ap2} \rename_{A(ap1, ap2)} alpha;"
         translation = self.translate_set(instring)
         expected = [
             ('a', ), ('b',)
@@ -897,7 +897,7 @@ class TestUnary(TestTranslator):
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_assign_project_rename(self):
-        instring = 'A := \project_{ap2} \\rename_{A(ap1, ap2)} alpha; A;'
+        instring = r"A := \project_{ap2} \rename_{A(ap1, ap2)} alpha; A;"
         translation = self.translate_set(instring)
         expected = [
             ('a', ), ('b',)

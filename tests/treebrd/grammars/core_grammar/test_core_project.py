@@ -10,34 +10,34 @@ class TestProject(unittest.TestCase):
         self.parser = CoreGrammar()
 
     def test_single_attribute(self):
-        expression = '\project_{species} astronauts;'
+        expression = r"\project_{species} astronauts;"
         expected = [['\\project', ['species'], ['astronauts']]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_two_attributes(self):
-        expression = '\project_{name, age} astronauts;'
+        expression = r"\project_{name, age} astronauts;"
         expected = [['\\project', ['name', 'age'], ['astronauts']]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_multiple_attributes(self):
-        expression = '\project_{name, age, colour, sex, alive} astronauts;'
+        expression = r"\project_{name, age, colour, sex, alive} astronauts;"
         expected = [['\\project', ['name', 'age', 'colour', 'sex', 'alive'],
                      ['astronauts']]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_recursive(self):
-        expression = '\project_{species} \project_{age, species} astronauts;'
+        expression = r"\project_{species} \project_{age, species} astronauts;"
         expected = [['\\project', ['species'],
                      ['\\project', ['age', 'species'], ['astronauts']]]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_recursive_double(self):
-        expression = '\project_{species} \project_{age} \project_{name} ' \
-                     'astronauts;'
+        expression = (r"\project_{species} \project_{age} \project_{name} "
+                     r"astronauts;")
         expected = [['\\project', ['species'],
                      ['\\project', ['age'],
                       ['\\project', ['name'], ['astronauts']]]]]
@@ -47,31 +47,31 @@ class TestProject(unittest.TestCase):
     # Exceptions
 
     def test_exp_basic(self):
-        expression = '\project;'
+        expression = r"\project;"
         self.assertRaises(ParseException, self.parser.statements.parseString,
                           expression, CoreGrammar)
 
     def test_exp_no_relation(self):
-        expression = '\project_{species};'
+        expression = r"\project_{species};"
         self.assertRaises(ParseException, self.parser.statements.parseString,
                           expression, CoreGrammar)
 
     def test_exp_no_attributes(self):
-        expression = '\project astronauts;'
+        expression = r"\project astronauts;"
         self.assertRaises(ParseException, self.parser.statements.parseString,
                           expression, CoreGrammar)
 
     def test_exp_empty_attribute_list(self):
-        expression = '\project_{} astronauts;'
+        expression = r"\project_{} astronauts;"
         self.assertRaises(ParseException, self.parser.statements.parseString,
                           expression, CoreGrammar)
 
     def test_exp_space_before_attributes(self):
-        expression = '\project _{species} astronauts;'
+        expression = r"\project _{species} astronauts;"
         self.assertRaises(ParseException, self.parser.statements.parseString,
                           expression, CoreGrammar)
 
     def test_exp_attribute_not_delim(self):
-        expression = '\project _{species age} astronauts;'
+        expression = r"\project _{species age} astronauts;"
         self.assertRaises(ParseException, self.parser.statements.parseString,
                           expression, CoreGrammar)

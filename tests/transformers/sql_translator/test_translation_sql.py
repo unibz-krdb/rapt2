@@ -43,95 +43,95 @@ class TestRelation(TestSQL):
 
 class TestSelect(TestSQL):
     def test_single_select(self):
-        ra = '\\select_{a1=a2} alpha;'
+        ra = r"\select_{a1=a2} alpha;"
         expected = ['SELECT alpha.a1, alpha.a2, alpha.a3 '
                     'FROM alpha WHERE a1 = a2']
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_single_select_set(self):
-        ra = '\\select_{a1=a2} alpha;'
+        ra = r"\select_{a1=a2} alpha;"
         expected = ['SELECT DISTINCT alpha.a1, alpha.a2, alpha.a3 '
                     'FROM alpha WHERE a1 = a2']
         actual = self.translate_set(ra)
         self.assertEqual(expected, actual)
 
     def test_single_select_with_relation(self):
-        ra = '\\select_{alpha.a1=a2} alpha;'
+        ra = r"\select_{alpha.a1=a2} alpha;"
         expected = ['SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha '
                     'WHERE alpha.a1 = a2']
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_multiple_selects(self):
-        ra = '\\select_{a1=1} \\select_{a2=2} alpha;'
+        ra = r"\select_{a1=1} \select_{a2=2} alpha;"
         expected = ['SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha '
                     'WHERE (a2 = 2) AND (a1 = 1)']
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_multiple_select_with_precedence(self):
-        ra = '\\select_{a2=a3} (\\select_{a1=a2} alpha);'
+        ra = r"\select_{a2=a3} (\select_{a1=a2} alpha);"
         expected = ['SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha '
                     'WHERE (a1 = a2) AND (a2 = a3)']
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_multiple_select_with_multiple_conditions(self):
-        ra = '\\select_{a1=2 or a1=1} \\select_{a2=2 or a2=1} alpha;'
+        ra = r"\select_{a1=2 or a1=1} \select_{a2=2 or a2=1} alpha;"
         expected = ['SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha '
                     'WHERE (a2 = 2 or a2 = 1) AND (a1 = 2 or a1 = 1)']
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_single_select_wrong_attrs(self):
-        ra = '\\select_{b1=bee_one} Alpha;'
+        ra = r"\select_{b1=bee_one} Alpha;"
         self.assertRaises(AttributeReferenceError, self.translate, ra)
 
     def test_multiple_selects_wrong_attrs(self):
-        ra = '\\select_{b1=1} \\select_{bee_two=2} Alpha;'
+        ra = r"\select_{b1=1} \select_{bee_two=2} Alpha;"
         self.assertRaises(AttributeReferenceError, self.translate, ra)
 
     def test_multiple_selects_wrong_attrs_both(self):
-        ra = '\\select_{bee_one=1} \\select_{a_two=2} Alpha;'
+        ra = r"\select_{bee_one=1} \select_{a_two=2} Alpha;"
         self.assertRaises(AttributeReferenceError, self.translate, ra)
 
 
 class TestProject(TestSQL):
     def test_simple(self):
-        ra = '\\project_{a1, a2, a3} alpha;'
+        ra = r"\project_{a1, a2, a3} alpha;"
         expected = ['SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha']
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_prefixed(self):
-        ra = '\\project_{alpha.a1, alpha.a2, alpha.a3} alpha;'
+        ra = r"\project_{alpha.a1, alpha.a2, alpha.a3} alpha;"
         expected = ['SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha']
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_subset(self):
-        ra = '\\project_{a1, alpha.a2} alpha;'
+        ra = r"\project_{a1, alpha.a2} alpha;"
         expected = ['SELECT alpha.a1, alpha.a2 FROM alpha']
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_not_a_subset(self):
-        ra = '\\project_{b} Alpha;'
+        ra = r"\project_{b} Alpha;"
         self.assertRaises(AttributeReferenceError, self.translate, ra)
 
     def test_not_a_subset2(self):
-        ra = '\\project_{Alpha.a1, b} Alpha;'
+        ra = r"\project_{Alpha.a1, b} Alpha;"
         self.assertRaises(AttributeReferenceError, self.translate, ra)
 
     def test_not_a_subset3(self):
-        ra = '\\project_{a1, Alpha.b} Alpha;'
+        ra = r"\project_{a1, Alpha.b} Alpha;"
         self.assertRaises(AttributeReferenceError, self.translate, ra)
 
 
 class TestRename(TestSQL):
     def test_relation(self):
-        ra = '\\rename_{apex} alpha;'
+        ra = r"\rename_{apex} alpha;"
         expected = ['SELECT apex.a1, apex.a2, apex.a3 '
                     'FROM (SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) '
                     'AS apex(a1, a2, a3)']
@@ -139,7 +139,7 @@ class TestRename(TestSQL):
         self.assertEqual(expected, actual)
 
     def test_rename_attributes(self):
-        ra = '\\rename_{(a, b, c)} alpha;'
+        ra = r"\rename_{(a, b, c)} alpha;"
         expected = ['SELECT alpha.a, alpha.b, alpha.c '
                     'FROM (SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) '
                     'AS alpha(a, b, c)']
@@ -147,7 +147,7 @@ class TestRename(TestSQL):
         self.assertEqual(expected, actual)
 
     def test_rename_all(self):
-        ra = '\\rename_{apex(a, b, c)} alpha;'
+        ra = r"\rename_{apex(a, b, c)} alpha;"
         expected = ['SELECT apex.a, apex.b, apex.c '
                     'FROM (SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) '
                     'AS apex(a, b, c)']
@@ -155,7 +155,7 @@ class TestRename(TestSQL):
         self.assertEqual(expected, actual)
 
     def test_rename_with_select(self):
-        ra = '\\rename_{apex(a, b, c)} \\select_{a1 = a2} alpha;'
+        ra = r"\rename_{apex(a, b, c)} \select_{a1 = a2} alpha;"
         expected = ['SELECT apex.a, apex.b, apex.c '
                     'FROM (SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha '
                     'WHERE a1 = a2) AS apex(a, b, c)']
@@ -163,7 +163,7 @@ class TestRename(TestSQL):
         self.assertEqual(expected, actual)
 
     def test_rename_is_projected(self):
-        ra = '\\project_{a, c} \\rename_{apex(a, b, c)} alpha;'
+        ra = r"\project_{a, c} \rename_{apex(a, b, c)} alpha;"
         expected = ['SELECT apex.a, apex.c '
                     'FROM (SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) '
                     'AS apex(a, b, c)']
@@ -195,7 +195,7 @@ class TestAssignment(TestSQL):
         self.assertEqual(expected, actual)
 
     def test_select(self):
-        ra = 'niche := \select_{b1=1} beta;'
+        ra = r"niche := \select_{b1=1} beta;"
         expected = ['CREATE TEMPORARY TABLE niche(b1, b2, b3) AS '
                     'SELECT beta.b1, beta.b2, beta.b3 FROM beta '
                     'WHERE b1 = 1']
@@ -203,7 +203,7 @@ class TestAssignment(TestSQL):
         self.assertEqual(expected, actual)
 
     def test_select_with_attributes(self):
-        ra = 'niche(a, b, c) := \select_{b1=1} beta;'
+        ra = r"niche(a, b, c) := \select_{b1=1} beta;"
         expected = ['CREATE TEMPORARY TABLE niche(a, b, c) AS '
                     'SELECT beta.b1, beta.b2, beta.b3 FROM beta '
                     'WHERE b1 = 1']

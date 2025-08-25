@@ -57,14 +57,14 @@ class TestProject(TreeBRDTestCase):
         cls.build = cls.create_build_function(cls.definition)
 
     def test_project_with_single_attr(self):
-        instring = '\project_{owner} magic_wand;'
+        instring = r"\project_{owner} magic_wand;"
         forest = self.build(instring)
         child = RelationNode('magic_wand', self.schema)
         expected = ProjectNode(child, ['owner'])
         self.assertEqual(expected, forest[0])
 
     def test_project_with_two_attr(self):
-        instring = '\project_{owner, wood} magic_wand;'
+        instring = r"\project_{owner, wood} magic_wand;"
         forest = self.build(instring)
         child = RelationNode('magic_wand', self.schema)
         expected = ProjectNode(child, ['owner', 'wood'])
@@ -73,7 +73,7 @@ class TestProject(TreeBRDTestCase):
     def test_project_with_all_but_one_attr(self):
         attr = self.schema.get_attributes('magic_wand')
         attr.remove('rigidity')
-        instring = '\project_{' + ', '.join(attr) + '} magic_wand;'
+        instring = r"\project_{" + ', '.join(attr) + r"} magic_wand;"
         forest = self.build(instring)
         child = RelationNode('magic_wand', self.schema)
         expected = ProjectNode(child, attr)
@@ -81,7 +81,7 @@ class TestProject(TreeBRDTestCase):
 
     def test_project_with_all_attr(self):
         attr = self.schema.get_attributes('magic_wand')
-        instring = '\\project_{' + ', '.join(attr) + '} magic_wand;'
+        instring = r"\project_{" + ', '.join(attr) + r"} magic_wand;"
         forest = self.build(instring)
         child = RelationNode('magic_wand', self.schema)
         expected = ProjectNode(child, attr)
@@ -90,7 +90,7 @@ class TestProject(TreeBRDTestCase):
     def test_project_with_all_attr_shuffled(self):
         attr = self.schema.get_attributes('magic_wand')
         attr.sort()
-        instring = '\\project_{' + ', '.join(attr) + '} magic_wand;'
+        instring = r"\project_{" + ', '.join(attr) + r"} magic_wand;"
         forest = self.build(instring)
         child = RelationNode('magic_wand', self.schema)
         expected = ProjectNode(child, attr)
