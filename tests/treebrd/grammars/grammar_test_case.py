@@ -1,5 +1,6 @@
 import unittest
 
+
 class GrammarTestCase(unittest.TestCase):
     @staticmethod
     def parse_function(parser):

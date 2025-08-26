@@ -9,7 +9,7 @@ class TestProtoGrammar(GrammarTestCase):
         self.parser = ProtoGrammar()
 
     def test_character(self):
-        expected = set(alphas + nums + '_')
+        expected = set(alphas + nums + "_")
         actual = set(self.parser.character)
 
         self.assertEqual(expected, actual)
@@ -17,18 +17,18 @@ class TestProtoGrammar(GrammarTestCase):
     def test_number_integers(self):
         parse = self.parse_function(self.parser.number)
 
-        self.assertEqual(parse('792'), ['792'])
-        self.assertEqual(parse('0'), ['0'])
-        self.assertEqual(parse('-42'), ['-42'])
+        self.assertEqual(parse("792"), ["792"])
+        self.assertEqual(parse("0"), ["0"])
+        self.assertEqual(parse("-42"), ["-42"])
 
     def test_number_floats(self):
         parse = self.parse_function(self.parser.number)
 
-        self.assertEqual(parse('7.42'), ['7.42'])
-        self.assertEqual(parse('0.0'), ['0.0'])
-        self.assertEqual(parse('.576'), ['.576'])
-        self.assertEqual(parse('-42.7'), ['-42.7'])
-        self.assertEqual(parse('-1042.789'), ['-1042.789'])
+        self.assertEqual(parse("7.42"), ["7.42"])
+        self.assertEqual(parse("0.0"), ["0.0"])
+        self.assertEqual(parse(".576"), [".576"])
+        self.assertEqual(parse("-42.7"), ["-42.7"])
+        self.assertEqual(parse("-1042.789"), ["-1042.789"])
 
     def test_number_exp(self):
         parse = self.parse_function(self.parser.number)
@@ -49,11 +49,11 @@ class TestProtoGrammar(GrammarTestCase):
     def test_identifier(self):
         parse = self.parse_function(self.parser.identifier)
 
-        self.assertEqual(parse('y'), ['y'])
-        self.assertEqual(parse('Q'), ['q'])
-        self.assertEqual(parse('why'), ['why'])
-        self.assertEqual(parse('why_not'), ['why_not'])
-        self.assertEqual(parse('Life_Is_42'), ['life_is_42'])
+        self.assertEqual(parse("y"), ["y"])
+        self.assertEqual(parse("Q"), ["q"])
+        self.assertEqual(parse("why"), ["why"])
+        self.assertEqual(parse("why_not"), ["why_not"])
+        self.assertEqual(parse("Life_Is_42"), ["life_is_42"])
 
     def test_identifier_exp(self):
         parse = self.parse_function(self.parser.identifier)
@@ -66,7 +66,7 @@ class TestProtoGrammar(GrammarTestCase):
     def test_literal(self):
         parse = self.parse_function(self.parser.string_literal)
         self.assertEqual(parse("'Single!'"), ["'Single!'"])
-        self.assertEqual(parse('"Two is one."'), ['\'Two is one.\''])
+        self.assertEqual(parse('"Two is one."'), ["'Two is one.'"])
         self.assertEqual(parse("''"), ["''"])
 
     def test_literal_exp(self):

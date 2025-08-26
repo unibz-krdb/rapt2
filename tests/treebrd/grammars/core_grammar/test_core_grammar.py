@@ -11,8 +11,8 @@ class TestCoreGrammar(GrammarTestCase):
     def test_attribute_id(self):
         parse = self.parse_function(self.parser.attribute_reference)
 
-        self.assertEqual(parse('attribute'), ['attribute'])
-        self.assertEqual(parse('relation.attribute'), ['relation.attribute'])
+        self.assertEqual(parse("attribute"), ["attribute"])
+        self.assertEqual(parse("relation.attribute"), ["relation.attribute"])
 
     def test_attribute_id_exp(self):
         parse = self.parse_function(self.parser.attribute_reference)

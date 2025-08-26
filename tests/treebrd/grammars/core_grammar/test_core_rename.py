@@ -10,59 +10,65 @@ class TestProject(unittest.TestCase):
         self.parser = CoreGrammar()
 
     def test_rename_relation(self):
-        expression = '\\rename_{species} astronauts;'
-        expected = [['\\rename', ['species'], ['astronauts']]]
+        expression = "\\rename_{species} astronauts;"
+        expected = [["\\rename", ["species"], ["astronauts"]]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_rename_attribute(self):
-        expression = '\\rename_{ (name)} astronauts;'
-        expected = [['\\rename', [['name']], ['astronauts']]]
+        expression = "\\rename_{ (name)} astronauts;"
+        expected = [["\\rename", [["name"]], ["astronauts"]]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_rename_multiple_attributes(self):
-        expression = '\\rename_{(name, age, alive)} astronauts;'
-        expected = [['\\rename', [['name', 'age', 'alive']],
-                     ['astronauts']]]
+        expression = "\\rename_{(name, age, alive)} astronauts;"
+        expected = [["\\rename", [["name", "age", "alive"]], ["astronauts"]]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_rename_relation_and_multiple_attributes(self):
-        expression = '\\rename_{nautical (name, age, alive)} astronauts;'
-        expected = [['\\rename', ['nautical', ['name', 'age', 'alive']],
-                     ['astronauts']]]
+        expression = "\\rename_{nautical (name, age, alive)} astronauts;"
+        expected = [
+            ["\\rename", ["nautical", ["name", "age", "alive"]], ["astronauts"]]
+        ]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     # Exceptions
 
     def test_exp_basic(self):
-        expression = '\\rename;'
-        self.assertRaises(ParseException, self.parser.statements.parseString,
-                          expression)
+        expression = "\\rename;"
+        self.assertRaises(
+            ParseException, self.parser.statements.parseString, expression
+        )
 
     def test_exp_no_relation(self):
-        expression = '\\rename_{species};'
-        self.assertRaises(ParseException, self.parser.statements.parseString,
-                          expression)
+        expression = "\\rename_{species};"
+        self.assertRaises(
+            ParseException, self.parser.statements.parseString, expression
+        )
 
     def test_exp_no_attributes(self):
-        expression = '\\rename astronauts;'
-        self.assertRaises(ParseException, self.parser.statements.parseString,
-                          expression)
+        expression = "\\rename astronauts;"
+        self.assertRaises(
+            ParseException, self.parser.statements.parseString, expression
+        )
 
     def test_exp_empty_attribute_list(self):
-        expression = '\\rename_{} astronauts;'
-        self.assertRaises(ParseException, self.parser.statements.parseString,
-                          expression)
+        expression = "\\rename_{} astronauts;"
+        self.assertRaises(
+            ParseException, self.parser.statements.parseString, expression
+        )
 
     def test_exp_space_before_attributes(self):
-        expression = '\\rename _{species} astronauts;'
-        self.assertRaises(ParseException, self.parser.statements.parseString,
-                          expression)
+        expression = "\\rename _{species} astronauts;"
+        self.assertRaises(
+            ParseException, self.parser.statements.parseString, expression
+        )
 
     def test_exp_attribute_not_delim(self):
-        expression = '\\rename _{species age} astronauts;'
-        self.assertRaises(ParseException, self.parser.statements.parseString,
-                          expression)
+        expression = "\\rename _{species age} astronauts;"
+        self.assertRaises(
+            ParseException, self.parser.statements.parseString, expression
+        )
