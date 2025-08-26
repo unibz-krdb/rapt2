@@ -1,4 +1,3 @@
-from rapt.treebrd.attributes import AttributeList
 from ...treebrd.node import Operator
 from ..base_translator import BaseTranslator
 

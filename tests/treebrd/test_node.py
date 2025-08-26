@@ -1,4 +1,3 @@
-import logging
 from unittest import TestCase
 
 from rapt.treebrd.errors import RelationReferenceError

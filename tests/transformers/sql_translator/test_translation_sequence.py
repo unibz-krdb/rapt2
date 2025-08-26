@@ -214,7 +214,7 @@ class TestSet:
                     'SELECT g1, g2 FROM (SELECT gamma.g1, gamma.g2 FROM gamma '
                     '{operator} ALL '
                     'SELECT gammatwin.g1, gammatwin.g2 FROM gammatwin) AS _{name1}'
-                        .format(operator=self.sql_operator, name1=child_name, name2=root_name),
+                        .format(operator=self.sql_operator, name1=child_name, ),
 
                     'SELECT gammaprime.g1, gammaprime.g2 FROM gammaprime',
 

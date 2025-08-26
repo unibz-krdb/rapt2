@@ -1,4 +1,3 @@
-from unittest import skip
 from rapt.rapt import Rapt
 
 from rapt.transformers.qtree.constants import *
