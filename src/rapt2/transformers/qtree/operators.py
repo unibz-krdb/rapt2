@@ -1,5 +1,5 @@
 from .constants import *
-from rapt.treebrd.node import Operator
+from ...treebrd.node import Operator
 
 latex_operator = {
     Operator.select: SELECT_OP,

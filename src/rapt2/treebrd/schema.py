@@ -1,6 +1,6 @@
 import copy
 
-from rapt.treebrd.errors import RelationReferenceError
+from .errors import RelationReferenceError
 
 
 class Schema:
