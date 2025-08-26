@@ -1,4 +1,4 @@
-# RAPT
+# RAPTv2
 
 RAPT uses a syntactic and semantic understanding of RA to transform input
 statements into a variety of outputs, including LATEX formatted queries,
