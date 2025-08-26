@@ -1,5 +1,5 @@
 from unittest import TestCase
-from rapt.treebrd.grammars.syntax import Syntax
+from rapt2.treebrd.grammars.syntax import Syntax
 
 
 class TestSyntax(TestCase):

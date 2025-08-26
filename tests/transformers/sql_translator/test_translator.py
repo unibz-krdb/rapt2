@@ -3,7 +3,7 @@ from unittest import TestCase
 import functools
 import psycopg2
 
-from rapt import Rapt
+from rapt2 import Rapt
 
 
 class TestTranslator(TestCase):

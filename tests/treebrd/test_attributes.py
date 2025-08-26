@@ -1,5 +1,5 @@
 from unittest import TestCase
-from rapt.treebrd.attributes import Attribute, AttributeList
+from rapt2.treebrd.attributes import Attribute, AttributeList
 
 __author__ = "Noel"
 

@@ -2,17 +2,17 @@ from unittest import TestCase
 
 import functools
 
-from rapt.treebrd.errors import RelationReferenceError
-from rapt.treebrd.grammars import ExtendedGrammar
-from rapt.treebrd.node import (
+from rapt2.treebrd.errors import RelationReferenceError
+from rapt2.treebrd.grammars import ExtendedGrammar
+from rapt2.treebrd.node import (
     RelationNode,
     ProjectNode,
     CrossJoinNode,
     NaturalJoinNode,
     ThetaJoinNode,
 )
-from rapt.treebrd.schema import Schema
-from rapt.treebrd.treebrd import TreeBRD
+from rapt2.treebrd.schema import Schema
+from rapt2.treebrd.treebrd import TreeBRD
 
 
 class TreeBRDTestCase(TestCase):

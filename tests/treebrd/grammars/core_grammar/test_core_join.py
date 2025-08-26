@@ -1,6 +1,6 @@
 import unittest
 
-from rapt.treebrd.grammars.core_grammar import CoreGrammar
+from rapt2.treebrd.grammars.core_grammar import CoreGrammar
 
 
 class TestJoin(unittest.TestCase):

@@ -1,4 +1,4 @@
-from rapt.treebrd.node import (
+from rapt2.treebrd.node import (
     UnionNode,
     DifferenceNode,
     BinaryNode,
@@ -6,8 +6,8 @@ from rapt.treebrd.node import (
     CrossJoinNode,
     ThetaJoinNode,
 )
-from rapt.treebrd.errors import InputError, AttributeReferenceError
-from rapt.treebrd.node import Operator
+from rapt2.treebrd.errors import InputError, AttributeReferenceError
+from rapt2.treebrd.node import Operator
 from tests.treebrd.test_node import NodeTestCase
 
 

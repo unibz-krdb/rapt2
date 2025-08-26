@@ -1,6 +1,6 @@
 from pyparsing import ParseException
 
-from rapt.treebrd.grammars.core_grammar import CoreGrammar
+from rapt2.treebrd.grammars.core_grammar import CoreGrammar
 from tests.treebrd.grammars.grammar_test_case import GrammarTestCase
 
 

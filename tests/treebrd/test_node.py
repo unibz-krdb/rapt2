@@ -1,9 +1,9 @@
 from unittest import TestCase
 
-from rapt.treebrd.errors import RelationReferenceError
-from rapt.treebrd.node import Node, Operator, RelationNode
-from rapt.treebrd.attributes import AttributeList
-from rapt.treebrd.schema import Schema
+from rapt2.treebrd.errors import RelationReferenceError
+from rapt2.treebrd.node import Node, Operator, RelationNode
+from rapt2.treebrd.attributes import AttributeList
+from rapt2.treebrd.schema import Schema
 
 
 class NodeTestCase(TestCase):

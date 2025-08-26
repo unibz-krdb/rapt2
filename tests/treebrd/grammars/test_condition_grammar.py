@@ -1,6 +1,6 @@
 import unittest
 from pyparsing import ParseException
-from rapt.treebrd.grammars.condition_grammar import (
+from rapt2.treebrd.grammars.condition_grammar import (
     ConditionGrammar,
     get_attribute_references,
 )

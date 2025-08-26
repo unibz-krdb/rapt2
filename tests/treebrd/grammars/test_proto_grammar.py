@@ -1,6 +1,6 @@
 from pyparsing import ParseException, alphas, nums
 
-from rapt.treebrd.grammars.proto_grammar import ProtoGrammar
+from rapt2.treebrd.grammars.proto_grammar import ProtoGrammar
 from tests.treebrd.grammars.grammar_test_case import GrammarTestCase
 
 

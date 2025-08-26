@@ -1,5 +1,5 @@
-from rapt.treebrd.errors import AttributeReferenceError, InputError, InputReferenceError
-from rapt.treebrd.node import (
+from rapt2.treebrd.errors import AttributeReferenceError, InputError, InputReferenceError
+from rapt2.treebrd.node import (
     ProjectNode,
     RenameNode,
     SelectNode,
@@ -8,7 +8,7 @@ from rapt.treebrd.node import (
     AssignNode,
     Node,
 )
-from rapt.treebrd.attributes import AttributeList
+from rapt2.treebrd.attributes import AttributeList
 from tests.treebrd.test_node import NodeTestCase
 
 

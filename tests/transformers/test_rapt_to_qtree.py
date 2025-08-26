@@ -1,7 +1,7 @@
-from rapt.rapt import Rapt
+from rapt2.rapt import Rapt
 
-from rapt.transformers.qtree.constants import *
-from rapt.treebrd.grammars.extended_grammar import ExtendedGrammar
+from rapt2.transformers.qtree.constants import *
+from rapt2.treebrd.grammars.extended_grammar import ExtendedGrammar
 from tests.transformers.test_transfomer import TestTransformer
 
 

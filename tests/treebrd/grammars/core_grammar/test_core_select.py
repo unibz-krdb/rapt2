@@ -2,7 +2,7 @@ import unittest
 
 from pyparsing import ParseException
 
-from rapt.treebrd.grammars.core_grammar import CoreGrammar
+from rapt2.treebrd.grammars.core_grammar import CoreGrammar
 
 
 class TestSelect(unittest.TestCase):
