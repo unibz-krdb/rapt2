@@ -14,7 +14,7 @@ class Translator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        return '[.${}$ ]'.format(node.name)
+        return "[.${}$ ]".format(node.name)
 
     def select(self, node):
         """
@@ -23,9 +23,9 @@ class Translator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         child = self.translate(node.child)
-        return '[.${op}_{{{conditions}}}$ {child} ]'\
-            .format(op=latex_operator[node.operator],
-                    conditions=node.conditions, child=child)
+        return "[.${op}_{{{conditions}}}$ {child} ]".format(
+            op=latex_operator[node.operator], conditions=node.conditions, child=child
+        )
 
     def project(self, node):
         """
@@ -34,10 +34,11 @@ class Translator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         child = self.translate(node.child)
-        return '[.${op}_{{{attributes}}}$ {child} ]'\
-            .format(op=latex_operator[node.operator],
-                    attributes=', '.join(node.attributes.names),
-                    child=child)
+        return "[.${op}_{{{attributes}}}$ {child} ]".format(
+            op=latex_operator[node.operator],
+            attributes=", ".join(node.attributes.names),
+            child=child,
+        )
 
     def rename(self, node):
         """
@@ -46,13 +47,15 @@ class Translator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         child = self.translate(node.child)
-        attributes = ''
+        attributes = ""
         if node.attributes:
-            attributes = '({})'.format(', '.join(node.attributes.names))
-        return '[.${op}_{{{name}{attributes}}}$ {child} ]'\
-            .format(op=latex_operator[node.operator], name=node.name,
-                    attributes=attributes,
-                    child=child)
+            attributes = "({})".format(", ".join(node.attributes.names))
+        return "[.${op}_{{{name}{attributes}}}$ {child} ]".format(
+            op=latex_operator[node.operator],
+            name=node.name,
+            attributes=attributes,
+            child=child,
+        )
 
     def assign(self, node):
         """
@@ -61,11 +64,12 @@ class Translator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         child = self.translate(node.child)
-        attributes = ''
+        attributes = ""
         if node.attributes:
-            attributes = '({})'.format(','.join(node.attributes.names))
-        return '[.${name}{attributes}$ {child} ]'\
-            .format(name=node.name, attributes=attributes, child=child)
+            attributes = "({})".format(",".join(node.attributes.names))
+        return "[.${name}{attributes}$ {child} ]".format(
+            name=node.name, attributes=attributes, child=child
+        )
 
     def theta_join(self, node):
         """
@@ -73,11 +77,12 @@ class Translator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        return '[.${op}_{{{conditions}}}$ {left} {right} ]'\
-            .format(op=latex_operator[node.operator],
-                    conditions=node.conditions,
-                    left=self.translate(node.left),
-                    right=self.translate(node.right))
+        return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
+            op=latex_operator[node.operator],
+            conditions=node.conditions,
+            left=self.translate(node.left),
+            right=self.translate(node.right),
+        )
 
     def cross_join(self, node):
         """
@@ -125,10 +130,11 @@ class Translator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        return '[.${op}$ {left} {right} ]'\
-            .format(op=latex_operator[node.operator],
-                    left=self.translate(node.left),
-                    right=self.translate(node.right))
+        return "[.${op}$ {left} {right} ]".format(
+            op=latex_operator[node.operator],
+            left=self.translate(node.left),
+            right=self.translate(node.right),
+        )
 
 
 def translate(roots):
@@ -137,5 +143,4 @@ def translate(roots):
     :param root: a treebrd node
     :return:  a string representing a latex qtree rooted at root
     """
-    return ['\\Tree{root}'.format(root=Translator().translate(root))
-            for root in roots]
+    return ["\\Tree{root}".format(root=Translator().translate(root)) for root in roots]

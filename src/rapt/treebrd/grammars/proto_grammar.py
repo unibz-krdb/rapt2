@@ -1,5 +1,15 @@
-from pyparsing import (alphanums, Regex, Word, alphas, quotedString,
-                       removeQuotes, Combine, Optional, ParserElement, pyparsing_common)
+from pyparsing import (
+    alphanums,
+    Regex,
+    Word,
+    alphas,
+    quotedString,
+    removeQuotes,
+    Combine,
+    Optional,
+    ParserElement,
+    pyparsing_common,
+)
 
 ParserElement.enablePackrat()
 
@@ -25,14 +35,14 @@ class ProtoGrammar:
         """
         character ::= letter | digit | "_"
         """
-        return alphanums + '_'
+        return alphanums + "_"
 
     @property
     def number(self):
         """
         number ::= float | integer | natural_number
         """
-        return Regex(r'[-+]?[0-9]*\.?[0-9]+')
+        return Regex(r"[-+]?[0-9]*\.?[0-9]+")
 
     @property
     def string_literal(self):
@@ -43,14 +53,17 @@ class ProtoGrammar:
         post-parsed operations.
         """
         return quotedString.setParseAction(
-            lambda s, l, t: "'{string}'".format(string=removeQuotes(s, l, t)))
+            lambda s, l, t: "'{string}'".format(string=removeQuotes(s, l, t))
+        )
 
     @property
     def identifier(self):
         """
         identifier ::= letter | letter string
         """
-        return Word(alphas, self.character).setParseAction(pyparsing_common.downcaseTokens)
+        return Word(alphas, self.character).setParseAction(
+            pyparsing_common.downcaseTokens
+        )
 
     @property
     def relation_name(self):
@@ -72,5 +85,4 @@ class ProtoGrammar:
         attribute_reference ::= relation_name "." attribute_name |
         attribute_name
         """
-        return Combine((Optional(self.relation_name + '.') +
-                        self.attribute_name))
+        return Combine((Optional(self.relation_name + ".") + self.attribute_name))

@@ -39,8 +39,7 @@ class CoreGrammar(ConditionGrammar):
         attribute_reference_list ::= attribute_reference |
                                  attribute_list delim attribute_reference
         """
-        return delimitedList(self.attribute_reference,
-                             delim=self.syntax.delim)
+        return delimitedList(self.attribute_reference, delim=self.syntax.delim)
 
     @property
     def relation(self):
@@ -57,8 +56,7 @@ class CoreGrammar(ConditionGrammar):
         project_expr ::= project param_start attribute_list param_stop
             expression
         """
-        return self.parametrize(self.syntax.project_op,
-                                self.attribute_reference_list)
+        return self.parametrize(self.syntax.project_op, self.attribute_reference_list)
 
     @property
     def select(self):
@@ -77,8 +75,9 @@ class CoreGrammar(ConditionGrammar):
             paren_left attribute_list paren_right |
             relation_name paren_left attribute_list paren_right
         """
-        params = self.relation_name ^ (Optional(self.relation_name) +
-                                       self.parenthesize(self.attribute_list))
+        params = self.relation_name ^ (
+            Optional(self.relation_name) + self.parenthesize(self.attribute_list)
+        )
         return self.parametrize(self.syntax.rename_op, params)
 
     @property
@@ -135,10 +134,14 @@ class CoreGrammar(ConditionGrammar):
         combination of relations that uses the previously defined operators
         and follows precedence rules.
         """
-        return infixNotation(self.relation, [
-            (self.unary_op, 1, opAssoc.RIGHT),
-            (self.binary_op_p1, 2, opAssoc.LEFT),
-            (self.binary_op_p2, 2, opAssoc.LEFT)])
+        return infixNotation(
+            self.relation,
+            [
+                (self.unary_op, 1, opAssoc.RIGHT),
+                (self.binary_op_p1, 2, opAssoc.LEFT),
+                (self.binary_op_p2, 2, opAssoc.LEFT),
+            ],
+        )
 
     @property
     def assignment(self):
@@ -147,8 +150,9 @@ class CoreGrammar(ConditionGrammar):
             relation_name param_start attribute_list param_stop
             assign expression
         """
-        lhs = Group(self.relation_name +
-                    Optional(self.parenthesize(self.attribute_list)))
+        lhs = Group(
+            self.relation_name + Optional(self.parenthesize(self.attribute_list))
+        )
         return Group(lhs + Keyword(self.syntax.assign_op) + self.expression)
 
     @property
@@ -156,8 +160,7 @@ class CoreGrammar(ConditionGrammar):
         """
         A terminated relational algebra statement.
         """
-        return (self.assignment ^ self.expression) + Suppress(
-            self.syntax.terminator)
+        return (self.assignment ^ self.expression) + Suppress(self.syntax.terminator)
 
     @property
     def statements(self):
@@ -167,29 +170,38 @@ class CoreGrammar(ConditionGrammar):
         return OneOrMore(self.statement)
 
     def parenthesize(self, parser):
-        return (Suppress(self.syntax.paren_left) + Group(parser) +
-                Suppress(self.syntax.paren_right))
+        return (
+            Suppress(self.syntax.paren_left)
+            + Group(parser)
+            + Suppress(self.syntax.paren_right)
+        )
 
     def parameter(self, parser):
         """
         Return a parser the parses parameters.
         """
-        return (Suppress(self.syntax.params_start).leaveWhitespace() +
-                Group(parser) + Suppress(self.syntax.params_stop))
+        return (
+            Suppress(self.syntax.params_start).leaveWhitespace()
+            + Group(parser)
+            + Suppress(self.syntax.params_stop)
+        )
 
     def parametrize(self, operator, params):
         """
         Return a parser that parses an operator with parameters.
         """
-        return (CaselessKeyword(operator, identChars=alphanums) +
-                self.parameter(params))
+        return CaselessKeyword(operator, identChars=alphanums) + self.parameter(params)
 
     def is_unary(self, operator):
-        return operator in {self.syntax.select_op,
-                            self.syntax.project_op,
-                            self.syntax.rename_op}
+        return operator in {
+            self.syntax.select_op,
+            self.syntax.project_op,
+            self.syntax.rename_op,
+        }
 
     def is_binary(self, operator):
-        return operator in {self.syntax.difference_op,
-                            self.syntax.union_op,
-                            self.syntax.join_op}
+        return operator in {
+            self.syntax.difference_op,
+            self.syntax.union_op,
+            self.syntax.join_op,
+        }

@@ -28,8 +28,9 @@ class ExtendedGrammar(CoreGrammar):
         select_expr ::= select param_start conditions param_stop expression
         """
         long = self.parametrize(self.syntax.theta_join_op, self.conditions)
-        short = self.parametrize(self.syntax.join_op, self.conditions).\
-            setParseAction(self.theta_parse_action)
+        short = self.parametrize(self.syntax.join_op, self.conditions).setParseAction(
+            self.theta_parse_action
+        )
         return long ^ short
 
     def theta_parse_action(self, s, l, t):
@@ -49,19 +50,26 @@ class ExtendedGrammar(CoreGrammar):
 
     @property
     def expression(self):
-        return infixNotation(self.relation, [
-            (self.unary_op, 1, opAssoc.RIGHT),
-            (self.binary_op_p1, 2, opAssoc.LEFT),
-            (self.intersect, 2, opAssoc.LEFT),
-            (self.binary_op_p2, 2, opAssoc.LEFT)])
+        return infixNotation(
+            self.relation,
+            [
+                (self.unary_op, 1, opAssoc.RIGHT),
+                (self.binary_op_p1, 2, opAssoc.LEFT),
+                (self.intersect, 2, opAssoc.LEFT),
+                (self.binary_op_p2, 2, opAssoc.LEFT),
+            ],
+        )
 
     def is_unary(self, operator):
-        return operator in {self.syntax.select_op,
-                            self.syntax.project_op,
-                            self.syntax.rename_op}
+        return operator in {
+            self.syntax.select_op,
+            self.syntax.project_op,
+            self.syntax.rename_op,
+        }
 
     def is_binary(self, operator):
-        return (operator in {self.syntax.intersect_op,
-                             self.syntax.natural_join_op,
-                             self.syntax.theta_join_op} or
-                super().is_binary(operator))
+        return operator in {
+            self.syntax.intersect_op,
+            self.syntax.natural_join_op,
+            self.syntax.theta_join_op,
+        } or super().is_binary(operator)

@@ -1,8 +1,18 @@
 from .schema import Schema
 from .utility import flatten
-from .node import SelectNode, ProjectNode, RenameNode, \
-    AssignNode, CrossJoinNode, NaturalJoinNode, UnionNode, DifferenceNode, \
-    IntersectNode, ThetaJoinNode, RelationNode
+from .node import (
+    SelectNode,
+    ProjectNode,
+    RenameNode,
+    AssignNode,
+    CrossJoinNode,
+    NaturalJoinNode,
+    UnionNode,
+    DifferenceNode,
+    IntersectNode,
+    ThetaJoinNode,
+    RelationNode,
+)
 
 
 class TreeBRD:
@@ -41,14 +51,16 @@ class TreeBRD:
         # Unary operators.
         elif isinstance(exp[0], str) and self.grammar.is_unary(exp[0]):
             child = self.to_node(exp[2:], schema)
-            node = self.create_unary_node(operator=exp[0], child=child,
-                                          param=exp[1], schema=schema)
+            node = self.create_unary_node(
+                operator=exp[0], child=child, param=exp[1], schema=schema
+            )
 
         # Assignment.
         elif exp[1] is self.grammar.syntax.assign_op:
             child = self.to_node(exp[2:], schema)
-            node = self.create_unary_node(operator=exp[1], child=child,
-                                          param=exp[0], schema=schema)
+            node = self.create_unary_node(
+                operator=exp[1], child=child, param=exp[0], schema=schema
+            )
 
         # Binary operators.
         elif self.grammar.is_binary(exp[1]):
@@ -67,8 +79,9 @@ class TreeBRD:
             operator = exp[op_pos]
             left = self.to_node(exp[:op_pos], schema)
             right = self.to_node(exp[-1], schema)
-            node = self.create_binary_node(operator=operator, left=left,
-                                           right=right, param=param)
+            node = self.create_binary_node(
+                operator=operator, left=left, right=right, param=param
+            )
 
         else:
             raise ValueError
@@ -87,7 +100,7 @@ class TreeBRD:
         """
 
         if operator == self.grammar.syntax.select_op:
-            conditions = ' '.join(flatten(param))
+            conditions = " ".join(flatten(param))
             node = SelectNode(child, conditions)
 
         elif operator == self.grammar.syntax.project_op:
@@ -128,7 +141,7 @@ class TreeBRD:
             node = NaturalJoinNode(left, right)
 
         elif operator == self.grammar.syntax.theta_join_op:
-            conditions = ' '.join(flatten(param))
+            conditions = " ".join(flatten(param))
             node = ThetaJoinNode(left, right, conditions)
 
         # Set operators

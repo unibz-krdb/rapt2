@@ -4,7 +4,7 @@ import itertools
 from .errors import InputError, AttributeReferenceError
 
 
-class Attribute(namedtuple('Attribute', ['name', 'prefix'])):
+class Attribute(namedtuple("Attribute", ["name", "prefix"])):
     """
     An Attribute is a relational algebra attribute. Attributes have optional
     prefixes which reference the relation they belong to.
@@ -13,7 +13,7 @@ class Attribute(namedtuple('Attribute', ['name', 'prefix'])):
     @property
     def prefixed(self):
         if self.prefix:
-            return '{pr}.{nm}'.format(pr=self.prefix, nm=self.name)
+            return "{pr}.{nm}".format(pr=self.prefix, nm=self.name)
         else:
             return self.name
 
@@ -43,8 +43,8 @@ class AttributeList:
         """
         merged = AttributeList([], None)
 
-        assert (isinstance(first, AttributeList))
-        assert (isinstance(second, AttributeList))
+        assert isinstance(first, AttributeList)
+        assert isinstance(second, AttributeList)
         merged._contents = first._contents[:]
         merged._contents += second._contents[:]
 
@@ -65,7 +65,7 @@ class AttributeList:
         """
         Return a comma delimitted string of prefixed attribute names.
         """
-        return ', '.join(self.to_list())
+        return ", ".join(self.to_list())
 
     def __len__(self):
         return len(self._contents)
@@ -114,23 +114,21 @@ class AttributeList:
         Return the attribute that matches the reference. Raise an error if
         the attribute cannot be found, or if there is more then one match.
         """
-        prefix, _, name = reference.rpartition('.')
+        prefix, _, name = reference.rpartition(".")
 
         match = None
         for attribute in self._contents:
-            if name == attribute.name and \
-                    (not prefix or prefix == attribute.prefix):
+            if name == attribute.name and (not prefix or prefix == attribute.prefix):
                 if match:
                     raise AttributeReferenceError(
-                        'Ambiguous attribute reference: {}.'.format(
-                            attribute.name))
+                        "Ambiguous attribute reference: {}.".format(attribute.name)
+                    )
                 else:
                     match = attribute
 
         if match:
             return match
-        raise AttributeReferenceError(
-            'Attribute does not exist: {}'.format(reference))
+        raise AttributeReferenceError("Attribute does not exist: {}".format(reference))
 
     def extend(self, attributes, prefix):
         """
@@ -150,7 +148,7 @@ class AttributeList:
             replacement.append(self.get_attribute(reference))
 
         if self.has_duplicates(replacement):
-            raise AttributeReferenceError('Duplicate attribute reference.')
+            raise AttributeReferenceError("Duplicate attribute reference.")
         self._contents = replacement
 
     def rename(self, names, prefix):
@@ -163,15 +161,15 @@ class AttributeList:
         """
         if names:
             if len(names) != len(self._contents):
-                raise InputError('Attribute count mismatch.')
+                raise InputError("Attribute count mismatch.")
             if self.has_duplicates(names):
-                raise InputError('Attributes are ambiguous.')
+                raise InputError("Attributes are ambiguous.")
         else:
             # If the attributes are not renamed, but the relation / prefix is,
             # there is a risk of creating two or more attributes with the
             # same name and prefix.
             if prefix and self.has_duplicates(self.names):
-                raise AttributeReferenceError('Attributes are ambiguous.')
+                raise AttributeReferenceError("Attributes are ambiguous.")
 
         replacement = []
         for old, name in itertools.zip_longest(self._contents, names):

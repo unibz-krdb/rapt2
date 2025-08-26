@@ -6,8 +6,9 @@ class SQLQuery:
     """
     Structure defining the building blocks of a SQL query.
     """
-    def __init__(self, select_block, from_block, where_block=''):
-        self.prefix = ''
+
+    def __init__(self, select_block, from_block, where_block=""):
+        self.prefix = ""
         self.select_block = select_block
         self.from_block = from_block
         self.where_block = where_block
@@ -15,16 +16,15 @@ class SQLQuery:
     @property
     def _basic_query(self):
         if self.select_block:
-            return '{prefix}' \
-                   'SELECT {select} FROM {relation}'
+            return "{prefix}SELECT {select} FROM {relation}"
         else:
-            return '{prefix}{relation}'
+            return "{prefix}{relation}"
 
     @property
     def _sql_query_skeleton(self):
         sql = self._basic_query
         if self.where_block:
-            sql += ' WHERE {conditions}'
+            sql += " WHERE {conditions}"
         return sql
 
     def to_sql(self):
@@ -33,8 +33,11 @@ class SQLQuery:
         :return: a SQL query
         """
         return self._sql_query_skeleton.format(
-            prefix=self.prefix, select=self.select_block,
-            relation=self.from_block, conditions=self.where_block)
+            prefix=self.prefix,
+            select=self.select_block,
+            relation=self.from_block,
+            conditions=self.where_block,
+        )
 
 
 class SQLSetQuery(SQLQuery):
@@ -44,8 +47,7 @@ class SQLSetQuery(SQLQuery):
 
     @property
     def _basic_query(self):
-        return '{prefix}' \
-               'SELECT DISTINCT {select} FROM {relation}'
+        return "{prefix}SELECT DISTINCT {select} FROM {relation}"
 
 
 class Translator(BaseTranslator):
@@ -53,21 +55,22 @@ class Translator(BaseTranslator):
     A Translator defining the operations for translating a relational algebra
     statement into a SQL statement using bag semantics.
     """
+
     query = SQLQuery
 
     @classmethod
     def _get_temp_name(cls, node):
-        return node.name or '_{}'.format(id(node))
+        return node.name or "_{}".format(id(node))
 
     @classmethod
     def _get_sql_operator(cls, node):
         operators = {
-            Operator.union: 'UNION',
-            Operator.difference: 'EXCEPT',
-            Operator.intersect: 'INTERSECT',
-            Operator.cross_join: 'CROSS JOIN',
-            Operator.theta_join: 'JOIN',
-            Operator.natural_join: 'NATURAL JOIN',
+            Operator.union: "UNION",
+            Operator.difference: "EXCEPT",
+            Operator.intersect: "INTERSECT",
+            Operator.cross_join: "CROSS JOIN",
+            Operator.theta_join: "JOIN",
+            Operator.natural_join: "NATURAL JOIN",
         }
         return operators[node.operator]
 
@@ -77,8 +80,7 @@ class Translator(BaseTranslator):
         :param node: a treebrd node
         :return: a SQLQuery object for the tree rooted at node
         """
-        return self.query(select_block=str(node.attributes),
-                          from_block=node.name)
+        return self.query(select_block=str(node.attributes), from_block=node.name)
 
     def select(self, node):
         """
@@ -90,8 +92,9 @@ class Translator(BaseTranslator):
         child_object = self.translate(node.child)
         where_block = node.conditions
         if child_object.where_block:
-              where_block = '({0}) AND ({1})'\
-                  .format(child_object.where_block, node.conditions)
+            where_block = "({0}) AND ({1})".format(
+                child_object.where_block, node.conditions
+            )
         child_object.where_block = where_block
         if not child_object.select_block:
             child_object.select_block = str(node.attributes)
@@ -114,9 +117,11 @@ class Translator(BaseTranslator):
         :return: a SQLQuery object for the tree rooted at node
         """
         child_object = self.translate(node.child)
-        from_block = '({child}) AS {name}({attributes})'.format(
-            child=child_object.to_sql(), name=node.name,
-            attributes=', '.join(node.attributes.names))
+        from_block = "({child}) AS {name}({attributes})".format(
+            child=child_object.to_sql(),
+            name=node.name,
+            attributes=", ".join(node.attributes.names),
+        )
         return self.query(str(node.attributes), from_block=from_block)
 
     def assign(self, node):
@@ -126,8 +131,9 @@ class Translator(BaseTranslator):
         :return: a SQLQuery object for the tree rooted at node
         """
         child_object = self.translate(node.child)
-        child_object.prefix = 'CREATE TEMPORARY TABLE {name}({attributes}) AS '\
-            .format(name=node.name, attributes=', '.join(node.attributes.names))
+        child_object.prefix = "CREATE TEMPORARY TABLE {name}({attributes}) AS ".format(
+            name=node.name, attributes=", ".join(node.attributes.names)
+        )
         return child_object
 
     def natural_join(self, node):
@@ -179,14 +185,17 @@ class Translator(BaseTranslator):
         return self._set_op(node)
 
     def _join_helper(self, node):
-            sobject = self.translate(node)
-            if node.operator in {
-                Operator.cross_join, Operator.natural_join, Operator.theta_join
-            }:
-                return sobject.from_block
-            else:
-                return '({subquery}) AS {name}'.format(
-                    subquery=sobject.to_sql(), name=self._get_temp_name(node))
+        sobject = self.translate(node)
+        if node.operator in {
+            Operator.cross_join,
+            Operator.natural_join,
+            Operator.theta_join,
+        }:
+            return sobject.from_block
+        else:
+            return "({subquery}) AS {name}".format(
+                subquery=sobject.to_sql(), name=self._get_temp_name(node)
+            )
 
     def _join(self, node):
         """
@@ -196,17 +205,18 @@ class Translator(BaseTranslator):
         """
 
         select_block = str(node.attributes)
-        from_block = '{left} {operator} {right}'.format(
+        from_block = "{left} {operator} {right}".format(
             left=self._join_helper(node.left),
             right=self._join_helper(node.right),
-            operator=self._get_sql_operator(node))
+            operator=self._get_sql_operator(node),
+        )
 
         if node.operator == Operator.theta_join:
-            from_block = '{from_block} ON {conditions}'.format(
-                from_block=from_block,
-                conditions=node.conditions)
+            from_block = "{from_block} ON {conditions}".format(
+                from_block=from_block, conditions=node.conditions
+            )
 
-        return self.query(select_block, from_block, '')
+        return self.query(select_block, from_block, "")
 
     def _set_op(self, node):
         """
@@ -215,10 +225,12 @@ class Translator(BaseTranslator):
         :return: a SQLQuery object for the tree rooted at node
         """
         select_block = str(node.attributes)
-        from_block = '({left} {operator} ALL {right}) AS {name}'.format(
+        from_block = "({left} {operator} ALL {right}) AS {name}".format(
             left=self.translate(node.left).to_sql(),
             right=self.translate(node.right).to_sql(),
-            operator=self._get_sql_operator(node), name=self._get_temp_name(node))
+            operator=self._get_sql_operator(node),
+            name=self._get_temp_name(node),
+        )
         return self.query(select_block=select_block, from_block=from_block)
 
 
@@ -227,6 +239,7 @@ class SetTranslator(Translator):
     A Translator defining the operations for translating a relational algebra
     statement into a SQL statement using set semantics.
     """
+
     query = SQLSetQuery
 
     def _set_op(self, node):
@@ -236,10 +249,12 @@ class SetTranslator(Translator):
         :return: a SQLSetQuery object for the tree rooted at node
         """
         select_block = str(node.attributes)
-        from_block = '({left} {operator} {right}) AS {name}'.format(
+        from_block = "({left} {operator} {right}) AS {name}".format(
             left=self.translate(node.left).to_sql(),
             right=self.translate(node.right).to_sql(),
-            operator=self._get_sql_operator(node), name=self._get_temp_name(node))
+            operator=self._get_sql_operator(node),
+            name=self._get_temp_name(node),
+        )
         return self.query(select_block=select_block, from_block=from_block)
 
 
@@ -251,5 +266,5 @@ def translate(root_list, use_bag_semantics=False):
     :param use_bag_semantics: flag for using relational algebra bag semantics
     :return: a list of SQL statements
     """
-    translator = (Translator() if use_bag_semantics else SetTranslator())
+    translator = Translator() if use_bag_semantics else SetTranslator()
     return [translator.translate(root).to_sql() for root in root_list]

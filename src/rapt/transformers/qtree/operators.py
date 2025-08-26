@@ -11,5 +11,5 @@ latex_operator = {
     Operator.theta_join: THETA_JOIN_OP,
     Operator.union: UNION_OP,
     Operator.difference: DIFFERENCE_OP,
-    Operator.intersect: INTERSECT_OP
+    Operator.intersect: INTERSECT_OP,
 }

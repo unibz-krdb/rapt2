@@ -8,8 +8,8 @@ from .transformers.qtree import qtree_translator
 class Rapt:
     @staticmethod
     def configure_grammar(**config):
-        syntax = Syntax(**config.get('syntax', {}))
-        grammar_class_name = config.get('grammar', 'Core Grammar')
+        syntax = Syntax(**config.get("syntax", {}))
+        grammar_class_name = config.get("grammar", "Core Grammar")
         grammar_class = GRAMMARS.get(grammar_class_name, CoreGrammar)
         return grammar_class(syntax)
 

@@ -34,13 +34,17 @@ class ConditionGrammar(ProtoGrammar):
 
     @property
     def comparator_op(self):
-        return oneOf([self.syntax.equal_op,
-                      self.syntax.not_equal_op,
-                      self.syntax.not_equal_alt_op,
-                      self.syntax.less_than_op,
-                      self.syntax.less_than_equal_op,
-                      self.syntax.greater_than_op,
-                      self.syntax.greater_than_equal_op])
+        return oneOf(
+            [
+                self.syntax.equal_op,
+                self.syntax.not_equal_op,
+                self.syntax.not_equal_alt_op,
+                self.syntax.less_than_op,
+                self.syntax.less_than_equal_op,
+                self.syntax.greater_than_op,
+                self.syntax.greater_than_equal_op,
+            ]
+        )
 
     @property
     def not_op(self):
@@ -51,17 +55,18 @@ class ConditionGrammar(ProtoGrammar):
         """
         logical_binary_op ::=  and_op | or_op
         """
-        return (CaselessKeyword(self.syntax.and_op) |
-                CaselessKeyword(self.syntax.or_op))
+        return CaselessKeyword(self.syntax.and_op) | CaselessKeyword(self.syntax.or_op)
 
     @property
     def operand(self):
         """
         operand ::= identifier | string_literal | number
         """
-        return (self.attribute_reference('attribute_reference*') |
-                self.string_literal |
-                self.number)
+        return (
+            self.attribute_reference("attribute_reference*")
+            | self.string_literal
+            | self.number
+        )
 
     @property
     def condition(self):
@@ -81,7 +86,10 @@ class ConditionGrammar(ProtoGrammar):
         """
         return infixNotation(
             base_expr=self.condition,
-            op_list=[(self.not_op, 1, opAssoc.RIGHT),
-                     (self.logical_binary_op, 2, opAssoc.LEFT)],
+            op_list=[
+                (self.not_op, 1, opAssoc.RIGHT),
+                (self.logical_binary_op, 2, opAssoc.LEFT),
+            ],
             lpar=self.syntax.paren_left,
-            rpar=self.syntax.paren_right)
+            rpar=self.syntax.paren_right,
+        )

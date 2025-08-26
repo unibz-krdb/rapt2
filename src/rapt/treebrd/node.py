@@ -122,7 +122,8 @@ class RenameNode(UnaryNode):
         super().__init__(Operator.rename, child, name)
         if schema.contains(name):
             raise RelationReferenceError(
-                'Relation \'{name}\' already exists.'.format(name=name))
+                "Relation '{name}' already exists.".format(name=name)
+            )
         self.attributes.rename(attributes, self.name)
 
 
@@ -140,10 +141,10 @@ class AssignNode(UnaryNode):
         :param child: The child of this Node.
         """
         if not name:
-            raise InputError('Name is required for assignment.')
+            raise InputError("Name is required for assignment.")
 
         if attributes and len(attributes) != len(child.attributes):
-            raise InputError('Assignment requires naming all attributes.')
+            raise InputError("Assignment requires naming all attributes.")
 
         super().__init__(Operator.assign, child, name)
         self.attributes.rename(attributes, name)
@@ -161,9 +162,11 @@ class BinaryNode(Node):
         self.right = right
 
     def __eq__(self, other):
-        return (super().__eq__(other)
-                and self.left.__eq__(other.left)
-                and self.right.__eq__(other.right))
+        return (
+            super().__eq__(other)
+            and self.left.__eq__(other.left)
+            and self.right.__eq__(other.right)
+        )
 
     def post_order(self):
         return self.left.post_order() + self.right.post_order() + [self]
@@ -176,7 +179,7 @@ class JoinNode(BinaryNode):
 
     def __init__(self, operator, left, right):
         if left.name and right.name and left.name == right.name:
-            raise RelationReferenceError('Ambiguous relation reference.')
+            raise RelationReferenceError("Ambiguous relation reference.")
         super().__init__(operator, left, right, None)
         self.attributes = AttributeList.merge(left.attributes, right.attributes)
 
@@ -197,12 +200,13 @@ class NaturalJoinNode(JoinNode):
 
     def __init__(self, left, right):
         super().__init__(Operator.natural_join, left, right)
-        left_attributes = [attribute.prefixed
-                           for attribute in self.left.attributes]
+        left_attributes = [attribute.prefixed for attribute in self.left.attributes]
         left_names = self.left.attributes.names
-        right_attributes = [attribute.prefixed
-                            for attribute in self.right.attributes
-                            if attribute.name not in left_names]
+        right_attributes = [
+            attribute.prefixed
+            for attribute in self.right.attributes
+            if attribute.name not in left_names
+        ]
         self.attributes.trim(left_attributes + right_attributes)
 
 
@@ -230,8 +234,7 @@ class SetOperatorNode(BinaryNode):
 
         names = left.attributes.names
         if not names == right.attributes.names:
-            raise InputError(
-                'Set operations require identical relation schemas.')
+            raise InputError("Set operations require identical relation schemas.")
 
         self.attributes = AttributeList(names, None)
 
@@ -267,6 +270,7 @@ class Operator(Enum):
     """
     A type of relational algebra operation.
     """
+
     # Basic operations
     relation = 1
     assign = 2

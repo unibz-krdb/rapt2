@@ -48,7 +48,8 @@ class Schema:
         attributes = self._data.get(name, None)
         if not attributes:
             raise RelationReferenceError(
-                'Relation \'{name}\' does not exist.'.format(name=name))
+                "Relation '{name}' does not exist.".format(name=name)
+            )
         return attributes[:]
 
     def add(self, name, attributes):
@@ -60,5 +61,6 @@ class Schema:
         """
         if name in self._data:
             raise RelationReferenceError(
-                'Relation \'{name}\' already exists.'.format(name=name))
+                "Relation '{name}' already exists.".format(name=name)
+            )
         self._data[name] = attributes[:]
