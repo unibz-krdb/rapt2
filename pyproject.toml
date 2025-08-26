@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "rapt2"
-version = "0.1.0"
+version = "0.1.1"
 description = "Relational algebra parsing tools"
 authors = [
     { name = "Aidan Bailey" }
@@ -26,12 +26,5 @@ dev = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["rapt2"]
+packages = ["src/rapt2"]
 
-[tool.hatch.build.sources]
-rapt2 = "src"
-
-[tool.pytest.ini_options]
-pythonpath = [
-    "src",
-]
