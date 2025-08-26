@@ -1,8 +1,5 @@
 import unittest
 
-__author__ = 'Noel'
-
-
 class GrammarTestCase(unittest.TestCase):
     @staticmethod
     def parse_function(parser):
