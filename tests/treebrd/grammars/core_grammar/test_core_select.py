@@ -35,7 +35,7 @@ class TestSelect(unittest.TestCase):
 
     def test_condition_not(self):
         expression = "\\select_{not(age < 42)} astronauts;"
-        expected = [["\\select", [["not", "(", "age", "<", "42", ")"]], ["astronauts"]]]
+        expected = [["\\select", [["not", "age", "<", "42"]], ["astronauts"]]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 

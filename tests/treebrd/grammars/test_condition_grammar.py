@@ -81,13 +81,13 @@ class TestConditionRules(GrammarTestCase):
 
     def test_conditions_par(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = ["(", "2", ">", "7", ")"]
+        expected = ["2", ">", "7"]
         actual = parse("(2 > 7)")
         self.assertEqual(actual, expected)
 
     def test_conditions_not(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [["not", "(", "2", ">", "7", ")"]]
+        expected = [["not", "2", ">", "7"]]
         actual = parse("not (2 > 7)")
         self.assertEqual(actual, expected)
 
@@ -99,13 +99,13 @@ class TestConditionRules(GrammarTestCase):
 
     def test_conditions_and_par(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [["(", "2", ">", "7", ")", "and", "(", "3", "<>", "3", ")"]]
+        expected = [["2", ">", "7", "and", "3", "<>", "3"]]
         actual = parse("(2 > 7) and (3 <> 3)")
         self.assertEqual(actual, expected)
 
     def test_conditions_or(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [["(", "2", ">", "7", ")", "or", "(", "3", "<>", "3", ")"]]
+        expected = [["2", ">", "7", "or", "3", "<>", "3"]]
         actual = parse("(2 > 7) or (3 <> 3)")
         self.assertEqual(actual, expected)
 
@@ -117,7 +117,7 @@ class TestConditionRules(GrammarTestCase):
 
     def test_conditions_unary_binary_simple_forced(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [["not", "(", ["2", ">", "7", "and", "3", "<>", "3"], ")"]]
+        expected = [["not", ["2", ">", "7", "and", "3", "<>", "3"]]]
         actual = parse("not (2 > 7 and 3 <> 3)")
         self.assertEqual(actual, expected)
 

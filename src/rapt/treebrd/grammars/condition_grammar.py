@@ -1,4 +1,5 @@
 from pyparsing import oneOf, CaselessKeyword, infixNotation, opAssoc, Literal
+from pyparsing.helpers import infix_notation
 
 from .proto_grammar import ProtoGrammar
 from .syntax import Syntax
@@ -84,12 +85,12 @@ class ConditionGrammar(ProtoGrammar):
         conditions ::= condition | condition logical_binary_op conditions
         Note: By default lpar and rpar arguments are suppressed.
         """
-        return infixNotation(
+        return infix_notation(
             base_expr=self.condition,
             op_list=[
                 (self.not_op, 1, opAssoc.RIGHT),
                 (self.logical_binary_op, 2, opAssoc.LEFT),
             ],
-            lpar=Literal(self.syntax.paren_left),
-            rpar=Literal(self.syntax.paren_right),
+            lpar=self.syntax.paren_left,
+            rpar=self.syntax.paren_right,
         )

@@ -789,7 +789,7 @@ class TestNaturalJoin(TestTranslator):
         self.assertCountEqual(set(expected), set(self.query_list(translation)))
 
     def test_join_prime_extra_set(self):
-        instring = "alpha \\natural_join alpha_prime\\natural_join alpha_prime_extra;"
+        instring = "alpha \\natural_join alpha_prime \\natural_join alpha_prime_extra;"
         translation = self.translate_set(instring)
         expected = [("2", "b", "?", "this")]
         self.assertCountEqual(expected, self.query_list(translation))
