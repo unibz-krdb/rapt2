@@ -2,6 +2,7 @@ from pyparsing import (
     CaselessKeyword,
     infixNotation,
     opAssoc,
+    Literal,
 )
 
 from .core_grammar import CoreGrammar
@@ -58,6 +59,8 @@ class ExtendedGrammar(CoreGrammar):
                 (self.intersect, 2, opAssoc.LEFT),
                 (self.binary_op_p2, 2, opAssoc.LEFT),
             ],
+            lpar=Literal(self.syntax.paren_left),
+            rpar=Literal(self.syntax.paren_right),
         )
 
     def is_unary(self, operator):

@@ -1,4 +1,4 @@
-from pyparsing import oneOf, CaselessKeyword, infixNotation, opAssoc
+from pyparsing import oneOf, CaselessKeyword, infixNotation, opAssoc, Literal
 
 from .proto_grammar import ProtoGrammar
 from .syntax import Syntax
@@ -90,6 +90,6 @@ class ConditionGrammar(ProtoGrammar):
                 (self.not_op, 1, opAssoc.RIGHT),
                 (self.logical_binary_op, 2, opAssoc.LEFT),
             ],
-            lpar=self.syntax.paren_left,
-            rpar=self.syntax.paren_right,
+            lpar=Literal(self.syntax.paren_left),
+            rpar=Literal(self.syntax.paren_right),
         )

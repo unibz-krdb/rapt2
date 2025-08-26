@@ -9,6 +9,7 @@ from pyparsing import (
     Suppress,
     OneOrMore,
     alphanums,
+    Literal,
 )
 
 from .condition_grammar import ConditionGrammar
@@ -141,6 +142,8 @@ class CoreGrammar(ConditionGrammar):
                 (self.binary_op_p1, 2, opAssoc.LEFT),
                 (self.binary_op_p2, 2, opAssoc.LEFT),
             ],
+            lpar=Literal(self.syntax.paren_left),
+            rpar=Literal(self.syntax.paren_right),
         )
 
     @property
