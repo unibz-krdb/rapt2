@@ -1,12 +1,21 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "rapt"
 version = "0.1.0"
 description = "Relational algebra parsing tools"
+authors = [
+    { name = "Aidan Bailey" }
+]
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pyparsing>=3.2.3",
 ]
+license = { file = "LICENSE.txt" }
+keywords = ["relational-algebra", "parser", "database", "query"]
 
 [dependency-groups]
 dev = [
