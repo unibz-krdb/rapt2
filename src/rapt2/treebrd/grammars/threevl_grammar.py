@@ -1,8 +1,8 @@
 from pyparsing import CaselessKeyword, Keyword, Literal, one_of
-from .core_grammar import CoreGrammar
+from .extended_grammar import ExtendedGrammar
 
 
-class ThreeVLGrammar(CoreGrammar):
+class ThreeVLGrammar(ExtendedGrammar):
     """
     A parser that recognizes a three-valued logic relational algebra grammar.
 
@@ -12,7 +12,7 @@ class ThreeVLGrammar(CoreGrammar):
 
     @property
     def defined_op(self):
-        return self.syntax.defined_op
+        return CaselessKeyword(self.syntax.defined_op)
 
     @property
     def defined_condition(self):
@@ -20,8 +20,15 @@ class ThreeVLGrammar(CoreGrammar):
         defined_condition ::= defined_op "(" identifier ")"
         """
         return (
-            Keyword(self.defined_op)
+            self.defined_op
             + Literal(self.syntax.paren_left).suppress()
             + self.attribute_reference("attribute_reference*")
             + Literal(self.syntax.paren_right).suppress()
         )
+
+    @property
+    def condition(self):
+        """
+        condition ::= condition | defined_condition
+        """
+        return super().condition | self.defined_condition
