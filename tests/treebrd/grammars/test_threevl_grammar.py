@@ -41,36 +41,36 @@ class TestThreeVLGrammarRules(GrammarTestCase):
 
     def test_conditions_and(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [["defined", "apple", "and", "defined", "pair"]]
-        actual = parse("defined(apple) and defined(pair)")
+        expected = [["defined", "apple", "and", "defined", "pear"]]
+        actual = parse("defined(apple) and defined(pear)")
         self.assertEqual(actual, expected)
 
     def test_conditions_and_par(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [["defined", "apple", "and", "defined", "pair"]]
-        actual = parse("(defined(apple)) and (defined(pair))")
+        expected = [["defined", "apple", "and", "defined", "pear"]]
+        actual = parse("(defined(apple)) and (defined(pear))")
         self.assertEqual(actual, expected)
 
     def test_conditions_or(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [["defined", "apple", "or", "defined", "pair"]]
-        actual = parse("(defined(apple)) or (defined(pair))")
+        expected = [["defined", "apple", "or", "defined", "pear"]]
+        actual = parse("(defined(apple)) or (defined(pear))")
         self.assertEqual(actual, expected)
 
     def test_conditions_unary_binary_simple(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [[["not", "defined", "apple"], "and", "defined", "pair"]]
-        actual = parse("not defined(apple) and defined(pair)")
+        expected = [[["not", "defined", "apple"], "and", "defined", "pear"]]
+        actual = parse("not defined(apple) and defined(pear)")
         self.assertEqual(actual, expected)
 
     def test_conditions_unary_binary_simple_forced(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [["not", ["defined", "apple", "and", "defined", "pair"]]]
-        actual = parse("not (defined(apple) and defined(pair))")
+        expected = [["not", ["defined", "apple", "and", "defined", "pear"]]]
+        actual = parse("not (defined(apple) and defined(pear))")
         self.assertEqual(actual, expected)
 
     def test_conditions_binary_unary_simple(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [["defined", "pair", "or", ["not", "defined", "apple"]]]
-        actual = parse("defined(pair) or not defined(apple)")
+        expected = [["defined", "pear", "or", ["not", "defined", "apple"]]]
+        actual = parse("defined(pear) or not defined(apple)")
         self.assertEqual(expected, actual)
