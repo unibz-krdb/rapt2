@@ -20,7 +20,6 @@ class TestThreeVLGrammarRules(GrammarTestCase):
         parse = self.parse_function(self.parser.defined_condition)
         self.assertRaises(ParseException, parse, "defined (")
         self.assertRaises(ParseException, parse, "defined ( )")
-        self.assertRaises(ParseException, parse, "defined ( 1 )")
 
     def test_conditions_single(self):
         parse = self.parse_function(self.parser.conditions)

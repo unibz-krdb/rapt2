@@ -5,6 +5,6 @@
 
 defined_op ::= "defined"
 
-defined_condition ::= defined_op "(" identifier ")"
+defined_condition ::= defined_op "(" operand ")"
 
 condition ::= condition | defined_condition

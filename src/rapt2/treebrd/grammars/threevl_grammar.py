@@ -17,12 +17,12 @@ class ThreeVLGrammar(ExtendedGrammar):
     @property
     def defined_condition(self):
         """
-        defined_condition ::= defined_op "(" identifier ")"
+        defined_condition ::= defined_op "(" operand ")"
         """
         return (
             self.defined_op
             + Literal(self.syntax.paren_left).suppress()
-            + self.attribute_reference("attribute_reference*")
+            + self.operand
             + Literal(self.syntax.paren_right).suppress()
         )
 
