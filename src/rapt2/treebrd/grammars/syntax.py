@@ -36,6 +36,9 @@ class Syntax:
         self.union_op = "\\union"
         self.intersect_op = "\\intersect"
 
+        # Defined operator.
+        self.defined_op = "defined"
+
         # Now set any user defined syntax.
         for key in kwargs:
             if hasattr(self, key):
