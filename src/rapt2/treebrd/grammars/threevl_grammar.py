@@ -1,4 +1,4 @@
-from pyparsing import CaselessKeyword, Keyword, Literal, one_of
+from pyparsing import CaselessKeyword, Keyword, Literal, one_of, Group
 from .extended_grammar import ExtendedGrammar
 
 
@@ -19,12 +19,10 @@ class ThreeVLGrammar(ExtendedGrammar):
         """
         defined_condition ::= defined_op "(" operand ")"
         """
-        return (
-            self.defined_op
+        return (self.defined_op
             + Literal(self.syntax.paren_left).suppress()
             + self.operand
-            + Literal(self.syntax.paren_right).suppress()
-        )
+            + Literal(self.syntax.paren_right).suppress())
 
     @property
     def condition(self):
