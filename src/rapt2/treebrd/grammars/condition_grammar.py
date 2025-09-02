@@ -1,4 +1,4 @@
-from pyparsing import oneOf, CaselessKeyword, infixNotation, opAssoc, Literal
+from pyparsing import oneOf, CaselessKeyword, infixNotation, opAssoc, Literal, Group
 from pyparsing.helpers import infix_notation
 
 from .proto_grammar import ProtoGrammar
@@ -77,7 +77,7 @@ class ConditionGrammar(ProtoGrammar):
         not_op and grouping rules are defined using infixNotation in
         conditions.
         """
-        return self.operand + self.comparator_op + self.operand
+        return Group(self.operand + self.comparator_op + self.operand)
 
     @property
     def conditions(self):
