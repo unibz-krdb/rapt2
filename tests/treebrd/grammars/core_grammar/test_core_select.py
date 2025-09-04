@@ -11,31 +11,31 @@ class TestSelect(unittest.TestCase):
 
     def test_single_condition(self):
         expression = "\\select_{age < 42} astronauts;"
-        expected = [["\\select", ["age", "<", "42"], ["astronauts"]]]
+        expected = [["\\select", [["age", "<", "42"]], ["astronauts"]]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_single_condition_reversed(self):
         expression = "\\select_{42 < age} astronauts;"
-        expected = [["\\select", ["42", "<", "age"], ["astronauts"]]]
+        expected = [["\\select", [["42", "<", "age"]], ["astronauts"]]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_single_condition_spacing(self):
         expression = "\\select_{age<42} astronauts;"
-        expected = [["\\select", ["age", "<", "42"], ["astronauts"]]]
+        expected = [["\\select", [["age", "<", "42"]], ["astronauts"]]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_single_condition_literal(self):
         expression = "\\select_{name = 'Douglas'} astronauts;"
-        expected = [["\\select", ["name", "=", "'Douglas'"], ["astronauts"]]]
+        expected = [["\\select", [["name", "=", "'Douglas'"]], ["astronauts"]]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
     def test_condition_not(self):
         expression = "\\select_{not(age < 42)} astronauts;"
-        expected = [["\\select", [["not", "age", "<", "42"]], ["astronauts"]]]
+        expected = [["\\select", [["not", ["age", "<", "42"]]], ["astronauts"]]]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)
 
@@ -44,7 +44,7 @@ class TestSelect(unittest.TestCase):
         expected = [
             [
                 "\\select",
-                [["age", "<", "42", "and", "flights", ">", "1"]],
+                [[["age", "<", "42"], "and", ["flights", ">", "1"]]],
                 ["astronauts"],
             ]
         ]
@@ -54,7 +54,7 @@ class TestSelect(unittest.TestCase):
     def test_two_conditions_or(self):
         expression = "\\select_{age < 42 or name = 5} astronauts;"
         expected = [
-            ["\\select", [["age", "<", "42", "or", "name", "=", "5"]], ["astronauts"]]
+            ["\\select", [[["age", "<", "42"], "or", ["name", "=", "5"]]], ["astronauts"]]
         ]
         actual = self.parser.statements.parseString(expression).asList()
         self.assertEqual(expected, actual)

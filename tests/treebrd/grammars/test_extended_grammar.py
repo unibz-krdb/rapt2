@@ -133,7 +133,7 @@ class TestThetaJoin(GrammarTestCase):
 
     def test_simple(self):
         expression = "zeppelin \\join_{year < 1975} floyd;"
-        expected = [[["zeppelin"], "\\theta_join", ["year", "<", "1975"], ["floyd"]]]
+        expected = [[["zeppelin"], "\\theta_join", [["year", "<", "1975"]], ["floyd"]]]
         actual = self.parse(expression)
         self.assertEqual(expected, actual)
 
@@ -143,10 +143,10 @@ class TestThetaJoin(GrammarTestCase):
             [
                 ["zeppelin"],
                 "\\theta_join",
-                ["year", "<", "1975"],
+                [["year", "<", "1975"]],
                 ["floyd"],
                 "\\theta_join",
-                ["year", "<", "1960"],
+                [["year", "<", "1960"]],
                 ["doors"],
             ]
         ]
@@ -159,7 +159,7 @@ class TestThetaJoin(GrammarTestCase):
             [
                 ["zeppelin"],
                 "\\theta_join",
-                ["year", "<", "1975"],
+                [["year", "<", "1975"]],
                 ["floyd"],
                 "\\join",
                 ["doors"],
@@ -174,7 +174,7 @@ class TestThetaJoin(GrammarTestCase):
             [
                 ["zeppelin"],
                 "\\union",
-                [["floyd"], "\\theta_join", ["year", "<", "1975"], ["doors"]],
+                [["floyd"], "\\theta_join", [["year", "<", "1975"]], ["doors"]],
             ]
         ]
         actual = self.parse(expression)
@@ -188,7 +188,7 @@ class TestThetaJoin(GrammarTestCase):
             [
                 ["\\project", ["albums"], ["zeppelin"]],
                 "\\theta_join",
-                ["year", "<", "1975"],
+                [["year", "<", "1975"]],
                 ["\\project", ["albums"], ["floyd"]],
             ]
         ]
