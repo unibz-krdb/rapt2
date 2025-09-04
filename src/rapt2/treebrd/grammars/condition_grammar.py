@@ -16,7 +16,17 @@ def get_attribute_references(instring):
     """
     parsed = ConditionGrammar().conditions.parseString(instring)
     result = parsed if isinstance(parsed[0], str) else parsed[0]
-    return result.attribute_reference.asList() if result.attribute_reference else []
+    
+    attribute_refs = []
+    def collect_attributes(item):
+        if hasattr(item, 'attribute_reference') and item.attribute_reference:
+            attribute_refs.extend(item.attribute_reference.asList())
+        if hasattr(item, '__iter__') and not isinstance(item, str):
+            for subitem in item:
+                collect_attributes(subitem)
+    
+    collect_attributes(result)
+    return attribute_refs
 
 
 class ConditionGrammar(ProtoGrammar):
