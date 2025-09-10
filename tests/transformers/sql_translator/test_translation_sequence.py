@@ -65,7 +65,7 @@ class TestSelect(TestSQLSequence):
                 "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
                 "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE ((a2 = 2) OR (a2 = 1))",
                 "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha "
-                "WHERE ((a2 = 2) OR (a2 = 1)) AND ((a1 = 2) OR (a1 = 1))",
+                "WHERE (((a2 = 2) OR (a2 = 1))) AND (((a1 = 2) OR (a1 = 1)))",
             ]
         ]
         actual = self.translate(ra)
@@ -217,7 +217,7 @@ class TestThetaJoin(TestSQLSequence):
                 "(SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
                 "JOIN "
                 "(SELECT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
-                "ON a1 = b1",
+                "ON (a1 = b1)",
             ]
         ]
         actual = self.translate(ra)
