@@ -167,5 +167,5 @@ class BinaryConditionNode(ConditionNode):
 
     def attribute_references(self) -> list[str]:
         return list(
-            set(self.left.attribute_references() + self.right.attribute_references())
+            self.left.attribute_references() + self.right.attribute_references()
         )
