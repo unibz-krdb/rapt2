@@ -1,3 +1,5 @@
+from pyparsing import ParseResults
+from rapt2.treebrd.condition_node import IdentityConditionNode, BinaryConditionNode, BinaryConditionalOperator, ConditionNode, UnaryConditionNode, UnaryConditionalOperator
 from .schema import Schema
 from .utility import flatten
 from .node import (
@@ -13,7 +15,7 @@ from .node import (
     ThetaJoinNode,
     RelationNode,
 )
-
+from .grammars.proto_grammar import ProtoGrammar
 
 class TreeBRD:
     """
@@ -21,15 +23,17 @@ class TreeBRD:
     that builds forests of relational algebra syntax trees. STARBuilder
     """
 
-    def __init__(self, grammar):
+    grammar: ProtoGrammar
+
+    def __init__(self, grammar: ProtoGrammar):
         self.grammar = grammar
 
     def build(self, instring, schema):
-        ra = self.grammar.parse(instring).asList()
+        ra = self.grammar.parse(instring)
         _schema = Schema(schema)
         return [self.to_node(statement, _schema) for statement in ra[:]]
 
-    def to_node(self, exp, schema):
+    def to_node(self, exp: ParseResults, schema):
         """
         Return a Node that is the root of the parse tree for the the specified
         expression.
@@ -40,12 +44,14 @@ class TreeBRD:
         for verification and generating attributes.
         :return: A Node.
         """
+
         # A relation node.
         if len(exp) == 1 and isinstance(exp[0], str):
-            node = RelationNode(name=exp[0], schema=schema)
+            name = exp[0]
+            node = RelationNode(name=name, schema=schema)
 
         # An expression.
-        elif len(exp) == 1 and isinstance(exp[0], list):
+        elif len(exp) == 1 and isinstance(exp[0], ParseResults):
             node = self.to_node(exp[0], schema)
 
         # Unary operators.
@@ -88,7 +94,37 @@ class TreeBRD:
 
         return node
 
-    def create_unary_node(self, operator, child, param=None, schema=None):
+    def create_condition_node(self, conditions: ParseResults) -> ConditionNode:
+
+        if isinstance(conditions, str):
+            # Attribute Condition Node
+            return IdentityConditionNode(conditions)
+
+        elif len(conditions) == 2:
+            # Unary Condition Node
+            op, right = conditions
+            right_node = self.create_condition_node(right)
+
+            return UnaryConditionNode(
+                op=UnaryConditionalOperator.from_syntax(self.grammar.syntax, op),
+                child=right_node
+            )
+
+        elif len(conditions) == 3:
+            # Binary Condition Node
+            left, op, right = conditions
+            left_node = self.create_condition_node(left)
+            right_node = self.create_condition_node(right)
+
+            return BinaryConditionNode(
+                op=BinaryConditionalOperator.from_syntax(self.grammar.syntax, op),
+                left=left_node,
+                right=right_node
+            )
+
+        raise ValueError
+
+    def create_unary_node(self, operator, child, param: ParseResults | None = None, schema=None):
         """
         Return a Unary Node whose type depends on the specified operator.
 
@@ -100,7 +136,8 @@ class TreeBRD:
         """
 
         if operator == self.grammar.syntax.select_op:
-            conditions = " ".join(flatten(param))
+            condition_node = self.create_condition_node(param[0])
+            conditions = " ".join(flatten(param.asList()))
             node = SelectNode(child, conditions)
 
         elif operator == self.grammar.syntax.project_op:
@@ -125,7 +162,7 @@ class TreeBRD:
 
         return node
 
-    def create_binary_node(self, operator, left, right, param=None):
+    def create_binary_node(self, operator, left, right, param: ParseResults | None = None):
         """
         Return a Node whose type depends on the specified operator.
 
@@ -141,7 +178,7 @@ class TreeBRD:
             node = NaturalJoinNode(left, right)
 
         elif operator == self.grammar.syntax.theta_join_op:
-            conditions = " ".join(flatten(param))
+            conditions = " ".join(flatten(param.asList()))
             node = ThetaJoinNode(left, right, conditions)
 
         # Set operators

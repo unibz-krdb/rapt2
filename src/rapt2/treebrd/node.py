@@ -53,7 +53,7 @@ class RelationNode(Node):
     A relation.
     """
 
-    def __init__(self, name, schema):
+    def __init__(self, name: str, schema):
         super().__init__(Operator.relation, name)
         self.attributes = AttributeList(schema.get_attributes(name), name)
 
