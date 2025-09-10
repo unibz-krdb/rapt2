@@ -102,6 +102,45 @@ class Translator(BaseTranslator):
         """
         return self._binary(node)
 
+    def full_outer_join(self, node):
+        """
+        Translate a full outer join node into latex qtree node.
+        :param node: a treebrd node
+        :return: a qtree subtree rooted at the node
+        """
+        return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
+            op=latex_operator[node.operator],
+            conditions=node.conditions.to_latex(),
+            left=self.translate(node.left),
+            right=self.translate(node.right),
+        )
+
+    def left_outer_join(self, node):
+        """
+        Translate a left outer join node into latex qtree node.
+        :param node: a treebrd node
+        :return: a qtree subtree rooted at the node
+        """
+        return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
+            op=latex_operator[node.operator],
+            conditions=node.conditions.to_latex(),
+            left=self.translate(node.left),
+            right=self.translate(node.right),
+        )
+
+    def right_outer_join(self, node):
+        """
+        Translate a right outer join node into latex qtree node.
+        :param node: a treebrd node
+        :return: a qtree subtree rooted at the node
+        """
+        return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
+            op=latex_operator[node.operator],
+            conditions=node.conditions.to_latex(),
+            left=self.translate(node.left),
+            right=self.translate(node.right),
+        )
+
     def union(self, node):
         """
         Translate a union node into latex qtree node.

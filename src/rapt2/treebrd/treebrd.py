@@ -19,6 +19,9 @@ from .node import (
     DifferenceNode,
     IntersectNode,
     ThetaJoinNode,
+    FullOuterJoinNode,
+    LeftOuterJoinNode,
+    RightOuterJoinNode,
     RelationNode,
 )
 from .grammars.proto_grammar import ProtoGrammar
@@ -189,6 +192,18 @@ class TreeBRD:
         elif operator == self.grammar.syntax.theta_join_op:
             condition = self.create_condition_node(param[0])
             node = ThetaJoinNode(left, right, condition)
+
+        elif operator == self.grammar.syntax.full_outer_join_op:
+            condition = self.create_condition_node(param[0])
+            node = FullOuterJoinNode(left, right, condition)
+
+        elif operator == self.grammar.syntax.left_outer_join_op:
+            condition = self.create_condition_node(param[0])
+            node = LeftOuterJoinNode(left, right, condition)
+
+        elif operator == self.grammar.syntax.right_outer_join_op:
+            condition = self.create_condition_node(param[0])
+            node = RightOuterJoinNode(left, right, condition)
 
         # Set operators
         elif operator == self.grammar.syntax.union_op:

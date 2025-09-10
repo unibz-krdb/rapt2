@@ -17,6 +17,9 @@ class BaseTranslator:
             Operator.cross_join: self.cross_join,
             Operator.natural_join: self.natural_join,
             Operator.theta_join: self.theta_join,
+            Operator.full_outer_join: self.full_outer_join,
+            Operator.left_outer_join: self.left_outer_join,
+            Operator.right_outer_join: self.right_outer_join,
             Operator.union: self.union,
             Operator.difference: self.difference,
             Operator.intersect: self.intersect,
@@ -55,6 +58,15 @@ class BaseTranslator:
         raise NotImplementedError("Must be implemented by translation modules.")
 
     def theta_join(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def full_outer_join(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def left_outer_join(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def right_outer_join(self, node):
         raise NotImplementedError("Must be implemented by translation modules.")
 
     def union(self, node):

@@ -289,3 +289,267 @@ class TestThreeValuedLogic(GrammarTestCase):
         expected = [[["defined", "pear"], "or", ["not", ["defined", "apple"]]]]
         actual = parse("defined(pear) or not defined(apple)")
         self.assertEqual(expected, actual)
+
+
+class TestFullOuterJoin(GrammarTestCase):
+    def setUp(self):
+        self.parser = ExtendedGrammar()
+        self.parse = self.parse_function(self.parser.statements)
+
+    def test_simple(self):
+        expression = "zeppelin \\full_outer_join_{year = year} floyd;"
+        expected = [[["zeppelin"], "\\full_outer_join", [["year", "=", "year"]], ["floyd"]]]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_multiple(self):
+        expression = "zeppelin \\full_outer_join_{year = year} floyd \\full_outer_join_{year = year} doors;"
+        expected = [
+            [
+                ["zeppelin"],
+                "\\full_outer_join",
+                [["year", "=", "year"]],
+                ["floyd"],
+                "\\full_outer_join",
+                [["year", "=", "year"]],
+                ["doors"],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_same_precedence(self):
+        expression = "zeppelin \\full_outer_join_{year = year} floyd \\join doors;"
+        expected = [
+            [
+                ["zeppelin"],
+                "\\full_outer_join",
+                [["year", "=", "year"]],
+                ["floyd"],
+                "\\join",
+                ["doors"],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_other_precedence(self):
+        expression = "zeppelin \\union floyd \\full_outer_join_{year = year} doors;"
+        expected = [
+            [
+                ["zeppelin"],
+                "\\union",
+                [["floyd"], "\\full_outer_join", [["year", "=", "year"]], ["doors"]],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_other_unary(self):
+        expression = (
+            "\\project_{albums} zeppelin \\full_outer_join_{year = year} \\project_{albums} floyd;"
+        )
+        expected = [
+            [
+                ["\\project", ["albums"], ["zeppelin"]],
+                "\\full_outer_join",
+                [["year", "=", "year"]],
+                ["\\project", ["albums"], ["floyd"]],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    # Exceptions
+
+    def test_exp_no_relations(self):
+        expression = "\\full_outer_join_;"
+        self.assertRaises(ParseException, self.parse, expression)
+
+    def test_exp_left_relation(self):
+        expression = "roger \\full_outer_join_{year = year};"
+        self.assertRaises(ParseException, self.parse, expression)
+
+    def test_exp_right_relation(self):
+        expression = "\\full_outer_join_{year = year} floyd;"
+        self.assertRaises(ParseException, self.parse, expression)
+
+    def test_exp_empty_conditions(self):
+        expression = "zeppelin \\full_outer_join_{} floyd;"
+        self.assertRaises(ParseException, self.parse, expression)
+
+
+class TestLeftOuterJoin(GrammarTestCase):
+    def setUp(self):
+        self.parser = ExtendedGrammar()
+        self.parse = self.parse_function(self.parser.statements)
+
+    def test_simple(self):
+        expression = "zeppelin \\left_outer_join_{year = year} floyd;"
+        expected = [[["zeppelin"], "\\left_outer_join", [["year", "=", "year"]], ["floyd"]]]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_multiple(self):
+        expression = "zeppelin \\left_outer_join_{year = year} floyd \\left_outer_join_{year = year} doors;"
+        expected = [
+            [
+                ["zeppelin"],
+                "\\left_outer_join",
+                [["year", "=", "year"]],
+                ["floyd"],
+                "\\left_outer_join",
+                [["year", "=", "year"]],
+                ["doors"],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_same_precedence(self):
+        expression = "zeppelin \\left_outer_join_{year = year} floyd \\join doors;"
+        expected = [
+            [
+                ["zeppelin"],
+                "\\left_outer_join",
+                [["year", "=", "year"]],
+                ["floyd"],
+                "\\join",
+                ["doors"],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_other_precedence(self):
+        expression = "zeppelin \\union floyd \\left_outer_join_{year = year} doors;"
+        expected = [
+            [
+                ["zeppelin"],
+                "\\union",
+                [["floyd"], "\\left_outer_join", [["year", "=", "year"]], ["doors"]],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_other_unary(self):
+        expression = (
+            "\\project_{albums} zeppelin \\left_outer_join_{year = year} \\project_{albums} floyd;"
+        )
+        expected = [
+            [
+                ["\\project", ["albums"], ["zeppelin"]],
+                "\\left_outer_join",
+                [["year", "=", "year"]],
+                ["\\project", ["albums"], ["floyd"]],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    # Exceptions
+
+    def test_exp_no_relations(self):
+        expression = "\\left_outer_join_;"
+        self.assertRaises(ParseException, self.parse, expression)
+
+    def test_exp_left_relation(self):
+        expression = "roger \\left_outer_join_{year = year};"
+        self.assertRaises(ParseException, self.parse, expression)
+
+    def test_exp_right_relation(self):
+        expression = "\\left_outer_join_{year = year} floyd;"
+        self.assertRaises(ParseException, self.parse, expression)
+
+    def test_exp_empty_conditions(self):
+        expression = "zeppelin \\left_outer_join_{} floyd;"
+        self.assertRaises(ParseException, self.parse, expression)
+
+
+class TestRightOuterJoin(GrammarTestCase):
+    def setUp(self):
+        self.parser = ExtendedGrammar()
+        self.parse = self.parse_function(self.parser.statements)
+
+    def test_simple(self):
+        expression = "zeppelin \\right_outer_join_{year = year} floyd;"
+        expected = [[["zeppelin"], "\\right_outer_join", [["year", "=", "year"]], ["floyd"]]]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_multiple(self):
+        expression = "zeppelin \\right_outer_join_{year = year} floyd \\right_outer_join_{year = year} doors;"
+        expected = [
+            [
+                ["zeppelin"],
+                "\\right_outer_join",
+                [["year", "=", "year"]],
+                ["floyd"],
+                "\\right_outer_join",
+                [["year", "=", "year"]],
+                ["doors"],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_same_precedence(self):
+        expression = "zeppelin \\right_outer_join_{year = year} floyd \\join doors;"
+        expected = [
+            [
+                ["zeppelin"],
+                "\\right_outer_join",
+                [["year", "=", "year"]],
+                ["floyd"],
+                "\\join",
+                ["doors"],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_other_precedence(self):
+        expression = "zeppelin \\union floyd \\right_outer_join_{year = year} doors;"
+        expected = [
+            [
+                ["zeppelin"],
+                "\\union",
+                [["floyd"], "\\right_outer_join", [["year", "=", "year"]], ["doors"]],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    def test_other_unary(self):
+        expression = (
+            "\\project_{albums} zeppelin \\right_outer_join_{year = year} \\project_{albums} floyd;"
+        )
+        expected = [
+            [
+                ["\\project", ["albums"], ["zeppelin"]],
+                "\\right_outer_join",
+                [["year", "=", "year"]],
+                ["\\project", ["albums"], ["floyd"]],
+            ]
+        ]
+        actual = self.parse(expression)
+        self.assertEqual(expected, actual)
+
+    # Exceptions
+
+    def test_exp_no_relations(self):
+        expression = "\\right_outer_join_;"
+        self.assertRaises(ParseException, self.parse, expression)
+
+    def test_exp_left_relation(self):
+        expression = "roger \\right_outer_join_{year = year};"
+        self.assertRaises(ParseException, self.parse, expression)
+
+    def test_exp_right_relation(self):
+        expression = "\\right_outer_join_{year = year} floyd;"
+        self.assertRaises(ParseException, self.parse, expression)
+
+    def test_exp_empty_conditions(self):
+        expression = "zeppelin \\right_outer_join_{} floyd;"
+        self.assertRaises(ParseException, self.parse, expression)

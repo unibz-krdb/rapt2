@@ -16,3 +16,11 @@ condition ::= condition | defined_condition
 
 intersect ::= "\\intersect"
 natural_join ::= "\\natural_join"
+
+full_outer_join_expr ::= expression \\full_outer_join param_start conditions param_stop expression
+left_outer_join_expr ::= expression \\left_outer_join param_start conditions param_stop expression
+right_outer_join_expr ::= expression \\right_outer_join param_start conditions param_stop expression
+
+full_outer_join ::= "\\full_outer_join"
+left_outer_join ::= "\\left_outer_join"
+right_outer_join ::= "\\right_outer_join"

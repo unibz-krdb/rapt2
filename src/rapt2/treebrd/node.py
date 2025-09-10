@@ -224,6 +224,48 @@ class ThetaJoinNode(JoinNode):
         return self.conditions == other.conditions and super().__eq__(other)
 
 
+class FullOuterJoinNode(JoinNode):
+    """
+    A relation that results from the relation algebra full outer join operator.
+    """
+
+    def __init__(self, left, right, conditions: ConditionNode):
+        super().__init__(Operator.full_outer_join, left, right)
+        self.attributes.validate(conditions.attribute_references())
+        self.conditions = conditions
+
+    def __eq__(self, other):
+        return self.conditions == other.conditions and super().__eq__(other)
+
+
+class LeftOuterJoinNode(JoinNode):
+    """
+    A relation that results from the relation algebra left outer join operator.
+    """
+
+    def __init__(self, left, right, conditions: ConditionNode):
+        super().__init__(Operator.left_outer_join, left, right)
+        self.attributes.validate(conditions.attribute_references())
+        self.conditions = conditions
+
+    def __eq__(self, other):
+        return self.conditions == other.conditions and super().__eq__(other)
+
+
+class RightOuterJoinNode(JoinNode):
+    """
+    A relation that results from the relation algebra right outer join operator.
+    """
+
+    def __init__(self, left, right, conditions: ConditionNode):
+        super().__init__(Operator.right_outer_join, left, right)
+        self.attributes.validate(conditions.attribute_references())
+        self.conditions = conditions
+
+    def __eq__(self, other):
+        return self.conditions == other.conditions and super().__eq__(other)
+
+
 class SetOperatorNode(BinaryNode):
     """
     An abstract class for binary nodes with set operators.
@@ -282,6 +324,9 @@ class Operator(Enum):
     cross_join = 24
     natural_join = 25
     theta_join = 26
+    full_outer_join = 27
+    left_outer_join = 28
+    right_outer_join = 29
 
     # Set operations.
     difference = 48

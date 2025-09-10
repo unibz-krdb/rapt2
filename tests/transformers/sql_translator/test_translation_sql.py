@@ -499,6 +499,135 @@ class TestThetaJoin(TestSQL):
         self.assertEqual(expected, actual)
 
 
+class TestFullOuterJoin(TestSQL):
+    grammar = ExtendedGrammar()
+
+    def test_relation(self):
+        ra = "alpha \\full_outer_join_{a1 = b1} beta;"
+        expected = [
+            "SELECT alpha.a1, alpha.a2, alpha.a3, "
+            "beta.b1, beta.b2, beta.b3 FROM "
+            "(SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
+            "FULL OUTER JOIN "
+            "(SELECT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
+            "ON (a1 = b1)"
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_relation_set(self):
+        ra = "alpha \\full_outer_join_{a1 = b1} beta;"
+        expected = [
+            "SELECT DISTINCT alpha.a1, alpha.a2, alpha.a3, "
+            "beta.b1, beta.b2, beta.b3 FROM "
+            "(SELECT DISTINCT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
+            "FULL OUTER JOIN "
+            "(SELECT DISTINCT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
+            "ON (a1 = b1)"
+        ]
+        actual = self.translate_set(ra)
+        self.assertEqual(expected, actual)
+
+    def test_complex_condition(self):
+        ra = "alpha \\full_outer_join_{alpha.a1=beta.b1 and b3>50} beta;"
+        expected = [
+            "SELECT alpha.a1, alpha.a2, alpha.a3, "
+            "beta.b1, beta.b2, beta.b3 FROM "
+            "(SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
+            "FULL OUTER JOIN "
+            "(SELECT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
+            "ON ((alpha.a1 = beta.b1) AND (b3 > 50))"
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+
+class TestLeftOuterJoin(TestSQL):
+    grammar = ExtendedGrammar()
+
+    def test_relation(self):
+        ra = "alpha \\left_outer_join_{a1 = b1} beta;"
+        expected = [
+            "SELECT alpha.a1, alpha.a2, alpha.a3, "
+            "beta.b1, beta.b2, beta.b3 FROM "
+            "(SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
+            "LEFT OUTER JOIN "
+            "(SELECT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
+            "ON (a1 = b1)"
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_relation_set(self):
+        ra = "alpha \\left_outer_join_{a1 = b1} beta;"
+        expected = [
+            "SELECT DISTINCT alpha.a1, alpha.a2, alpha.a3, "
+            "beta.b1, beta.b2, beta.b3 FROM "
+            "(SELECT DISTINCT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
+            "LEFT OUTER JOIN "
+            "(SELECT DISTINCT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
+            "ON (a1 = b1)"
+        ]
+        actual = self.translate_set(ra)
+        self.assertEqual(expected, actual)
+
+    def test_complex_condition(self):
+        ra = "alpha \\left_outer_join_{alpha.a1=beta.b1 and b3>50} beta;"
+        expected = [
+            "SELECT alpha.a1, alpha.a2, alpha.a3, "
+            "beta.b1, beta.b2, beta.b3 FROM "
+            "(SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
+            "LEFT OUTER JOIN "
+            "(SELECT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
+            "ON ((alpha.a1 = beta.b1) AND (b3 > 50))"
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+
+class TestRightOuterJoin(TestSQL):
+    grammar = ExtendedGrammar()
+
+    def test_relation(self):
+        ra = "alpha \\right_outer_join_{a1 = b1} beta;"
+        expected = [
+            "SELECT alpha.a1, alpha.a2, alpha.a3, "
+            "beta.b1, beta.b2, beta.b3 FROM "
+            "(SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
+            "RIGHT OUTER JOIN "
+            "(SELECT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
+            "ON (a1 = b1)"
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_relation_set(self):
+        ra = "alpha \\right_outer_join_{a1 = b1} beta;"
+        expected = [
+            "SELECT DISTINCT alpha.a1, alpha.a2, alpha.a3, "
+            "beta.b1, beta.b2, beta.b3 FROM "
+            "(SELECT DISTINCT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
+            "RIGHT OUTER JOIN "
+            "(SELECT DISTINCT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
+            "ON (a1 = b1)"
+        ]
+        actual = self.translate_set(ra)
+        self.assertEqual(expected, actual)
+
+    def test_complex_condition(self):
+        ra = "alpha \\right_outer_join_{alpha.a1=beta.b1 and b3>50} beta;"
+        expected = [
+            "SELECT alpha.a1, alpha.a2, alpha.a3, "
+            "beta.b1, beta.b2, beta.b3 FROM "
+            "(SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
+            "RIGHT OUTER JOIN "
+            "(SELECT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
+            "ON ((alpha.a1 = beta.b1) AND (b3 > 50))"
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+
 class TestSet:
     __test__ = False
 

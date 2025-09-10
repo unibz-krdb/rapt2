@@ -71,6 +71,9 @@ class Translator(BaseTranslator):
             Operator.cross_join: "CROSS JOIN",
             Operator.theta_join: "JOIN",
             Operator.natural_join: "NATURAL JOIN",
+            Operator.full_outer_join: "FULL OUTER JOIN",
+            Operator.left_outer_join: "LEFT OUTER JOIN",
+            Operator.right_outer_join: "RIGHT OUTER JOIN",
         }
         return operators[node.operator]
 
@@ -160,6 +163,30 @@ class Translator(BaseTranslator):
         """
         return self._join(node)
 
+    def full_outer_join(self, node):
+        """
+        Translate a full outer join node into SQLQuery.
+        :param node: a treebrd node
+        :return: a SQLQuery object for the tree rooted at node
+        """
+        return self._join(node)
+
+    def left_outer_join(self, node):
+        """
+        Translate a left outer join node into SQLQuery.
+        :param node: a treebrd node
+        :return: a SQLQuery object for the tree rooted at node
+        """
+        return self._join(node)
+
+    def right_outer_join(self, node):
+        """
+        Translate a right outer join node into SQLQuery.
+        :param node: a treebrd node
+        :return: a SQLQuery object for the tree rooted at node
+        """
+        return self._join(node)
+
     def union(self, node):
         """
         Translate a union node into SQLQuery.
@@ -190,6 +217,9 @@ class Translator(BaseTranslator):
             Operator.cross_join,
             Operator.natural_join,
             Operator.theta_join,
+            Operator.full_outer_join,
+            Operator.left_outer_join,
+            Operator.right_outer_join,
         }:
             return sobject.from_block
         else:
@@ -211,7 +241,12 @@ class Translator(BaseTranslator):
             operator=self._get_sql_operator(node),
         )
 
-        if node.operator == Operator.theta_join:
+        if node.operator in {
+            Operator.theta_join,
+            Operator.full_outer_join,
+            Operator.left_outer_join,
+            Operator.right_outer_join,
+        }:
             from_block = "{from_block} ON {conditions}".format(
                 from_block=from_block, conditions=node.conditions.to_sql()
             )

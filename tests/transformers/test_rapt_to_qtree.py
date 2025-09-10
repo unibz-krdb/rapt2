@@ -106,6 +106,78 @@ class TestThetaJoin(TestQTreeTransformer):
         self.assertEqual(expected, actual)
 
 
+class TestFullOuterJoin(TestQTreeTransformer):
+    grammar = ExtendedGrammar
+
+    def test_relation(self):
+        ra = r"alpha \full_outer_join_{a1 = b1} beta;"
+        expected = [
+            r"\Tree[.${}_{{(a1 \eq b1)}}$ [.$alpha$ ] [.$beta$ ] ]".format(
+                FULL_OUTER_JOIN_OP
+            )
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_complex_condition(self):
+        ra = r"alpha \full_outer_join_{alpha.a1=beta.b1 and b3>50} beta;"
+        expected = [
+            r"\Tree[.${}_{{((alpha.a1 \eq beta.b1) \land (b3 \gt 50))}}$ [.$alpha$ ] [.$beta$ ] ]".format(
+                FULL_OUTER_JOIN_OP
+            )
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+
+class TestLeftOuterJoin(TestQTreeTransformer):
+    grammar = ExtendedGrammar
+
+    def test_relation(self):
+        ra = r"alpha \left_outer_join_{a1 = b1} beta;"
+        expected = [
+            r"\Tree[.${}_{{(a1 \eq b1)}}$ [.$alpha$ ] [.$beta$ ] ]".format(
+                LEFT_OUTER_JOIN_OP
+            )
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_complex_condition(self):
+        ra = r"alpha \left_outer_join_{alpha.a1=beta.b1 and b3>50} beta;"
+        expected = [
+            r"\Tree[.${}_{{((alpha.a1 \eq beta.b1) \land (b3 \gt 50))}}$ [.$alpha$ ] [.$beta$ ] ]".format(
+                LEFT_OUTER_JOIN_OP
+            )
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+
+class TestRightOuterJoin(TestQTreeTransformer):
+    grammar = ExtendedGrammar
+
+    def test_relation(self):
+        ra = r"alpha \right_outer_join_{a1 = b1} beta;"
+        expected = [
+            r"\Tree[.${}_{{(a1 \eq b1)}}$ [.$alpha$ ] [.$beta$ ] ]".format(
+                RIGHT_OUTER_JOIN_OP
+            )
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_complex_condition(self):
+        ra = r"alpha \right_outer_join_{alpha.a1=beta.b1 and b3>50} beta;"
+        expected = [
+            r"\Tree[.${}_{{((alpha.a1 \eq beta.b1) \land (b3 \gt 50))}}$ [.$alpha$ ] [.$beta$ ] ]".format(
+                RIGHT_OUTER_JOIN_OP
+            )
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+
 class TestUnion(TestQTreeTransformer):
     def test_simple(self):
         ra = r"gamma \union gammatwin;"

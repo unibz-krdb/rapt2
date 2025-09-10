@@ -40,8 +40,29 @@ class ExtendedGrammar(CoreGrammar):
         return t
 
     @property
+    def full_outer_join(self):
+        """
+        full_outer_join_expr ::= expression \\full_outer_join param_start conditions param_stop expression
+        """
+        return self.parametrize(self.syntax.full_outer_join_op, self.conditions)
+
+    @property
+    def left_outer_join(self):
+        """
+        left_outer_join_expr ::= expression \\left_outer_join param_start conditions param_stop expression
+        """
+        return self.parametrize(self.syntax.left_outer_join_op, self.conditions)
+
+    @property
+    def right_outer_join(self):
+        """
+        right_outer_join_expr ::= expression \\right_outer_join param_start conditions param_stop expression
+        """
+        return self.parametrize(self.syntax.right_outer_join_op, self.conditions)
+
+    @property
     def binary_op_p1(self):
-        return super().binary_op_p1 ^ self.natural_join ^ self.theta_join
+        return super().binary_op_p1 ^ self.natural_join ^ self.theta_join ^ self.full_outer_join ^ self.left_outer_join ^ self.right_outer_join
 
     @property
     def intersect(self):
@@ -99,4 +120,7 @@ class ExtendedGrammar(CoreGrammar):
             self.syntax.intersect_op,
             self.syntax.natural_join_op,
             self.syntax.theta_join_op,
+            self.syntax.full_outer_join_op,
+            self.syntax.left_outer_join_op,
+            self.syntax.right_outer_join_op,
         } or super().is_binary(operator)
