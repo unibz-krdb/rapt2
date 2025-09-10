@@ -38,4 +38,4 @@ class TestConditionNode(ConditionNodeTestCase):
         node = BinaryConditionNode(BinaryConditionalOperator.AND, left, right)
         self.assertEqual(node.to_latex(), "(alpha.a1 \\land beta.b1)")
         self.assertEqual(node.to_sql(), "(alpha.a1 AND beta.b1)")
-        self.assertEqual(node.attribute_references(), ["alpha.b1", "beta.a1"])
+        self.assertEqual(node.attribute_references(), ["alpha.a1", "beta.b1"])
