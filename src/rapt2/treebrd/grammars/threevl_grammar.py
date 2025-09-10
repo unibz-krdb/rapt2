@@ -19,10 +19,12 @@ class ThreeVLGrammar(ExtendedGrammar):
         """
         defined_condition ::= defined_op "(" operand ")"
         """
-        return Group(self.defined_op
+        return Group(
+            self.defined_op
             + Literal(self.syntax.paren_left).suppress()
             + self.operand
-            + Literal(self.syntax.paren_right).suppress())
+            + Literal(self.syntax.paren_right).suppress()
+        )
 
     @property
     def condition(self):

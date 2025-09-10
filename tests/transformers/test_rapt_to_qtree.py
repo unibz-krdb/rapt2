@@ -98,7 +98,9 @@ class TestThetaJoin(TestQTreeTransformer):
     def test_relation(self):
         ra = r"alpha \join_{a1 = b1} beta;"
         expected = [
-            r"\Tree[.${}_{{(a1 \eq b1)}}$ [.$alpha$ ] [.$beta$ ] ]".format(THETA_JOIN_OP)
+            r"\Tree[.${}_{{(a1 \eq b1)}}$ [.$alpha$ ] [.$beta$ ] ]".format(
+                THETA_JOIN_OP
+            )
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)

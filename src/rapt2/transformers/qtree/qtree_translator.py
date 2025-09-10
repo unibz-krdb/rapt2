@@ -24,7 +24,9 @@ class Translator(BaseTranslator):
         """
         child = self.translate(node.child)
         return "[.${op}_{{{conditions}}}$ {child} ]".format(
-            op=latex_operator[node.operator], conditions=node.conditions.to_latex(), child=child
+            op=latex_operator[node.operator],
+            conditions=node.conditions.to_latex(),
+            child=child,
         )
 
     def project(self, node):

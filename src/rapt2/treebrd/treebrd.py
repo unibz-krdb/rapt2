@@ -1,5 +1,12 @@
 from pyparsing import ParseResults
-from rapt2.treebrd.condition_node import IdentityConditionNode, BinaryConditionNode, BinaryConditionalOperator, ConditionNode, UnaryConditionNode, UnaryConditionalOperator
+from rapt2.treebrd.condition_node import (
+    IdentityConditionNode,
+    BinaryConditionNode,
+    BinaryConditionalOperator,
+    ConditionNode,
+    UnaryConditionNode,
+    UnaryConditionalOperator,
+)
 from .schema import Schema
 from .utility import flatten
 from .node import (
@@ -16,6 +23,7 @@ from .node import (
     RelationNode,
 )
 from .grammars.proto_grammar import ProtoGrammar
+
 
 class TreeBRD:
     """
@@ -95,7 +103,6 @@ class TreeBRD:
         return node
 
     def create_condition_node(self, conditions: ParseResults) -> ConditionNode:
-
         if isinstance(conditions, str):
             # Attribute Condition Node
             return IdentityConditionNode(conditions)
@@ -107,7 +114,7 @@ class TreeBRD:
 
             return UnaryConditionNode(
                 op=UnaryConditionalOperator.from_syntax(self.grammar.syntax, op),
-                child=right_node
+                child=right_node,
             )
 
         elif len(conditions) == 3:
@@ -119,12 +126,14 @@ class TreeBRD:
             return BinaryConditionNode(
                 op=BinaryConditionalOperator.from_syntax(self.grammar.syntax, op),
                 left=left_node,
-                right=right_node
+                right=right_node,
             )
 
         raise ValueError
 
-    def create_unary_node(self, operator, child, param: ParseResults | None = None, schema=None):
+    def create_unary_node(
+        self, operator, child, param: ParseResults | None = None, schema=None
+    ):
         """
         Return a Unary Node whose type depends on the specified operator.
 
@@ -161,7 +170,9 @@ class TreeBRD:
 
         return node
 
-    def create_binary_node(self, operator, left, right, param: ParseResults | None = None):
+    def create_binary_node(
+        self, operator, left, right, param: ParseResults | None = None
+    ):
         """
         Return a Node whose type depends on the specified operator.
 

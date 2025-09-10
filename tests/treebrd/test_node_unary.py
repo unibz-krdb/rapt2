@@ -1,5 +1,13 @@
-from rapt2.treebrd.condition_node import BinaryConditionNode, BinaryConditionalOperator, IdentityConditionNode
-from rapt2.treebrd.errors import AttributeReferenceError, InputError, InputReferenceError
+from rapt2.treebrd.condition_node import (
+    BinaryConditionNode,
+    BinaryConditionalOperator,
+    IdentityConditionNode,
+)
+from rapt2.treebrd.errors import (
+    AttributeReferenceError,
+    InputError,
+    InputReferenceError,
+)
 from rapt2.treebrd.node import (
     ProjectNode,
     RenameNode,
@@ -90,49 +98,107 @@ class TestUnaryNodeEquality(UnaryTestCase):
 
 class TestSelect(UnaryTestCase):
     def test_operator_is_correct(self):
-        condition = BinaryConditionNode(BinaryConditionalOperator.EQUAL, IdentityConditionNode("a1"), IdentityConditionNode("42"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("a1"),
+            IdentityConditionNode("42"),
+        )
         actual = SelectNode(self.alpha, condition).operator
         self.assertEqual(Operator.select, actual)
 
     def test_condition_when_init_has_condition(self):
-        condition = BinaryConditionNode(BinaryConditionalOperator.EQUAL, IdentityConditionNode("a1"), IdentityConditionNode("42"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("a1"),
+            IdentityConditionNode("42"),
+        )
         actual = SelectNode(self.alpha, condition).conditions
         self.assertEqual(condition, actual)
 
     def test_condition_when_multiple_conditions(self):
-        condition = BinaryConditionNode(BinaryConditionalOperator.AND, BinaryConditionNode(BinaryConditionalOperator.GREATER_THAN, IdentityConditionNode("a1"), IdentityConditionNode("41")), BinaryConditionNode(BinaryConditionalOperator.LESS_THAN, IdentityConditionNode("a1"), IdentityConditionNode("43")))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.AND,
+            BinaryConditionNode(
+                BinaryConditionalOperator.GREATER_THAN,
+                IdentityConditionNode("a1"),
+                IdentityConditionNode("41"),
+            ),
+            BinaryConditionNode(
+                BinaryConditionalOperator.LESS_THAN,
+                IdentityConditionNode("a1"),
+                IdentityConditionNode("43"),
+            ),
+        )
         node = SelectNode(self.alpha, condition)
         self.assertEqual(condition, node.conditions)
 
     def test_condition_when_with_prefix(self):
-        condition = BinaryConditionNode(BinaryConditionalOperator.GREATER_THAN, IdentityConditionNode("alpha.a1"), IdentityConditionNode("41"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.GREATER_THAN,
+            IdentityConditionNode("alpha.a1"),
+            IdentityConditionNode("41"),
+        )
         node = SelectNode(self.alpha, condition)
         self.assertEqual(condition, node.conditions)
 
     def test_condition_when_multiple_conditions_with_prefix(self):
-        condition = BinaryConditionNode(BinaryConditionalOperator.AND, BinaryConditionNode(BinaryConditionalOperator.GREATER_THAN, IdentityConditionNode("alpha.a1"), IdentityConditionNode("41")), BinaryConditionNode(BinaryConditionalOperator.LESS_THAN, IdentityConditionNode("alpha.a1"), IdentityConditionNode("43")))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.AND,
+            BinaryConditionNode(
+                BinaryConditionalOperator.GREATER_THAN,
+                IdentityConditionNode("alpha.a1"),
+                IdentityConditionNode("41"),
+            ),
+            BinaryConditionNode(
+                BinaryConditionalOperator.LESS_THAN,
+                IdentityConditionNode("alpha.a1"),
+                IdentityConditionNode("43"),
+            ),
+        )
         node = SelectNode(self.alpha, condition)
         self.assertEqual(condition, node.conditions)
 
     def test_exception_when_first_attribute_in_condition_is_wrong(self):
-        condition = BinaryConditionNode(BinaryConditionalOperator.EQUAL, IdentityConditionNode("a2"), IdentityConditionNode("42"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("a2"),
+            IdentityConditionNode("42"),
+        )
         self.assertRaises(AttributeReferenceError, SelectNode, self.alpha, condition)
 
     def test_exception_when_second_attribute_in_condition_is_wrong(self):
-        condition = BinaryConditionNode(BinaryConditionalOperator.EQUAL, IdentityConditionNode("a1"), IdentityConditionNode("a2"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("a1"),
+            IdentityConditionNode("a2"),
+        )
         self.assertRaises(AttributeReferenceError, SelectNode, self.alpha, condition)
 
     def test_exception_when_both_attributes_in_condition_are_wrong(self):
-        condition = BinaryConditionNode(BinaryConditionalOperator.EQUAL, IdentityConditionNode("a2"), IdentityConditionNode("a3"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("a2"),
+            IdentityConditionNode("a3"),
+        )
         self.assertRaises(AttributeReferenceError, SelectNode, self.alpha, condition)
 
     def test_exception_when_prefix_in_condition_is_wrong(self):
-        condition = BinaryConditionNode(BinaryConditionalOperator.EQUAL, IdentityConditionNode("beta.a1"), IdentityConditionNode("42"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("beta.a1"),
+            IdentityConditionNode("42"),
+        )
         self.assertRaises(AttributeReferenceError, SelectNode, self.alpha, condition)
 
     def test_exception_when_ambiguous_attributes(self):
-        condition = BinaryConditionNode(BinaryConditionalOperator.LESS_THAN, IdentityConditionNode("d1"), IdentityConditionNode("5"))
-        self.assertRaises(AttributeReferenceError, SelectNode, self.ambiguous, condition)
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.LESS_THAN,
+            IdentityConditionNode("d1"),
+            IdentityConditionNode("5"),
+        )
+        self.assertRaises(
+            AttributeReferenceError, SelectNode, self.ambiguous, condition
+        )
 
 
 class TestProject(UnaryTestCase):

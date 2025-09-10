@@ -2,7 +2,11 @@ from unittest import TestCase
 
 import functools
 
-from rapt2.treebrd.condition_node import BinaryConditionNode, BinaryConditionalOperator, IdentityConditionNode
+from rapt2.treebrd.condition_node import (
+    BinaryConditionNode,
+    BinaryConditionalOperator,
+    IdentityConditionNode,
+)
 from rapt2.treebrd.errors import RelationReferenceError
 from rapt2.treebrd.grammars import ExtendedGrammar
 from rapt2.treebrd.node import (
@@ -153,7 +157,11 @@ class TestJoins(JoinTestCase):
         middle = RelationNode("beta", self.schema)
         right = RelationNode("gamma", self.schema)
         intermediate = CrossJoinNode(left, middle)
-        condition = BinaryConditionNode(BinaryConditionalOperator.EQUAL, IdentityConditionNode("a1"), IdentityConditionNode("c1"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("a1"),
+            IdentityConditionNode("c1"),
+        )
         expected = ThetaJoinNode(intermediate, right, condition)
         self.assertEqual(expected, forest[0])
 
@@ -163,7 +171,11 @@ class TestJoins(JoinTestCase):
         left = RelationNode("alpha", self.schema)
         middle = RelationNode("beta", self.schema)
         right = RelationNode("gamma", self.schema)
-        condition = BinaryConditionNode(BinaryConditionalOperator.EQUAL, IdentityConditionNode("a1"), IdentityConditionNode("b1"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("a1"),
+            IdentityConditionNode("b1"),
+        )
         intermediate = ThetaJoinNode(left, middle, condition)
         expected = CrossJoinNode(intermediate, right)
         self.assertEqual(expected, forest[0])
@@ -200,7 +212,11 @@ class TestThetaJoin(JoinTestCase):
         forest = self.build(instring)
         left = RelationNode("alpha", self.schema)
         right = RelationNode("beta", self.schema)
-        condition = BinaryConditionNode(BinaryConditionalOperator.EQUAL, IdentityConditionNode("a1"), IdentityConditionNode("b1"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("a1"),
+            IdentityConditionNode("b1"),
+        )
         expected = ThetaJoinNode(left, right, condition)
         self.assertEqual(expected, forest[0])
 
@@ -210,7 +226,11 @@ class TestThetaJoin(JoinTestCase):
         left = RelationNode("alpha", self.schema)
         middle = RelationNode("beta", self.schema)
         right = RelationNode("gamma", self.schema)
-        condition = BinaryConditionNode(BinaryConditionalOperator.EQUAL, IdentityConditionNode("a1"), IdentityConditionNode("b1"))
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("a1"),
+            IdentityConditionNode("b1"),
+        )
         intermediate = ThetaJoinNode(left, middle, condition)
         expected = ThetaJoinNode(intermediate, right, condition)
         self.assertEqual(expected, forest[0])
