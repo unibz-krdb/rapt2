@@ -4,6 +4,7 @@ from enum import Enum
 from .errors import InputError, RelationReferenceError
 from .grammars.condition_grammar import get_attribute_references
 from .attributes import AttributeList
+from .condition_node import ConditionNode
 
 
 class Node:
@@ -66,7 +67,7 @@ class UnaryNode(Node):
     A Node with one child.
     """
 
-    def __init__(self, operator, child, name=None):
+    def __init__(self, operator, child, name: str | None = None):
         super().__init__(operator, name)
         self.child = child
 
@@ -87,9 +88,9 @@ class SelectNode(UnaryNode):
     A relation that results from the relation algebra select operator.
     """
 
-    def __init__(self, child, conditions):
+    def __init__(self, child, conditions: ConditionNode):
         super().__init__(Operator.select, child)
-        self.attributes.validate(get_attribute_references(conditions))
+        self.attributes.validate(conditions.attribute_references())
         self.conditions = conditions
 
     def __eq__(self, other):
@@ -215,9 +216,9 @@ class ThetaJoinNode(JoinNode):
     A relation that results from the relation algebra theta join operator.
     """
 
-    def __init__(self, left, right, conditions):
+    def __init__(self, left, right, conditions: ConditionNode):
         super().__init__(Operator.theta_join, left, right)
-        self.attributes.validate(get_attribute_references(conditions))
+        self.attributes.validate(conditions.attribute_references())
         self.conditions = conditions
 
     def __eq__(self, other):

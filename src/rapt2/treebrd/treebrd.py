@@ -136,9 +136,8 @@ class TreeBRD:
         """
 
         if operator == self.grammar.syntax.select_op:
-            condition_node = self.create_condition_node(param[0])
-            conditions = " ".join(flatten(param.asList()))
-            node = SelectNode(child, conditions)
+            condition = self.create_condition_node(param[0])
+            node = SelectNode(child, condition)
 
         elif operator == self.grammar.syntax.project_op:
             node = ProjectNode(child, param)
@@ -178,8 +177,8 @@ class TreeBRD:
             node = NaturalJoinNode(left, right)
 
         elif operator == self.grammar.syntax.theta_join_op:
-            conditions = " ".join(flatten(param.asList()))
-            node = ThetaJoinNode(left, right, conditions)
+            condition = self.create_condition_node(param[0])
+            node = ThetaJoinNode(left, right, condition)
 
         # Set operators
         elif operator == self.grammar.syntax.union_op:
