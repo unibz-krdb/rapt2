@@ -50,14 +50,14 @@ class TestRelation(TestSQL):
 class TestSelect(TestSQL):
     def test_single_select(self):
         ra = r"\select_{a1=a2} alpha;"
-        expected = ["SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE a1 = a2"]
+        expected = ["SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (a1 = a2)"]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_single_select_set(self):
         ra = r"\select_{a1=a2} alpha;"
         expected = [
-            "SELECT DISTINCT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE a1 = a2"
+            "SELECT DISTINCT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (a1 = a2)"
         ]
         actual = self.translate_set(ra)
         self.assertEqual(expected, actual)
@@ -65,7 +65,7 @@ class TestSelect(TestSQL):
     def test_single_select_with_relation(self):
         ra = r"\select_{alpha.a1=a2} alpha;"
         expected = [
-            "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE alpha.a1 = a2"
+            "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (alpha.a1 = a2)"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -73,7 +73,7 @@ class TestSelect(TestSQL):
     def test_multiple_selects(self):
         ra = r"\select_{a1=1} \select_{a2=2} alpha;"
         expected = [
-            "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (a2 = 2) AND (a1 = 1)"
+            "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE ((a2 = 2)) AND ((a1 = 1))"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -82,7 +82,7 @@ class TestSelect(TestSQL):
         ra = r"\select_{a2=a3} (\select_{a1=a2} alpha);"
         expected = [
             "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha "
-            "WHERE (a1 = a2) AND (a2 = a3)"
+            "WHERE ((a1 = a2)) AND ((a2 = a3))"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -91,7 +91,7 @@ class TestSelect(TestSQL):
         ra = r"\select_{a1=2 or a1=1} \select_{a2=2 or a2=1} alpha;"
         expected = [
             "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha "
-            "WHERE (a2 = 2 or a2 = 1) AND (a1 = 2 or a1 = 1)"
+            "WHERE (((a2 = 2) OR (a2 = 1))) AND (((a1 = 2) OR (a1 = 1)))"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -177,7 +177,7 @@ class TestRename(TestSQL):
         expected = [
             "SELECT apex.a, apex.b, apex.c "
             "FROM (SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha "
-            "WHERE a1 = a2) AS apex(a, b, c)"
+            "WHERE (a1 = a2)) AS apex(a, b, c)"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -227,7 +227,7 @@ class TestAssignment(TestSQL):
         expected = [
             "CREATE TEMPORARY TABLE niche(b1, b2, b3) AS "
             "SELECT beta.b1, beta.b2, beta.b3 FROM beta "
-            "WHERE b1 = 1"
+            "WHERE (b1 = 1)"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -237,7 +237,7 @@ class TestAssignment(TestSQL):
         expected = [
             "CREATE TEMPORARY TABLE niche(a, b, c) AS "
             "SELECT beta.b1, beta.b2, beta.b3 FROM beta "
-            "WHERE b1 = 1"
+            "WHERE (b1 = 1)"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -263,7 +263,7 @@ class TestAssignment(TestSQL):
         expected = [
             "CREATE TEMPORARY TABLE combine(b1, b2) AS "
             "SELECT beta.b1, beta.b2 FROM beta "
-            "WHERE b1 = 1"
+            "WHERE (b1 = 1)"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -360,7 +360,7 @@ class TestJoin(TestSQL):
             "(SELECT delta.d1, delta.d2 FROM delta) AS delta "
             "CROSS JOIN "
             "(SELECT gamma.g1, gamma.g2 FROM gamma "
-            "WHERE g1 = g2) AS gamma"
+            "WHERE (g1 = g2)) AS gamma"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -370,7 +370,7 @@ class TestJoin(TestSQL):
         expected = [
             "SELECT gamma.g1, gamma.g2, delta.d1, delta.d2 FROM "
             "(SELECT gamma.g1, gamma.g2 FROM gamma "
-            "WHERE g1 = g2) AS gamma "
+            "WHERE (g1 = g2)) AS gamma "
             "CROSS JOIN "
             "(SELECT delta.d1, delta.d2 FROM delta) AS delta"
         ]
@@ -385,7 +385,7 @@ class TestJoin(TestSQL):
             "(SELECT gamma.g1, gamma.g2 FROM gamma) AS gamma "
             "CROSS JOIN "
             "(SELECT delta.d1, delta.d2 FROM delta) AS delta "
-            "WHERE g1 = g2"
+            "WHERE (g1 = g2)"
         ]
         actual = translation
         self.assertEqual(expected, actual)
@@ -478,7 +478,7 @@ class TestThetaJoin(TestSQL):
             "(SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
             "JOIN "
             "(SELECT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
-            "ON a1 = b1"
+            "ON (a1 = b1)"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -492,7 +492,7 @@ class TestThetaJoin(TestSQL):
             "(SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha) AS alpha "
             "JOIN "
             "(SELECT beta.b1, beta.b2, beta.b3 FROM beta) AS beta "
-            "ON alpha.a1 = beta.b1 and b3 > 50 "
+            "ON ((alpha.a1 = beta.b1) AND (b3 > 50)) "
             "CROSS JOIN (SELECT gamma.g1, gamma.g2 FROM gamma) AS gamma"
         ]
         actual = self.translate(ra)
