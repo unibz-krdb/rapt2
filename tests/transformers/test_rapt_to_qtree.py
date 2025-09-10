@@ -27,7 +27,7 @@ class TestRelation(TestQTreeTransformer):
 class TestSelect(TestQTreeTransformer):
     def test_simple(self):
         ra = r"\select_{a1=a2} alpha;"
-        expected = [r"\Tree[.${}_{{a1 = a2}}$ [.$alpha$ ] ]".format(SELECT_OP)]
+        expected = [r"\Tree[.${}_{{(a1 \eq a2)}}$ [.$alpha$ ] ]".format(SELECT_OP)]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
@@ -98,7 +98,7 @@ class TestThetaJoin(TestQTreeTransformer):
     def test_relation(self):
         ra = r"alpha \join_{a1 = b1} beta;"
         expected = [
-            r"\Tree[.${}_{{a1 = b1}}$ [.$alpha$ ] [.$beta$ ] ]".format(THETA_JOIN_OP)
+            r"\Tree[.${}_{{(a1 \eq b1)}}$ [.$alpha$ ] [.$beta$ ] ]".format(THETA_JOIN_OP)
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
