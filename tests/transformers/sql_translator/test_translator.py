@@ -897,3 +897,244 @@ class TestUnary(TestTranslator):
         translation = self.translate_set(instring)
         expected = [("a",), ("b",)]
         self.assertCountEqual(expected, self.query_list(translation))
+
+
+class TestFullOuterJoin(TestTranslator):
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = {
+            "alpha": ["a1", "a2"],
+            "beta": ["b1", "b2"],
+            "gamma": ["g1", "g2"],
+        }
+        cls.data = {
+            "alpha": [("1", "a"), ("2", "b"), ("3", "c")],
+            "beta": [("1", "x"), ("2", "y"), ("4", "z")],
+            "gamma": [("5", "p"), ("6", "q")],
+        }
+        super().setUpClass()
+
+    def test_full_outer_join_basic_set(self):
+        instring = "alpha \\full_outer_join_{a1 = b1} beta;"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "a", "1", "x"),
+            ("2", "b", "2", "y"),
+            ("3", "c", None, None),
+            (None, None, "4", "z"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_full_outer_join_basic_bag(self):
+        instring = "alpha \\full_outer_join_{a1 = b1} beta;"
+        translation = self.translate_bag(instring)
+        expected = [
+            ("1", "a", "1", "x"),
+            ("2", "b", "2", "y"),
+            ("3", "c", None, None),
+            (None, None, "4", "z"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_full_outer_join_complex_condition_set(self):
+        instring = "alpha \\full_outer_join_{alpha.a1 = beta.b1 and a2 = 'a'} beta;"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "a", "1", "x"),
+            ("2", "b", None, None),
+            ("3", "c", None, None),
+            (None, None, "2", "y"),
+            (None, None, "4", "z"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_full_outer_join_with_project_set(self):
+        instring = "\\project_{alpha.a1, beta.b1} (alpha \\full_outer_join_{a1 = b1} beta);"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "1"),
+            ("2", "2"),
+            ("3", None),
+            (None, "4"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_full_outer_join_with_select_set(self):
+        instring = "\\select_{alpha.a1 > '1'} (alpha \\full_outer_join_{a1 = b1} beta);"
+        translation = self.translate_set(instring)
+        expected = [
+            ("2", "b", "2", "y"),
+            ("3", "c", None, None),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_full_outer_join_chained_set(self):
+        instring = "(alpha \\full_outer_join_{a1 = b1} beta) \\join gamma;"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "a", "1", "x", "5", "p"),
+            ("1", "a", "1", "x", "6", "q"),
+            ("2", "b", "2", "y", "5", "p"),
+            ("2", "b", "2", "y", "6", "q"),
+            ("3", "c", None, None, "5", "p"),
+            ("3", "c", None, None, "6", "q"),
+            (None, None, "4", "z", "5", "p"),
+            (None, None, "4", "z", "6", "q"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+
+class TestLeftOuterJoin(TestTranslator):
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = {
+            "alpha": ["a1", "a2"],
+            "beta": ["b1", "b2"],
+            "gamma": ["g1", "g2"],
+        }
+        cls.data = {
+            "alpha": [("1", "a"), ("2", "b"), ("3", "c")],
+            "beta": [("1", "x"), ("2", "y"), ("4", "z")],
+            "gamma": [("5", "p"), ("6", "q")],
+        }
+        super().setUpClass()
+
+    def test_left_outer_join_basic_set(self):
+        instring = "alpha \\left_outer_join_{a1 = b1} beta;"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "a", "1", "x"),
+            ("2", "b", "2", "y"),
+            ("3", "c", None, None),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_left_outer_join_basic_bag(self):
+        instring = "alpha \\left_outer_join_{a1 = b1} beta;"
+        translation = self.translate_bag(instring)
+        expected = [
+            ("1", "a", "1", "x"),
+            ("2", "b", "2", "y"),
+            ("3", "c", None, None),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_left_outer_join_complex_condition_set(self):
+        instring = "alpha \\left_outer_join_{alpha.a1 = beta.b1 and a2 = 'a'} beta;"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "a", "1", "x"),
+            ("2", "b", None, None),
+            ("3", "c", None, None),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_left_outer_join_with_project_set(self):
+        instring = "\\project_{alpha.a1, beta.b1} (alpha \\left_outer_join_{a1 = b1} beta);"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "1"),
+            ("2", "2"),
+            ("3", None),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_left_outer_join_with_select_set(self):
+        instring = "\\select_{alpha.a1 > '1'} (alpha \\left_outer_join_{a1 = b1} beta);"
+        translation = self.translate_set(instring)
+        expected = [
+            ("2", "b", "2", "y"),
+            ("3", "c", None, None),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_left_outer_join_chained_set(self):
+        instring = "(alpha \\left_outer_join_{a1 = b1} beta) \\join gamma;"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "a", "1", "x", "5", "p"),
+            ("1", "a", "1", "x", "6", "q"),
+            ("2", "b", "2", "y", "5", "p"),
+            ("2", "b", "2", "y", "6", "q"),
+            ("3", "c", None, None, "5", "p"),
+            ("3", "c", None, None, "6", "q"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+
+class TestRightOuterJoin(TestTranslator):
+    @classmethod
+    def setUpClass(cls):
+        cls.schema = {
+            "alpha": ["a1", "a2"],
+            "beta": ["b1", "b2"],
+            "gamma": ["g1", "g2"],
+        }
+        cls.data = {
+            "alpha": [("1", "a"), ("2", "b"), ("3", "c")],
+            "beta": [("1", "x"), ("2", "y"), ("4", "z")],
+            "gamma": [("5", "p"), ("6", "q")],
+        }
+        super().setUpClass()
+
+    def test_right_outer_join_basic_set(self):
+        instring = "alpha \\right_outer_join_{a1 = b1} beta;"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "a", "1", "x"),
+            ("2", "b", "2", "y"),
+            (None, None, "4", "z"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_right_outer_join_basic_bag(self):
+        instring = "alpha \\right_outer_join_{a1 = b1} beta;"
+        translation = self.translate_bag(instring)
+        expected = [
+            ("1", "a", "1", "x"),
+            ("2", "b", "2", "y"),
+            (None, None, "4", "z"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_right_outer_join_complex_condition_set(self):
+        instring = "alpha \\right_outer_join_{alpha.a1 = beta.b1 and a2 = 'a'} beta;"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "a", "1", "x"),
+            (None, None, "2", "y"),
+            (None, None, "4", "z"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_right_outer_join_with_project_set(self):
+        instring = "\\project_{alpha.a1, beta.b1} (alpha \\right_outer_join_{a1 = b1} beta);"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "1"),
+            ("2", "2"),
+            (None, "4"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_right_outer_join_with_select_set(self):
+        instring = "\\select_{beta.b1 > '1'} (alpha \\right_outer_join_{a1 = b1} beta);"
+        translation = self.translate_set(instring)
+        expected = [
+            ("2", "b", "2", "y"),
+            (None, None, "4", "z"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
+
+    def test_right_outer_join_chained_set(self):
+        instring = "(alpha \\right_outer_join_{a1 = b1} beta) \\join gamma;"
+        translation = self.translate_set(instring)
+        expected = [
+            ("1", "a", "1", "x", "5", "p"),
+            ("1", "a", "1", "x", "6", "q"),
+            ("2", "b", "2", "y", "5", "p"),
+            ("2", "b", "2", "y", "6", "q"),
+            (None, None, "4", "z", "5", "p"),
+            (None, None, "4", "z", "6", "q"),
+        ]
+        self.assertCountEqual(expected, self.query_list(translation))
