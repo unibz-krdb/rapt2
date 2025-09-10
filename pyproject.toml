@@ -20,8 +20,8 @@ keywords = ["relational-algebra", "parser", "database", "query"]
 
 [dependency-groups]
 dev = [
-    "pytest>=8.4.1",
-    "ruff>=0.12.10",
+    "pytest>=8.4.2",
+    "ruff>=0.12.12",
 ]
 
 [tool.hatch.build.targets.wheel]
