@@ -40,7 +40,7 @@ class BinaryConditionalOperator(Enum):
                 return cls.OR
             case syntax.equal_op:
                 return cls.EQUAL
-            case syntax.not_equal_op:
+            case syntax.not_equal_op | syntax.not_equal_alt_op:
                 return cls.NOT_EQUAL
             case syntax.less_than_op:
                 return cls.LESS_THAN
