@@ -15,11 +15,11 @@ class TestSQLSequence(TestTransformer):
     def setUp(self):
         self.translate = self.translate_func(
             functools.partial(
-                Rapt(grammar="Extended Grammar").to_sql_sequence, use_bag_semantics=True
+                Rapt(grammar="3VL Grammar").to_sql_sequence, use_bag_semantics=True
             )
         )
         self.translate_set = self.translate_func(
-            functools.partial(Rapt(grammar="Extended Grammar").to_sql_sequence)
+            functools.partial(Rapt(grammar="3VL Grammar").to_sql_sequence)
         )
 
 
@@ -52,7 +52,7 @@ class TestSelect(TestSQLSequence):
         expected = [
             [
                 "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
-                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE a1 = a2",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (a1 = a2)",
             ]
         ]
         actual = self.translate(ra)
@@ -63,9 +63,9 @@ class TestSelect(TestSQLSequence):
         expected = [
             [
                 "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
-                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE a2 = 2 or a2 = 1",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE ((a2 = 2) OR (a2 = 1))",
                 "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha "
-                "WHERE (a2 = 2 or a2 = 1) AND (a1 = 2 or a1 = 1)",
+                "WHERE ((a2 = 2) OR (a2 = 1)) AND ((a1 = 2) OR (a1 = 1))",
             ]
         ]
         actual = self.translate(ra)
