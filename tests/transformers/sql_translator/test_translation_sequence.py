@@ -294,3 +294,105 @@ class TestIntersection(TestSQLSequence, TestSet):
     grammar = ExtendedGrammar()
     ra_operator = "\\intersect"
     sql_operator = "INTERSECT"
+
+
+class TestDefined(TestSQLSequence):
+    def test_simple_defined(self):
+        ra = "\\select_{defined(a1)} alpha;"
+        expected = [
+            [
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE a1 IS NOT NULL",
+            ]
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_not_defined(self):
+        ra = "\\select_{not defined(a1)} alpha;"
+        expected = [
+            [
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE NOT a1 IS NOT NULL",
+            ]
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_defined_and_defined(self):
+        ra = "\\select_{defined(a1) and defined(a2)} alpha;"
+        expected = [
+            [
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (a1 IS NOT NULL AND a2 IS NOT NULL)",
+            ]
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_defined_or_defined(self):
+        ra = "\\select_{defined(a1) or defined(a2)} alpha;"
+        expected = [
+            [
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (a1 IS NOT NULL OR a2 IS NOT NULL)",
+            ]
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_defined_with_equality(self):
+        ra = "\\select_{defined(a1) and a1=5} alpha;"
+        expected = [
+            [
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (a1 IS NOT NULL AND (a1 = 5))",
+            ]
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_not_defined_with_equality(self):
+        ra = "\\select_{not defined(a1) or a2=10} alpha;"
+        expected = [
+            [
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (NOT a1 IS NOT NULL OR (a2 = 10))",
+            ]
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_complex_defined_condition(self):
+        ra = "\\select_{defined(a1) and (a2=5 or not defined(a3))} alpha;"
+        expected = [
+            [
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (a1 IS NOT NULL AND ((a2 = 5) OR NOT a3 IS NOT NULL))",
+            ]
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_defined_with_relation_attribute(self):
+        ra = "\\select_{defined(alpha.a1)} alpha;"
+        expected = [
+            [
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE alpha.a1 IS NOT NULL",
+            ]
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_multiple_defined_conditions(self):
+        ra = "\\select_{defined(a1)} \\select_{defined(a2)} alpha;"
+        expected = [
+            [
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE a2 IS NOT NULL",
+                "SELECT alpha.a1, alpha.a2, alpha.a3 FROM alpha WHERE (a2 IS NOT NULL) AND (a1 IS NOT NULL)",
+            ]
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
