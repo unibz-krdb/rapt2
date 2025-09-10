@@ -9,5 +9,10 @@ theta_join_expr ::= expression join param_start conditions param_stop expression
 
 intersect_expr ::= expression intersect expression
 
+; Three-valued logic rules
+defined_op ::= "defined"
+defined_condition ::= defined_op "(" operand ")"
+condition ::= condition | defined_condition
+
 intersect ::= "\\intersect"
 natural_join ::= "\\natural_join"

@@ -15,11 +15,11 @@ class TestSQLSequence(TestTransformer):
     def setUp(self):
         self.translate = self.translate_func(
             functools.partial(
-                Rapt(grammar="3VL Grammar").to_sql_sequence, use_bag_semantics=True
+                Rapt(grammar="Extended Grammar").to_sql_sequence, use_bag_semantics=True
             )
         )
         self.translate_set = self.translate_func(
-            functools.partial(Rapt(grammar="3VL Grammar").to_sql_sequence)
+            functools.partial(Rapt(grammar="Extended Grammar").to_sql_sequence)
         )
 
 

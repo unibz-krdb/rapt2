@@ -2,6 +2,8 @@ from pyparsing import (
     CaselessKeyword,
     infixNotation,
     opAssoc,
+    Literal,
+    Group,
 )
 
 from .core_grammar import CoreGrammar
@@ -33,7 +35,7 @@ class ExtendedGrammar(CoreGrammar):
         )
         return long ^ short
 
-    def theta_parse_action(self, s, l, t):
+    def theta_parse_action(self, s, loc, t):
         t[0] = self.syntax.theta_join_op
         return t
 
@@ -47,6 +49,29 @@ class ExtendedGrammar(CoreGrammar):
         intersect_op ::= intersect_name
         """
         return CaselessKeyword(self.syntax.intersect_op)
+
+    @property
+    def defined_op(self):
+        return CaselessKeyword(self.syntax.defined_op)
+
+    @property
+    def defined_condition(self):
+        """
+        defined_condition ::= defined_op "(" operand ")"
+        """
+        return Group(
+            self.defined_op
+            + Literal(self.syntax.paren_left).suppress()
+            + self.operand
+            + Literal(self.syntax.paren_right).suppress()
+        )
+
+    @property
+    def condition(self):
+        """
+        condition ::= condition | defined_condition
+        """
+        return super().condition | self.defined_condition
 
     @property
     def expression(self):
