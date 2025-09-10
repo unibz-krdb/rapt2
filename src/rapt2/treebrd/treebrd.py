@@ -8,7 +8,6 @@ from rapt2.treebrd.condition_node import (
     UnaryConditionalOperator,
 )
 from .schema import Schema
-from .utility import flatten
 from .node import (
     SelectNode,
     ProjectNode,

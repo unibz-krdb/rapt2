@@ -9,7 +9,6 @@ from pyparsing import (
     Suppress,
     OneOrMore,
     alphanums,
-    Literal,
 )
 
 from .condition_grammar import ConditionGrammar

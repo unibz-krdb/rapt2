@@ -2,7 +2,6 @@ from pyparsing import (
     CaselessKeyword,
     infixNotation,
     opAssoc,
-    Literal,
 )
 
 from .core_grammar import CoreGrammar

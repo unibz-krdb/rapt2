@@ -1,4 +1,4 @@
-from pyparsing import oneOf, CaselessKeyword, infixNotation, opAssoc, Literal, Group
+from pyparsing import oneOf, CaselessKeyword, opAssoc, Group
 from pyparsing.helpers import infix_notation
 
 from .proto_grammar import ProtoGrammar

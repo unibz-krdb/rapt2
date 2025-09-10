@@ -2,7 +2,6 @@ import copy
 from enum import Enum
 
 from .errors import InputError, RelationReferenceError
-from .grammars.condition_grammar import get_attribute_references
 from .attributes import AttributeList
 from .condition_node import ConditionNode
 
