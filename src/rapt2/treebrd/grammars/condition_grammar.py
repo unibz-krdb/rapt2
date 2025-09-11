@@ -100,7 +100,7 @@ class ConditionGrammar(ProtoGrammar):
             base_expr=self.condition,
             op_list=[
                 (self.not_op, 1, opAssoc.RIGHT),
-                (self.logical_binary_op, 2, opAssoc.LEFT),
+                (self.logical_binary_op, 2, opAssoc.RIGHT),
             ],
             lpar=self.syntax.paren_left,
             rpar=self.syntax.paren_right,
