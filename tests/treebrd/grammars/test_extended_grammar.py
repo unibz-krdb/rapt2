@@ -298,7 +298,9 @@ class TestFullOuterJoin(GrammarTestCase):
 
     def test_simple(self):
         expression = "zeppelin \\full_outer_join_{year = year} floyd;"
-        expected = [[["zeppelin"], "\\full_outer_join", [["year", "=", "year"]], ["floyd"]]]
+        expected = [
+            [["zeppelin"], "\\full_outer_join", [["year", "=", "year"]], ["floyd"]]
+        ]
         actual = self.parse(expression)
         self.assertEqual(expected, actual)
 
@@ -346,9 +348,7 @@ class TestFullOuterJoin(GrammarTestCase):
         self.assertEqual(expected, actual)
 
     def test_other_unary(self):
-        expression = (
-            "\\project_{albums} zeppelin \\full_outer_join_{year = year} \\project_{albums} floyd;"
-        )
+        expression = "\\project_{albums} zeppelin \\full_outer_join_{year = year} \\project_{albums} floyd;"
         expected = [
             [
                 ["\\project", ["albums"], ["zeppelin"]],
@@ -386,7 +386,9 @@ class TestLeftOuterJoin(GrammarTestCase):
 
     def test_simple(self):
         expression = "zeppelin \\left_outer_join_{year = year} floyd;"
-        expected = [[["zeppelin"], "\\left_outer_join", [["year", "=", "year"]], ["floyd"]]]
+        expected = [
+            [["zeppelin"], "\\left_outer_join", [["year", "=", "year"]], ["floyd"]]
+        ]
         actual = self.parse(expression)
         self.assertEqual(expected, actual)
 
@@ -434,9 +436,7 @@ class TestLeftOuterJoin(GrammarTestCase):
         self.assertEqual(expected, actual)
 
     def test_other_unary(self):
-        expression = (
-            "\\project_{albums} zeppelin \\left_outer_join_{year = year} \\project_{albums} floyd;"
-        )
+        expression = "\\project_{albums} zeppelin \\left_outer_join_{year = year} \\project_{albums} floyd;"
         expected = [
             [
                 ["\\project", ["albums"], ["zeppelin"]],
@@ -474,7 +474,9 @@ class TestRightOuterJoin(GrammarTestCase):
 
     def test_simple(self):
         expression = "zeppelin \\right_outer_join_{year = year} floyd;"
-        expected = [[["zeppelin"], "\\right_outer_join", [["year", "=", "year"]], ["floyd"]]]
+        expected = [
+            [["zeppelin"], "\\right_outer_join", [["year", "=", "year"]], ["floyd"]]
+        ]
         actual = self.parse(expression)
         self.assertEqual(expected, actual)
 
@@ -522,9 +524,7 @@ class TestRightOuterJoin(GrammarTestCase):
         self.assertEqual(expected, actual)
 
     def test_other_unary(self):
-        expression = (
-            "\\project_{albums} zeppelin \\right_outer_join_{year = year} \\project_{albums} floyd;"
-        )
+        expression = "\\project_{albums} zeppelin \\right_outer_join_{year = year} \\project_{albums} floyd;"
         expected = [
             [
                 ["\\project", ["albums"], ["zeppelin"]],

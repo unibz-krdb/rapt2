@@ -141,7 +141,13 @@ class TestConditionRules(GrammarTestCase):
 
     def test_conditions_chained_and_four(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [[["1", "=", "1"], "and", [["2", "=", "2"], "and", [["3", "=", "3"], "and", ["4", "=", "4"]]]]]
+        expected = [
+            [
+                ["1", "=", "1"],
+                "and",
+                [["2", "=", "2"], "and", [["3", "=", "3"], "and", ["4", "=", "4"]]],
+            ]
+        ]
         actual = parse("1 = 1 and 2 = 2 and 3 = 3 and 4 = 4")
         self.assertEqual(actual, expected)
 
@@ -159,19 +165,37 @@ class TestConditionRules(GrammarTestCase):
 
     def test_conditions_chained_or_four(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [[["1", "=", "1"], "or", [["2", "=", "2"], "or", [["3", "=", "3"], "or", ["4", "=", "4"]]]]]
+        expected = [
+            [
+                ["1", "=", "1"],
+                "or",
+                [["2", "=", "2"], "or", [["3", "=", "3"], "or", ["4", "=", "4"]]],
+            ]
+        ]
         actual = parse("1 = 1 or 2 = 2 or 3 = 3 or 4 = 4")
         self.assertEqual(actual, expected)
 
     def test_conditions_mixed_chained_and_or(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [[["1", "=", "1"], "and", [["2", "=", "2"], "or", [["3", "=", "3"], "and", ["4", "=", "4"]]]]]
+        expected = [
+            [
+                ["1", "=", "1"],
+                "and",
+                [["2", "=", "2"], "or", [["3", "=", "3"], "and", ["4", "=", "4"]]],
+            ]
+        ]
         actual = parse("1 = 1 and 2 = 2 or 3 = 3 and 4 = 4")
         self.assertEqual(actual, expected)
 
     def test_conditions_mixed_chained_or_and(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [[["1", "=", "1"], "or", [["2", "=", "2"], "and", [["3", "=", "3"], "or", ["4", "=", "4"]]]]]
+        expected = [
+            [
+                ["1", "=", "1"],
+                "or",
+                [["2", "=", "2"], "and", [["3", "=", "3"], "or", ["4", "=", "4"]]],
+            ]
+        ]
         actual = parse("1 = 1 or 2 = 2 and 3 = 3 or 4 = 4")
         self.assertEqual(actual, expected)
 
@@ -201,37 +225,90 @@ class TestConditionRules(GrammarTestCase):
 
     def test_conditions_chained_with_not_mixed(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [[["not", ["1", "=", "1"]], "and", [["2", "=", "2"], "or", [["3", "=", "3"], "and", ["not", ["4", "=", "4"]]]]]]
+        expected = [
+            [
+                ["not", ["1", "=", "1"]],
+                "and",
+                [
+                    ["2", "=", "2"],
+                    "or",
+                    [["3", "=", "3"], "and", ["not", ["4", "=", "4"]]],
+                ],
+            ]
+        ]
         actual = parse("not 1 = 1 and 2 = 2 or 3 = 3 and not 4 = 4")
         self.assertEqual(actual, expected)
 
     def test_conditions_chained_with_not_parentheses(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [["not", [["1", "=", "1"], "and", [["2", "=", "2"], "or", [["3", "=", "3"], "and", ["4", "=", "4"]]]]]]
+        expected = [
+            [
+                "not",
+                [
+                    ["1", "=", "1"],
+                    "and",
+                    [["2", "=", "2"], "or", [["3", "=", "3"], "and", ["4", "=", "4"]]],
+                ],
+            ]
+        ]
         actual = parse("not (1 = 1 and 2 = 2 or 3 = 3 and 4 = 4)")
         self.assertEqual(actual, expected)
 
     def test_conditions_chained_complex_nested(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [[[["1", "=", "1"], "and", [["2", "=", "2"], "or", ["3", "=", "3"]]], "and", [["4", "=", "4"], "or", [["5", "=", "5"], "and", ["6", "=", "6"]]]]]
+        expected = [
+            [
+                [["1", "=", "1"], "and", [["2", "=", "2"], "or", ["3", "=", "3"]]],
+                "and",
+                [["4", "=", "4"], "or", [["5", "=", "5"], "and", ["6", "=", "6"]]],
+            ]
+        ]
         actual = parse("(1 = 1 and (2 = 2 or 3 = 3)) and (4 = 4 or (5 = 5 and 6 = 6))")
         self.assertEqual(actual, expected)
 
     def test_conditions_chained_with_strings(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [[["'name'", "=", "'john'"], "and", [["'age'", ">", "18"], "or", [["'status'", "=", "'active'"], "and", ["'role'", "!=", "'admin'"]]]]]
-        actual = parse("'name' = 'john' and 'age' > 18 or 'status' = 'active' and 'role' != 'admin'")
+        expected = [
+            [
+                ["'name'", "=", "'john'"],
+                "and",
+                [
+                    ["'age'", ">", "18"],
+                    "or",
+                    [["'status'", "=", "'active'"], "and", ["'role'", "!=", "'admin'"]],
+                ],
+            ]
+        ]
+        actual = parse(
+            "'name' = 'john' and 'age' > 18 or 'status' = 'active' and 'role' != 'admin'"
+        )
         self.assertEqual(actual, expected)
 
     def test_conditions_chained_with_numbers(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [[["1.5", ">", "1.0"], "and", [["2.7", "<", "3.0"], "or", [["4.2", ">=", "4.0"], "and", ["5.1", "<=", "6.0"]]]]]
+        expected = [
+            [
+                ["1.5", ">", "1.0"],
+                "and",
+                [
+                    ["2.7", "<", "3.0"],
+                    "or",
+                    [["4.2", ">=", "4.0"], "and", ["5.1", "<=", "6.0"]],
+                ],
+            ]
+        ]
         actual = parse("1.5 > 1.0 and 2.7 < 3.0 or 4.2 >= 4.0 and 5.1 <= 6.0")
         self.assertEqual(actual, expected)
 
     def test_conditions_chained_with_identifiers(self):
         parse = self.parse_function(self.parser.conditions)
-        expected = [[["x", "=", "y"], "and", [["a", "!=", "b"], "or", [["c", "<", "d"], "and", ["e", ">=", "f"]]]]]
+        expected = [
+            [
+                ["x", "=", "y"],
+                "and",
+                [["a", "!=", "b"], "or", [["c", "<", "d"], "and", ["e", ">=", "f"]]],
+            ]
+        ]
         actual = parse("x = y and a != b or c < d and e >= f")
         self.assertEqual(actual, expected)
 

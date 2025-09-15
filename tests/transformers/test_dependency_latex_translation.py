@@ -9,7 +9,7 @@ class TestDependencyLatexTranslation:
 
     def setup_method(self):
         """Set up test fixtures."""
-        self.rapt = Rapt(grammar='Dependency Grammar')
+        self.rapt = Rapt(grammar="Dependency Grammar")
         self.schema = {"R": ["a", "b", "c"], "S": ["x", "y"], "T": ["id", "name"]}
 
     def test_primary_key_latex_translation(self):
@@ -63,22 +63,25 @@ class TestDependencyLatexTranslation:
 
     def test_multiple_dependency_statements_latex_translation(self):
         """Test LaTeX translation of multiple dependency statements."""
-        latex = self.rapt.to_qtree("pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);", self.schema)
+        latex = self.rapt.to_qtree(
+            "pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);",
+            self.schema,
+        )
         assert len(latex) == 5
-        
+
         # Check first statement (primary key)
         assert "\\text{pk}_{a}(r)" in latex[0]
-        
+
         # Check second statement (multivalued dependency)
         assert "\\text{mvd}_{b, c}(s)" in latex[1]
-        
+
         # Check third statement (functional dependency)
         assert "\\text{fd}_{x, y}" in latex[2]
         assert "(t)" in latex[2]
-        
+
         # Check fourth statement (inclusion equivalence)
         assert "r[a] \\equiv s[b]" in latex[3]
-        
+
         # Check fifth statement (inclusion subsumption)
         assert "s[x] \\subseteq t[y]" in latex[4]
 
@@ -89,9 +92,9 @@ class TestDependencyLatexTranslation:
             "mvd_{x, y} S;",
             "fd_{id, name}_{id > 0} T;",
             "inc=_{a, b} (R, S);",
-            "inc⊆_{x, y} (S, T);"
+            "inc⊆_{x, y} (S, T);",
         ]
-        
+
         for test_case in test_cases:
             latex = self.rapt.to_qtree(test_case, self.schema)
             assert len(latex) == 1
@@ -112,7 +115,7 @@ class TestDependencyLatexTranslation:
             ("inc=_{a, b} (R, S);", "\\equiv"),
             ("inc⊆_{a, b} (R, S);", "\\subseteq"),
         ]
-        
+
         for test_case, expected_operator in test_mappings:
             latex = self.rapt.to_qtree(test_case, self.schema)
             assert expected_operator in latex[0]
@@ -122,7 +125,7 @@ class TestDependencyLatexTranslation:
         # Test single attribute
         latex = self.rapt.to_qtree("pk_{a} R;", self.schema)
         assert "_{a}" in latex[0]
-        
+
         # Test multiple attributes
         latex = self.rapt.to_qtree("pk_{a, b, c} R;", self.schema)
         assert "_{a, b, c}" in latex[0]
@@ -132,11 +135,11 @@ class TestDependencyLatexTranslation:
         # Test single relation
         latex = self.rapt.to_qtree("pk_{a} R;", self.schema)
         assert "(r)" in latex[0]
-        
+
         # Test inclusion dependencies with new format
         latex = self.rapt.to_qtree("inc=_{a, b} (R, S);", self.schema)
         assert "r[a]" in latex[0] and "s[b]" in latex[0]
-        
+
         latex = self.rapt.to_qtree("inc⊆_{x, y} (S, T);", self.schema)
         assert "s[x]" in latex[0] and "t[y]" in latex[0]
 
@@ -150,12 +153,15 @@ class TestDependencyLatexTranslation:
     def test_latex_translation_with_different_schemas(self):
         """Test LaTeX translation with different schema configurations."""
         schema1 = {"Users": ["id", "name", "email"]}
-        schema2 = {"Products": ["product_id", "name", "price"], "Orders": ["order_id", "customer_id"]}
-        
+        schema2 = {
+            "Products": ["product_id", "name", "price"],
+            "Orders": ["order_id", "customer_id"],
+        }
+
         # Test with schema1
         latex1 = self.rapt.to_qtree("pk_{id} Users;", schema1)
         assert "\\text{pk}_{id}(users)" in latex1[0]
-        
+
         # Test with schema2
         latex2 = self.rapt.to_qtree("inc=_{id, name} (Products, Orders);", schema2)
         assert "products[id] \\equiv orders[name]" in latex2[0]
@@ -165,7 +171,7 @@ class TestDependencyLatexTranslation:
         # Test with invalid syntax
         with pytest.raises(Exception):
             self.rapt.to_qtree("invalid syntax", self.schema)
-        
+
         # Test with empty input
         with pytest.raises(Exception):
             self.rapt.to_qtree("", self.schema)
@@ -173,11 +179,11 @@ class TestDependencyLatexTranslation:
     def test_latex_translation_consistency_across_runs(self):
         """Test that LaTeX translation is consistent across multiple runs."""
         test_case = "pk_{a, b} R; mvd_{x, y} S;"
-        
+
         # Run multiple times
         latex1 = self.rapt.to_qtree(test_case, self.schema)
         latex2 = self.rapt.to_qtree(test_case, self.schema)
-        
+
         assert latex1 == latex2
         assert len(latex1) == 2
         assert len(latex2) == 2
@@ -195,11 +201,11 @@ class TestDependencyLatexTranslationIntegration:
     def test_direct_grammar_latex_translation(self):
         """Test LaTeX translation using grammar directly."""
         from src.rapt2.transformers.qtree import qtree_translator
-        
+
         # Parse dependency statements
         trees = self.builder.build("pk_{a, b} R;", self.schema)
         assert len(trees) == 1
-        
+
         # Translate to LaTeX
         latex = qtree_translator.translate(trees)
         assert len(latex) == 1
@@ -208,15 +214,21 @@ class TestDependencyLatexTranslationIntegration:
     def test_multiple_dependency_types_latex_translation(self):
         """Test LaTeX translation of all dependency types in one go."""
         from src.rapt2.transformers.qtree import qtree_translator
-        
+
         test_input = "pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);"
         trees = self.builder.build(test_input, self.schema)
         assert len(trees) == 5
-        
+
         latex = qtree_translator.translate(trees)
         assert len(latex) == 5
-        
+
         # Check each dependency type is properly translated
-        expected_operators = ["\\text{pk}", "\\text{mvd}", "\\text{fd}", "\\equiv", "\\subseteq"]
+        expected_operators = [
+            "\\text{pk}",
+            "\\text{mvd}",
+            "\\text{fd}",
+            "\\equiv",
+            "\\subseteq",
+        ]
         for i, expected_op in enumerate(expected_operators):
             assert expected_op in latex[i]

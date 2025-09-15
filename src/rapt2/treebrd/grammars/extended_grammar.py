@@ -62,7 +62,14 @@ class ExtendedGrammar(CoreGrammar):
 
     @property
     def binary_op_p1(self):
-        return super().binary_op_p1 ^ self.natural_join ^ self.theta_join ^ self.full_outer_join ^ self.left_outer_join ^ self.right_outer_join
+        return (
+            super().binary_op_p1
+            ^ self.natural_join
+            ^ self.theta_join
+            ^ self.full_outer_join
+            ^ self.left_outer_join
+            ^ self.right_outer_join
+        )
 
     @property
     def intersect(self):

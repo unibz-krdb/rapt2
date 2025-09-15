@@ -320,9 +320,9 @@ class DependencyNode(Node):
 
     def __eq__(self, other):
         return (
-            super().__eq__(other) and
-            self.relation_name == other.relation_name and
-            self.attributes == other.attributes
+            super().__eq__(other)
+            and self.relation_name == other.relation_name
+            and self.attributes == other.attributes
         )
 
     def post_order(self):
@@ -357,10 +357,7 @@ class FunctionalDependencyNode(DependencyNode):
         self.conditions = conditions
 
     def __eq__(self, other):
-        return (
-            super().__eq__(other) and
-            self.conditions == other.conditions
-        )
+        return super().__eq__(other) and self.conditions == other.conditions
 
 
 class InclusionEquivalenceNode(DependencyNode):
@@ -373,10 +370,7 @@ class InclusionEquivalenceNode(DependencyNode):
         self.relation_names = relation_names
 
     def __eq__(self, other):
-        return (
-            super().__eq__(other) and
-            self.relation_names == other.relation_names
-        )
+        return super().__eq__(other) and self.relation_names == other.relation_names
 
 
 class InclusionSubsumptionNode(DependencyNode):
@@ -389,10 +383,7 @@ class InclusionSubsumptionNode(DependencyNode):
         self.relation_names = relation_names
 
     def __eq__(self, other):
-        return (
-            super().__eq__(other) and
-            self.relation_names == other.relation_names
-        )
+        return super().__eq__(other) and self.relation_names == other.relation_names
 
 
 class Operator(Enum):

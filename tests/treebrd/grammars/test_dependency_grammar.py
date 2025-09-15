@@ -81,17 +81,17 @@ class TestDependencyGrammar:
         """Test parsing of multiple dependency statements."""
         result = self.grammar.parse("pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T;")
         assert len(result) == 3
-        
+
         # Check first statement (primary key)
         assert result[0][0] == "pk"
         assert list(result[0][1]) == ["a"]
         assert result[0][2] == "r"
-        
+
         # Check second statement (multivalued dependency)
         assert result[1][0] == "mvd"
         assert list(result[1][1]) == ["b", "c"]
         assert result[1][2] == "s"
-        
+
         # Check third statement (functional dependency)
         assert result[2][0] == "fd"
         assert list(result[2][1]) == ["x", "y"]
@@ -122,7 +122,7 @@ class TestDependencyGrammarIntegration:
         """Test creation of PrimaryKeyNode from dependency statements."""
         trees = self.builder.build("pk_{a, b} R;", self.schema)
         assert len(trees) == 1
-        
+
         node = trees[0]
         assert isinstance(node, PrimaryKeyNode)
         assert node.operator == Operator.primary_key
@@ -133,7 +133,7 @@ class TestDependencyGrammarIntegration:
         """Test creation of MultivaluedDependencyNode from dependency statements."""
         trees = self.builder.build("mvd_{a, b} R;", self.schema)
         assert len(trees) == 1
-        
+
         node = trees[0]
         assert isinstance(node, MultivaluedDependencyNode)
         assert node.operator == Operator.multivalued_dependency
@@ -144,7 +144,7 @@ class TestDependencyGrammarIntegration:
         """Test creation of FunctionalDependencyNode from dependency statements."""
         trees = self.builder.build("fd_{a, b}_{a = 1} R;", self.schema)
         assert len(trees) == 1
-        
+
         node = trees[0]
         assert isinstance(node, FunctionalDependencyNode)
         assert node.operator == Operator.functional_dependency
@@ -156,7 +156,7 @@ class TestDependencyGrammarIntegration:
         """Test creation of InclusionEquivalenceNode from dependency statements."""
         trees = self.builder.build("inc=_{a, b} (R, S);", self.schema)
         assert len(trees) == 1
-        
+
         node = trees[0]
         assert isinstance(node, InclusionEquivalenceNode)
         assert node.operator == Operator.inclusion_equivalence
@@ -167,7 +167,7 @@ class TestDependencyGrammarIntegration:
         """Test creation of InclusionSubsumptionNode from dependency statements."""
         trees = self.builder.build("inc⊆_{a, b} (R, S);", self.schema)
         assert len(trees) == 1
-        
+
         node = trees[0]
         assert isinstance(node, InclusionSubsumptionNode)
         assert node.operator == Operator.inclusion_subsumption
@@ -176,17 +176,19 @@ class TestDependencyGrammarIntegration:
 
     def test_multiple_dependency_statements(self):
         """Test parsing multiple dependency statements into multiple nodes."""
-        trees = self.builder.build("pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T;", self.schema)
+        trees = self.builder.build(
+            "pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T;", self.schema
+        )
         assert len(trees) == 3
-        
+
         # Check first node (primary key)
         assert isinstance(trees[0], PrimaryKeyNode)
         assert trees[0].relation_name == "r"
-        
+
         # Check second node (multivalued dependency)
         assert isinstance(trees[1], MultivaluedDependencyNode)
         assert trees[1].relation_name == "s"
-        
+
         # Check third node (functional dependency)
         assert isinstance(trees[2], FunctionalDependencyNode)
         assert trees[2].relation_name == "t"
@@ -195,14 +197,14 @@ class TestDependencyGrammarIntegration:
         """Test equality comparison of dependency nodes."""
         trees1 = self.builder.build("pk_{a, b} R;", self.schema)
         trees2 = self.builder.build("pk_{a, b} R;", self.schema)
-        
+
         # Test that nodes have the same properties
         node1 = trees1[0]
         node2 = trees2[0]
         assert node1.operator == node2.operator
         assert node1.relation_name == node2.relation_name
         assert list(node1.attributes) == list(node2.attributes)
-        
+
         # Test inequality
         trees3 = self.builder.build("pk_{a, c} R;", self.schema)
         node3 = trees3[0]
@@ -212,7 +214,7 @@ class TestDependencyGrammarIntegration:
         """Test post-order traversal of dependency nodes."""
         trees = self.builder.build("pk_{a, b} R;", self.schema)
         node = trees[0]
-        
+
         post_order = node.post_order()
         assert len(post_order) == 1
         assert post_order[0] == node
@@ -224,6 +226,7 @@ class TestDependencyGrammarWithRapt:
     def setup_method(self):
         """Set up test fixtures."""
         from src.rapt2.rapt import Rapt
+
         self.rapt = Rapt(grammar="Dependency Grammar")
         self.schema = {"R": ["a", "b", "c"], "S": ["x", "y"], "T": ["id", "name"]}
 
@@ -240,8 +243,7 @@ class TestDependencyGrammarWithRapt:
     def test_multiple_dependency_syntax_trees(self):
         """Test generation of multiple syntax trees for multiple dependency statements."""
         trees = self.rapt.to_syntax_tree(
-            "pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T;", 
-            self.schema
+            "pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T;", self.schema
         )
         assert len(trees) == 3
         assert isinstance(trees[0], PrimaryKeyNode)

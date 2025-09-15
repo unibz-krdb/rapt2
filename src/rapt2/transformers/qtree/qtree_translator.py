@@ -243,6 +243,7 @@ class Translator(BaseTranslator):
 
         return f"[.${rel1}[{attr1}] {op} {rel2}[{attr2}]$ ]"
 
+
 def translate(roots):
     """
     Translate a treebrd tree rooted at root into latex tree.

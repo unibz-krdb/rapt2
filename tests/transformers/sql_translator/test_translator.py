@@ -949,7 +949,9 @@ class TestFullOuterJoin(TestTranslator):
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_full_outer_join_with_project_set(self):
-        instring = "\\project_{alpha.a1, beta.b1} (alpha \\full_outer_join_{a1 = b1} beta);"
+        instring = (
+            "\\project_{alpha.a1, beta.b1} (alpha \\full_outer_join_{a1 = b1} beta);"
+        )
         translation = self.translate_set(instring)
         expected = [
             ("1", "1"),
@@ -1030,7 +1032,9 @@ class TestLeftOuterJoin(TestTranslator):
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_left_outer_join_with_project_set(self):
-        instring = "\\project_{alpha.a1, beta.b1} (alpha \\left_outer_join_{a1 = b1} beta);"
+        instring = (
+            "\\project_{alpha.a1, beta.b1} (alpha \\left_outer_join_{a1 = b1} beta);"
+        )
         translation = self.translate_set(instring)
         expected = [
             ("1", "1"),
@@ -1108,7 +1112,9 @@ class TestRightOuterJoin(TestTranslator):
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_right_outer_join_with_project_set(self):
-        instring = "\\project_{alpha.a1, beta.b1} (alpha \\right_outer_join_{a1 = b1} beta);"
+        instring = (
+            "\\project_{alpha.a1, beta.b1} (alpha \\right_outer_join_{a1 = b1} beta);"
+        )
         translation = self.translate_set(instring)
         expected = [
             ("1", "1"),
@@ -1149,16 +1155,16 @@ class TestDefined(TestTranslator):
         }
         cls.data = {
             "alpha": [
-                ("1", "a", "x"),      # All non-null
-                ("2", None, "y"),     # a2 is null
-                (None, "c", "z"),     # a1 is null
-                ("4", "d", None),     # a3 is null
-                (None, None, None),   # All null
+                ("1", "a", "x"),  # All non-null
+                ("2", None, "y"),  # a2 is null
+                (None, "c", "z"),  # a1 is null
+                ("4", "d", None),  # a3 is null
+                (None, None, None),  # All null
             ],
             "beta": [
-                ("1", "p"),           # All non-null
-                (None, "q"),          # b1 is null
-                ("3", None),          # b2 is null
+                ("1", "p"),  # All non-null
+                (None, "q"),  # b1 is null
+                ("3", None),  # b2 is null
             ],
         }
         super().setUpClass()
@@ -1167,9 +1173,9 @@ class TestDefined(TestTranslator):
         instring = "\\select_{defined(a1)} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x"),          # a1 = "1" (defined)
-            ("2", None, "y"),         # a1 = "2" (defined)
-            ("4", "d", None),         # a1 = "4" (defined)
+            ("1", "a", "x"),  # a1 = "1" (defined)
+            ("2", None, "y"),  # a1 = "2" (defined)
+            ("4", "d", None),  # a1 = "4" (defined)
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1177,9 +1183,9 @@ class TestDefined(TestTranslator):
         instring = "\\select_{defined(a1)} alpha;"
         translation = self.translate_bag(instring)
         expected = [
-            ("1", "a", "x"),          # a1 = "1" (defined)
-            ("2", None, "y"),         # a1 = "2" (defined)
-            ("4", "d", None),         # a1 = "4" (defined)
+            ("1", "a", "x"),  # a1 = "1" (defined)
+            ("2", None, "y"),  # a1 = "2" (defined)
+            ("4", "d", None),  # a1 = "4" (defined)
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1187,8 +1193,8 @@ class TestDefined(TestTranslator):
         instring = "\\select_{not defined(a1)} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            (None, "c", "z"),         # a1 is null
-            (None, None, None),       # a1 is null
+            (None, "c", "z"),  # a1 is null
+            (None, None, None),  # a1 is null
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1196,8 +1202,8 @@ class TestDefined(TestTranslator):
         instring = "\\select_{defined(a1) and defined(a2)} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x"),          # Both a1 and a2 defined
-            ("4", "d", None),         # Both a1 and a2 defined (a3 is null but that's OK)
+            ("1", "a", "x"),  # Both a1 and a2 defined
+            ("4", "d", None),  # Both a1 and a2 defined (a3 is null but that's OK)
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1205,10 +1211,10 @@ class TestDefined(TestTranslator):
         instring = "\\select_{defined(a1) or defined(a2)} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x"),          # Both defined
-            ("2", None, "y"),         # a1 defined, a2 null
-            (None, "c", "z"),         # a1 null, a2 defined
-            ("4", "d", None),         # a1 defined, a2 defined
+            ("1", "a", "x"),  # Both defined
+            ("2", None, "y"),  # a1 defined, a2 null
+            (None, "c", "z"),  # a1 null, a2 defined
+            ("4", "d", None),  # a1 defined, a2 defined
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1216,7 +1222,7 @@ class TestDefined(TestTranslator):
         instring = "\\select_{defined(a1) and a1 = '1'} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x"),          # a1 defined and equals "1"
+            ("1", "a", "x"),  # a1 defined and equals "1"
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1224,8 +1230,8 @@ class TestDefined(TestTranslator):
         instring = "\\select_{not defined(a1) or a2 = 'c'} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            (None, "c", "z"),         # a1 not defined, a2 = "c"
-            (None, None, None),       # a1 not defined
+            (None, "c", "z"),  # a1 not defined, a2 = "c"
+            (None, None, None),  # a1 not defined
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1233,8 +1239,8 @@ class TestDefined(TestTranslator):
         instring = "\\select_{defined(a1) and (a2 = 'a' or not defined(a3))} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x"),          # a1 defined, a2 = "a"
-            ("4", "d", None),         # a1 defined, a3 not defined
+            ("1", "a", "x"),  # a1 defined, a2 = "a"
+            ("4", "d", None),  # a1 defined, a3 not defined
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1242,9 +1248,9 @@ class TestDefined(TestTranslator):
         instring = "\\select_{defined(alpha.a1)} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x"),          # alpha.a1 defined
-            ("2", None, "y"),         # alpha.a1 defined
-            ("4", "d", None),         # alpha.a1 defined
+            ("1", "a", "x"),  # alpha.a1 defined
+            ("2", None, "y"),  # alpha.a1 defined
+            ("4", "d", None),  # alpha.a1 defined
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1252,9 +1258,9 @@ class TestDefined(TestTranslator):
         instring = "\\project_{a1, a2} \\select_{defined(a1)} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a"),               # a1 defined
-            ("2", None),              # a1 defined
-            ("4", "d"),               # a1 defined
+            ("1", "a"),  # a1 defined
+            ("2", None),  # a1 defined
+            ("4", "d"),  # a1 defined
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1262,27 +1268,29 @@ class TestDefined(TestTranslator):
         instring = "alpha \\join_{defined(alpha.a1) and defined(beta.b1)} beta;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x", "1", "p"),    # Both a1 and b1 defined
-            ("2", None, "y", "1", "p"),   # Both a1 and b1 defined
-            ("4", "d", None, "1", "p"),   # Both a1 and b1 defined
-            ("1", "a", "x", "3", None),   # Both a1 and b1 defined (b1="3")
+            ("1", "a", "x", "1", "p"),  # Both a1 and b1 defined
+            ("2", None, "y", "1", "p"),  # Both a1 and b1 defined
+            ("4", "d", None, "1", "p"),  # Both a1 and b1 defined
+            ("1", "a", "x", "3", None),  # Both a1 and b1 defined (b1="3")
             ("2", None, "y", "3", None),  # Both a1 and b1 defined (b1="3")
             ("4", "d", None, "3", None),  # Both a1 and b1 defined (b1="3")
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
     def test_defined_with_outer_join_set(self):
-        instring = "alpha \\left_outer_join_{defined(alpha.a1) and defined(beta.b1)} beta;"
+        instring = (
+            "alpha \\left_outer_join_{defined(alpha.a1) and defined(beta.b1)} beta;"
+        )
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x", "1", "p"),    # Both defined - matches
-            ("2", None, "y", "1", "p"),   # Both defined - matches
-            ("4", "d", None, "1", "p"),   # Both defined - matches
-            ("1", "a", "x", "3", None),   # Both defined - matches (b1="3")
+            ("1", "a", "x", "1", "p"),  # Both defined - matches
+            ("2", None, "y", "1", "p"),  # Both defined - matches
+            ("4", "d", None, "1", "p"),  # Both defined - matches
+            ("1", "a", "x", "3", None),  # Both defined - matches (b1="3")
             ("2", None, "y", "3", None),  # Both defined - matches (b1="3")
             ("4", "d", None, "3", None),  # Both defined - matches (b1="3")
-            (None, "c", "z", None, None), # a1 not defined - no match
-            (None, None, None, None, None), # a1 not defined - no match
+            (None, "c", "z", None, None),  # a1 not defined - no match
+            (None, None, None, None, None),  # a1 not defined - no match
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1290,9 +1298,9 @@ class TestDefined(TestTranslator):
         instring = "\\select_{defined(a1)} alpha \\union \\select_{defined(a1)} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x"),          # From alpha where a1 defined
-            ("2", None, "y"),         # From alpha where a1 defined
-            ("4", "d", None),         # From alpha where a1 defined
+            ("1", "a", "x"),  # From alpha where a1 defined
+            ("2", None, "y"),  # From alpha where a1 defined
+            ("4", "d", None),  # From alpha where a1 defined
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1300,8 +1308,8 @@ class TestDefined(TestTranslator):
         instring = "\\select_{defined(a1)} \\select_{defined(a2)} alpha;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x"),          # Both a1 and a2 defined
-            ("4", "d", None),         # Both a1 and a2 defined (a3 is null)
+            ("1", "a", "x"),  # Both a1 and a2 defined
+            ("4", "d", None),  # Both a1 and a2 defined (a3 is null)
         ]
         self.assertCountEqual(expected, self.query_list(translation))
 
@@ -1309,8 +1317,8 @@ class TestDefined(TestTranslator):
         instring = "defined_alpha := \\select_{defined(a1)} alpha; defined_alpha;"
         translation = self.translate_set(instring)
         expected = [
-            ("1", "a", "x"),          # a1 defined
-            ("2", None, "y"),         # a1 defined
-            ("4", "d", None),         # a1 defined
+            ("1", "a", "x"),  # a1 defined
+            ("2", None, "y"),  # a1 defined
+            ("4", "d", None),  # a1 defined
         ]
         self.assertCountEqual(expected, self.query_list(translation))

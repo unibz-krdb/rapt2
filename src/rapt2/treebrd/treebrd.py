@@ -232,13 +232,13 @@ class TreeBRD:
     def is_dependency_statement(self, exp: ParseResults) -> bool:
         """
         Check if the expression is a dependency statement.
-        
+
         :param exp: A parsed expression
         :return: True if it's a dependency statement
         """
         if not exp or len(exp) < 2:
             return False
-        
+
         # Check if the first element is a dependency operator
         dependency_operators = {"pk", "mvd", "fd", "inc=", "inc⊆"}
         return exp[0] in dependency_operators
@@ -246,25 +246,25 @@ class TreeBRD:
     def create_dependency_node(self, exp: ParseResults, schema):
         """
         Create a dependency node from a parsed dependency statement.
-        
+
         :param exp: A parsed dependency expression
         :param schema: A schema object
         :return: A dependency node
         """
         operator = exp[0]
-        
+
         if operator == "pk":
             # pk_{attributes} relation
             attributes = exp[1]
             relation_name = exp[2]
             return PrimaryKeyNode(relation_name, attributes)
-            
+
         elif operator == "mvd":
             # mvd_{attribute1, attribute2} relation
             attributes = exp[1]
             relation_name = exp[2]
             return MultivaluedDependencyNode(relation_name, attributes)
-            
+
         elif operator == "fd":
             # fd_{attribute1, attribute2}_{conditions} relation
             attributes = exp[1]
@@ -272,18 +272,18 @@ class TreeBRD:
             relation_name = exp[3]
             condition_node = self.create_condition_node(conditions[0])
             return FunctionalDependencyNode(relation_name, attributes, condition_node)
-            
+
         elif operator == "inc=":
             # inc=_{attributes} (relation1, relation2)
             attributes = exp[1]
             relation_names = exp[2]
             return InclusionEquivalenceNode(relation_names, attributes)
-            
+
         elif operator == "inc⊆":
             # inc⊆_{attributes} (relation1, relation2)
             attributes = exp[1]
             relation_names = exp[2]
             return InclusionSubsumptionNode(relation_names, attributes)
-            
+
         else:
             raise ValueError(f"Unknown dependency operator: {operator}")
