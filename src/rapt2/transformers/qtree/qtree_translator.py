@@ -241,17 +241,9 @@ class Translator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         left_attr, right_attr = node.attributes
-        relation = node.relation_name
         op = self._get_latex_operator(node.operator)
-        
-        # Check if we have conditions (SelectNode) or just a simple relation (RelationNode)
-        if hasattr(node.relation_node, 'conditions') and node.relation_node.conditions:
-            # This is a SelectNode with conditions
-            conditions = node.relation_node.conditions.to_latex()
-            return f"[.${relation} : {left_attr} {op} {right_attr} \\text{{ where }} {conditions}$ ]"
-        else:
-            # This is a simple RelationNode without conditions
-            return f"[.${relation} : {left_attr} {op} {right_attr}$ ]"
+        child = self.translate(node.child)
+        return f"[.${left_attr} {op} {right_attr}$ {child} ]"
 
     def inclusion_equivalence(self, node: InclusionEquivalenceNode) -> str:
         """

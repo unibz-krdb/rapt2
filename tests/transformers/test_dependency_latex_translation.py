@@ -37,7 +37,7 @@ class TestDependencyLatexTranslation:
         # Test simple functional dependency
         latex = self.rapt.to_qtree("fd_{a, b} \\select_{a = 1} R;", self.schema)
         assert len(latex) == 1
-        assert "r : a \\rightarrow b" in latex[0]
+        assert "a \\rightarrow b" in latex[0]
         assert "\\Tree" in latex[0]
 
         # Test complex functional dependency
@@ -45,7 +45,7 @@ class TestDependencyLatexTranslation:
             "fd_{a, b} \\select_{a = 1 and b > 0} R;", self.schema
         )
         assert len(latex) == 1
-        assert "r : a \\rightarrow b" in latex[0]
+        assert "a \\rightarrow b" in latex[0]
 
     def test_inclusion_equivalence_latex_translation(self):
         """Test LaTeX translation of inclusion equivalence dependencies."""
@@ -64,7 +64,7 @@ class TestDependencyLatexTranslation:
     def test_multiple_dependency_statements_latex_translation(self):
         """Test LaTeX translation of multiple dependency statements."""
         latex = self.rapt.to_qtree(
-            "pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);",
+            "pk_{a} R; mvd_{x, y} S; fd_{id, name} \\select_{id > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);",
             self.schema,
         )
         assert len(latex) == 5
@@ -73,10 +73,10 @@ class TestDependencyLatexTranslation:
         assert "\\text{pk}_{a}(r)" in latex[0]
 
         # Check second statement (multivalued dependency)
-        assert "\\text{mvd}_{b, c}(s)" in latex[1]
+        assert "\\text{mvd}_{x, y}(s)" in latex[1]
 
         # Check third statement (functional dependency)
-        assert "t : x \\rightarrow y" in latex[2]
+        assert "id \\rightarrow name" in latex[2]
 
         # Check fourth statement (inclusion equivalence)
         assert "r[a] \\equiv s[b]" in latex[3]
@@ -149,8 +149,8 @@ class TestDependencyLatexTranslation:
         latex = self.rapt.to_qtree(
             "fd_{a, b} \\select_{a = 1 and b > 0} R;", self.schema
         )
-        assert "r : a \\rightarrow b" in latex[0]
-        # Note: Conditions are not currently included in the new functional dependency format
+        assert "a \\rightarrow b" in latex[0]
+        # Note: Conditions are now included as child nodes in the new functional dependency format
 
     def test_latex_translation_with_different_schemas(self):
         """Test LaTeX translation with different schema configurations."""
@@ -217,7 +217,7 @@ class TestDependencyLatexTranslationIntegration:
         """Test LaTeX translation of all dependency types in one go."""
         from src.rapt2.transformers.qtree import qtree_translator
 
-        test_input = "pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);"
+        test_input = "pk_{a} R; mvd_{x, y} S; fd_{id, name} \\select_{id > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);"
         trees = self.builder.build(test_input, self.schema)
         assert len(trees) == 5
 

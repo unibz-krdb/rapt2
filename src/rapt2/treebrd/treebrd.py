@@ -275,15 +275,18 @@ class TreeBRD:
             if len(exp) == 3:
                 # Simple form: fd_{attributes} relation
                 relation_name = exp[2]
-                return FunctionalDependencyNode(relation_name, attributes, None)
+                relation_node = RelationNode(relation_name, schema)
+                return FunctionalDependencyNode(relation_name, attributes, relation_node)
             else:
                 # With conditions: fd_{attributes} \select_{conditions} relation
                 # exp[2] = "\select", exp[3] = conditions, exp[4] = relation_name
                 conditions = exp[3]
                 relation_name = exp[4]
                 condition_node = self.create_condition_node(conditions[0])
+                base_relation = RelationNode(relation_name, schema)
+                select_node = SelectNode(base_relation, condition_node)
                 return FunctionalDependencyNode(
-                    relation_name, attributes, condition_node
+                    relation_name, attributes, select_node
                 )
 
         elif operator == self.grammar.syntax.inc_equiv_op:

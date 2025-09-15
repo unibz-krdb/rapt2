@@ -47,7 +47,6 @@ class Node:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-
 class RelationNode(Node):
     """
     A relation.
@@ -352,12 +351,14 @@ class FunctionalDependencyNode(DependencyNode):
     A node representing a functional dependency.
     """
 
-    def __init__(self, relation_name, attributes, conditions):
+    child: RelationNode | SelectNode
+
+    def __init__(self, relation_name, attributes, relation_node):
         super().__init__(Operator.functional_dependency, relation_name, attributes)
-        self.conditions = conditions
+        self.child = relation_node
 
     def __eq__(self, other):
-        return super().__eq__(other) and self.conditions == other.conditions
+        return super().__eq__(other) and self.child == other.child
 
 
 class InclusionEquivalenceNode(DependencyNode):
