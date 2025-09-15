@@ -51,20 +51,20 @@ class TestDependencyLatexTranslation:
         """Test LaTeX translation of inclusion equivalence dependencies."""
         latex = self.rapt.to_qtree("inc=_{a, b} (R, S);", self.schema)
         assert len(latex) == 1
-        assert "\\text{inc=}_{a, b}(r, s)" in latex[0]
+        assert "r[a] \\equiv s[b]" in latex[0]
         assert "\\Tree" in latex[0]
 
     def test_inclusion_subsumption_latex_translation(self):
         """Test LaTeX translation of inclusion subsumption dependencies."""
         latex = self.rapt.to_qtree("inc⊆_{a, b} (R, S);", self.schema)
         assert len(latex) == 1
-        assert "\\text{inc}⊆_{a, b}(r, s)" in latex[0]
+        assert "r[a] \\subseteq s[b]" in latex[0]
         assert "\\Tree" in latex[0]
 
     def test_multiple_dependency_statements_latex_translation(self):
         """Test LaTeX translation of multiple dependency statements."""
-        latex = self.rapt.to_qtree("pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T;", self.schema)
-        assert len(latex) == 3
+        latex = self.rapt.to_qtree("pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);", self.schema)
+        assert len(latex) == 5
         
         # Check first statement (primary key)
         assert "\\text{pk}_{a}(r)" in latex[0]
@@ -75,6 +75,12 @@ class TestDependencyLatexTranslation:
         # Check third statement (functional dependency)
         assert "\\text{fd}_{x, y}" in latex[2]
         assert "(t)" in latex[2]
+        
+        # Check fourth statement (inclusion equivalence)
+        assert "r[a] \\equiv s[b]" in latex[3]
+        
+        # Check fifth statement (inclusion subsumption)
+        assert "s[x] \\subseteq t[y]" in latex[4]
 
     def test_latex_structure_consistency(self):
         """Test that LaTeX output has consistent structure."""
@@ -91,7 +97,11 @@ class TestDependencyLatexTranslation:
             assert len(latex) == 1
             assert latex[0].startswith("\\Tree")
             assert latex[0].endswith(" ]")
-            assert "\\text{" in latex[0]  # All dependency operators use \\text{}
+            # Most dependency operators use \\text{}, but inclusion dependencies use mathematical symbols
+            if "inc=" in test_case or "inc⊆" in test_case:
+                assert "\\equiv" in latex[0] or "\\subseteq" in latex[0]
+            else:
+                assert "\\text{" in latex[0]
 
     def test_latex_operators_mapping(self):
         """Test that correct LaTeX operators are used for each dependency type."""
@@ -99,8 +109,8 @@ class TestDependencyLatexTranslation:
             ("pk_{a} R;", "\\text{pk}"),
             ("mvd_{a, b} R;", "\\text{mvd}"),
             ("fd_{a, b}_{a = 1} R;", "\\text{fd}"),
-            ("inc=_{a, b} (R, S);", "\\text{inc=}"),
-            ("inc⊆_{a, b} (R, S);", "\\text{inc}⊆"),
+            ("inc=_{a, b} (R, S);", "\\equiv"),
+            ("inc⊆_{a, b} (R, S);", "\\subseteq"),
         ]
         
         for test_case, expected_operator in test_mappings:
@@ -123,9 +133,12 @@ class TestDependencyLatexTranslation:
         latex = self.rapt.to_qtree("pk_{a} R;", self.schema)
         assert "(r)" in latex[0]
         
-        # Test multiple relations
+        # Test inclusion dependencies with new format
         latex = self.rapt.to_qtree("inc=_{a, b} (R, S);", self.schema)
-        assert "(r, s)" in latex[0]
+        assert "r[a]" in latex[0] and "s[b]" in latex[0]
+        
+        latex = self.rapt.to_qtree("inc⊆_{x, y} (S, T);", self.schema)
+        assert "s[x]" in latex[0] and "t[y]" in latex[0]
 
     def test_latex_conditions_formatting(self):
         """Test that conditions are properly formatted in LaTeX output."""
@@ -145,7 +158,7 @@ class TestDependencyLatexTranslation:
         
         # Test with schema2
         latex2 = self.rapt.to_qtree("inc=_{id, name} (Products, Orders);", schema2)
-        assert "\\text{inc=}_{id, name}(products, orders)" in latex2[0]
+        assert "products[id] \\equiv orders[name]" in latex2[0]
 
     def test_latex_translation_error_handling(self):
         """Test LaTeX translation error handling."""
@@ -204,6 +217,6 @@ class TestDependencyLatexTranslationIntegration:
         assert len(latex) == 5
         
         # Check each dependency type is properly translated
-        expected_operators = ["\\text{pk}", "\\text{mvd}", "\\text{fd}", "\\text{inc=}", "\\text{inc}⊆"]
+        expected_operators = ["\\text{pk}", "\\text{mvd}", "\\text{fd}", "\\equiv", "\\subseteq"]
         for i, expected_op in enumerate(expected_operators):
             assert expected_op in latex[i]

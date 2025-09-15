@@ -224,13 +224,11 @@ class Translator(BaseTranslator):
         :param node: a dependency node
         :return: a qtree subtree rooted at the node
         """
-        attributes = ", ".join(node.attributes)
-        relations = ", ".join(node.relation_names)
-        return "[.${op}_{{{attributes}}}({relations})$ ]".format(
-            op=latex_operator[node.operator],
-            attributes=attributes,
-            relations=relations,
-        )
+        rel1, rel2 = node.relation_names
+        attr1, attr2 = node.attributes
+        op = latex_operator[node.operator]
+
+        return f"[.${rel1}[{attr1}] {op} {rel2}[{attr2}]$ ]"
 
     def inclusion_subsumption(self, node):
         """
@@ -238,14 +236,12 @@ class Translator(BaseTranslator):
         :param node: a dependency node
         :return: a qtree subtree rooted at the node
         """
-        attributes = ", ".join(node.attributes)
-        relations = ", ".join(node.relation_names)
-        return "[.${op}_{{{attributes}}}({relations})$ ]".format(
-            op=latex_operator[node.operator],
-            attributes=attributes,
-            relations=relations,
-        )
 
+        rel1, rel2 = node.relation_names
+        attr1, attr2 = node.attributes
+        op = latex_operator[node.operator]
+
+        return f"[.${rel1}[{attr1}] {op} {rel2}[{attr2}]$ ]"
 
 def translate(roots):
     """
