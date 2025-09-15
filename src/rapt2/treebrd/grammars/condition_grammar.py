@@ -1,8 +1,11 @@
+from typing import TypeVar
 from pyparsing import oneOf, CaselessKeyword, opAssoc, Group
 from pyparsing.helpers import infix_notation
 
 from .proto_grammar import ProtoGrammar
 from .syntax import ConditionSyntax
+
+TConditionSyntax = TypeVar('TConditionSyntax', bound=ConditionSyntax)
 
 
 def get_attribute_references(instring):
@@ -30,13 +33,12 @@ def get_attribute_references(instring):
     return attribute_refs
 
 
-class ConditionGrammar(ProtoGrammar):
+class ConditionGrammar(ProtoGrammar[TConditionSyntax]):
     """
     A grammar for condition expressions.
     """
-    syntax: ConditionSyntax
 
-    def __init__(self, syntax: ConditionSyntax = ConditionSyntax()):
+    def __init__(self, syntax: TConditionSyntax = ConditionSyntax()):
         """
         Initializes a ConditionGrammar. Uses the default syntax if none
         is provided.

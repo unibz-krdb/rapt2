@@ -1,3 +1,4 @@
+from typing import TypeVar
 from pyparsing import (
     delimitedList,
     Group,
@@ -14,17 +15,19 @@ from pyparsing import (
 from .condition_grammar import ConditionGrammar
 from .syntax import CoreSyntax
 
+TCoreSyntax = TypeVar('TCoreSyntax', bound=CoreSyntax)
 
-class CoreGrammar(ConditionGrammar):
+
+class CoreGrammar(ConditionGrammar[TCoreSyntax]):
     """
     A parser that recognizes a core relational algebra grammar.
 
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
-    syntax: CoreSyntax
+    syntax: TCoreSyntax
 
-    def __init__(self, syntax: CoreSyntax = CoreSyntax()):
+    def __init__(self, syntax: TCoreSyntax = CoreSyntax()):
         """
         Initializes a CoreGrammar. Uses the default syntax if none
         is provided.

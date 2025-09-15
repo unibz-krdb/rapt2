@@ -1,3 +1,4 @@
+from typing import TypeVar
 from pyparsing import (
     CaselessKeyword,
     infixNotation,
@@ -9,17 +10,19 @@ from pyparsing import (
 from .core_grammar import CoreGrammar
 from .syntax import ExtendedSyntax
 
+TExtendedSyntax = TypeVar('TExtendedSyntax', bound=ExtendedSyntax)
 
-class ExtendedGrammar(CoreGrammar):
+
+class ExtendedGrammar(CoreGrammar[TExtendedSyntax]):
     """
     A parser that recognizes an extended relational algebra grammar.
 
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
-    syntax: ExtendedSyntax
+    syntax: TExtendedSyntax
 
-    def __init__(self, syntax: ExtendedSyntax = ExtendedSyntax()):
+    def __init__(self, syntax: TExtendedSyntax = ExtendedSyntax()):
         """
         Initializes an ExtendedGrammar. Uses the default syntax if none
         is provided.

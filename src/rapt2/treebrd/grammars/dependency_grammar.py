@@ -1,3 +1,4 @@
+from typing import TypeVar
 from pyparsing import (
     Group,
     Suppress,
@@ -8,17 +9,19 @@ from pyparsing import (
 from .extended_grammar import ExtendedGrammar
 from .syntax import DependencySyntax
 
+TDependencySyntax = TypeVar('TDependencySyntax', bound=DependencySyntax)
 
-class DependencyGrammar(ExtendedGrammar):
+
+class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     """
     A parser that recognizes database dependency grammar rules.
 
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
-    syntax: DependencySyntax
+    syntax: TDependencySyntax
 
-    def __init__(self, syntax: DependencySyntax = DependencySyntax()):
+    def __init__(self, syntax: TDependencySyntax = DependencySyntax()):
         """
         Initializes a DependencyGrammar. Uses the default syntax if none
         is provided.
