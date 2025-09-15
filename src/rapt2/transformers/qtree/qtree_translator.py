@@ -1,5 +1,28 @@
+from typing import Union, List
 from ..base_translator import BaseTranslator
 from .operators import latex_operator
+from ...treebrd.node import (
+    Node,
+    RelationNode,
+    SelectNode,
+    ProjectNode,
+    RenameNode,
+    AssignNode,
+    ThetaJoinNode,
+    CrossJoinNode,
+    NaturalJoinNode,
+    FullOuterJoinNode,
+    LeftOuterJoinNode,
+    RightOuterJoinNode,
+    UnionNode,
+    DifferenceNode,
+    IntersectNode,
+    PrimaryKeyNode,
+    MultivaluedDependencyNode,
+    FunctionalDependencyNode,
+    InclusionEquivalenceNode,
+    InclusionSubsumptionNode,
+)
 
 
 class Translator(BaseTranslator):
@@ -16,7 +39,7 @@ class Translator(BaseTranslator):
         """
         return latex_operator[operator]
 
-    def relation(self, node):
+    def relation(self, node: RelationNode) -> str:
         """
         Translate a relation node into latex qtree node.
         :param node: a treebrd node
@@ -24,7 +47,7 @@ class Translator(BaseTranslator):
         """
         return "[.${}$ ]".format(node.name)
 
-    def select(self, node):
+    def select(self, node: SelectNode) -> str:
         """
         Translate a select node into a latex qtree node.
         :param node: a treebrd node
@@ -37,7 +60,7 @@ class Translator(BaseTranslator):
             child=child,
         )
 
-    def project(self, node):
+    def project(self, node: ProjectNode) -> str:
         """
         Translate a project node into latex qtree node.
         :param node: a treebrd node
@@ -50,7 +73,7 @@ class Translator(BaseTranslator):
             child=child,
         )
 
-    def rename(self, node):
+    def rename(self, node: RenameNode) -> str:
         """
         Translate a rename node into latex qtree node.
         :param node: a treebrd node
@@ -67,7 +90,7 @@ class Translator(BaseTranslator):
             child=child,
         )
 
-    def assign(self, node):
+    def assign(self, node: AssignNode) -> str:
         """
         Translate an assign node into latex qtree node.
         :param node: a treebrd node
@@ -81,7 +104,7 @@ class Translator(BaseTranslator):
             name=node.name, attributes=attributes, child=child
         )
 
-    def theta_join(self, node):
+    def theta_join(self, node: ThetaJoinNode) -> str:
         """
         Translate a join node into latex qtree node.
         :param node: a treebrd node
@@ -94,7 +117,7 @@ class Translator(BaseTranslator):
             right=self.translate(node.right),
         )
 
-    def cross_join(self, node):
+    def cross_join(self, node: CrossJoinNode) -> str:
         """
         Translate a cross node into latex qtree node.
         :param node: a treebrd node
@@ -102,7 +125,7 @@ class Translator(BaseTranslator):
         """
         return self._binary(node)
 
-    def natural_join(self, node):
+    def natural_join(self, node: NaturalJoinNode) -> str:
         """
         Translate a natural join node into latex qtree node.
         :param node: a treebrd node
@@ -110,7 +133,7 @@ class Translator(BaseTranslator):
         """
         return self._binary(node)
 
-    def full_outer_join(self, node):
+    def full_outer_join(self, node: FullOuterJoinNode) -> str:
         """
         Translate a full outer join node into latex qtree node.
         :param node: a treebrd node
@@ -123,7 +146,7 @@ class Translator(BaseTranslator):
             right=self.translate(node.right),
         )
 
-    def left_outer_join(self, node):
+    def left_outer_join(self, node: LeftOuterJoinNode) -> str:
         """
         Translate a left outer join node into latex qtree node.
         :param node: a treebrd node
@@ -136,7 +159,7 @@ class Translator(BaseTranslator):
             right=self.translate(node.right),
         )
 
-    def right_outer_join(self, node):
+    def right_outer_join(self, node: RightOuterJoinNode) -> str:
         """
         Translate a right outer join node into latex qtree node.
         :param node: a treebrd node
@@ -149,7 +172,7 @@ class Translator(BaseTranslator):
             right=self.translate(node.right),
         )
 
-    def union(self, node):
+    def union(self, node: UnionNode) -> str:
         """
         Translate a union node into latex qtree node.
         :param node: a treebrd node
@@ -157,7 +180,7 @@ class Translator(BaseTranslator):
         """
         return self._binary(node)
 
-    def difference(self, node):
+    def difference(self, node: DifferenceNode) -> str:
         """
         Translate a difference node into latex qtree node.
         :param node: a treebrd node
@@ -165,7 +188,7 @@ class Translator(BaseTranslator):
         """
         return self._binary(node)
 
-    def intersect(self, node):
+    def intersect(self, node: IntersectNode) -> str:
         """
         Translate an intersect node into latex qtree node.
         :param node: a treebrd node
@@ -173,7 +196,7 @@ class Translator(BaseTranslator):
         """
         return self._binary(node)
 
-    def _binary(self, node):
+    def _binary(self, node: Union[CrossJoinNode, NaturalJoinNode, UnionNode, DifferenceNode, IntersectNode]) -> str:
         """
         Translate a binary node into latex qtree node.
         :param node: a treebrd node
@@ -185,7 +208,7 @@ class Translator(BaseTranslator):
             right=self.translate(node.right),
         )
 
-    def primary_key(self, node):
+    def primary_key(self, node: PrimaryKeyNode) -> str:
         """
         Translate a primary key dependency node into a latex qtree node.
         :param node: a dependency node
@@ -198,7 +221,7 @@ class Translator(BaseTranslator):
             relation=node.relation_name,
         )
 
-    def multivalued_dependency(self, node):
+    def multivalued_dependency(self, node: MultivaluedDependencyNode) -> str:
         """
         Translate a multivalued dependency node into a latex qtree node.
         :param node: a dependency node
@@ -211,19 +234,26 @@ class Translator(BaseTranslator):
             relation=node.relation_name,
         )
 
-    def functional_dependency(self, node):
+    def functional_dependency(self, node: FunctionalDependencyNode) -> str:
         """
         Translate a functional dependency node into a latex qtree node.
         :param node: a dependency node
         :return: a qtree subtree rooted at the node
         """
         left_attr, right_attr = node.attributes
-        conditions = node.conditions.to_latex()
         relation = node.relation_name
         op = self._get_latex_operator(node.operator)
-        return f"[.${relation} : {left_attr} {op} {right_attr}$ ]"
+        
+        # Check if we have conditions (SelectNode) or just a simple relation (RelationNode)
+        if hasattr(node.relation_node, 'conditions') and node.relation_node.conditions:
+            # This is a SelectNode with conditions
+            conditions = node.relation_node.conditions.to_latex()
+            return f"[.${relation} : {left_attr} {op} {right_attr} \\text{{ where }} {conditions}$ ]"
+        else:
+            # This is a simple RelationNode without conditions
+            return f"[.${relation} : {left_attr} {op} {right_attr}$ ]"
 
-    def inclusion_equivalence(self, node):
+    def inclusion_equivalence(self, node: InclusionEquivalenceNode) -> str:
         """
         Translate an inclusion equivalence dependency node into a latex qtree node.
         :param node: a dependency node
@@ -235,7 +265,7 @@ class Translator(BaseTranslator):
 
         return f"[.${rel1}[{attr1}] {op} {rel2}[{attr2}]$ ]"
 
-    def inclusion_subsumption(self, node):
+    def inclusion_subsumption(self, node: InclusionSubsumptionNode) -> str:
         """
         Translate an inclusion subsumption dependency node into a latex qtree node.
         :param node: a dependency node
@@ -249,7 +279,7 @@ class Translator(BaseTranslator):
         return f"[.${rel1}[{attr1}] {op} {rel2}[{attr2}]$ ]"
 
 
-def translate(roots, syntax=None):
+def translate(roots: List[Node], syntax=None) -> List[str]:
     """
     Translate a treebrd tree rooted at root into latex tree.
     :param roots: a list of treebrd nodes
@@ -258,4 +288,4 @@ def translate(roots, syntax=None):
     """
     return [
         "\\Tree{root}".format(root=Translator(syntax).translate(root)) for root in roots
-    ]  # type: ignore
+    ]
