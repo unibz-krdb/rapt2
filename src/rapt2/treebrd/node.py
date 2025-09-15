@@ -1,5 +1,5 @@
 import copy
-from enum import Enum
+from enum import Enum, auto
 
 from .errors import InputError, RelationReferenceError
 from .attributes import AttributeList
@@ -392,28 +392,28 @@ class Operator(Enum):
     """
 
     # Basic operations
-    relation = 1
-    assign = 2
-    project = 3
-    rename = 4
-    select = 5
+    relation = auto()
+    assign = auto()
+    project = auto()
+    rename = auto()
+    select = auto()
 
     # Join operations.
-    cross_join = 24
-    natural_join = 25
-    theta_join = 26
-    full_outer_join = 27
-    left_outer_join = 28
-    right_outer_join = 29
+    cross_join = auto()
+    natural_join = auto()
+    theta_join = auto()
+    full_outer_join = auto()
+    left_outer_join = auto()
+    right_outer_join = auto()
 
     # Set operations.
-    difference = 48
-    union = 49
-    intersect = 50
+    difference = auto()
+    union = auto()
+    intersect = auto()
 
     # Dependency operations.
-    primary_key = 60
-    multivalued_dependency = 61
-    functional_dependency = 62
-    inclusion_equivalence = 63
-    inclusion_subsumption = 64
+    primary_key = auto()
+    multivalued_dependency = auto()
+    functional_dependency = auto()
+    inclusion_equivalence = auto()
+    inclusion_subsumption = auto()
