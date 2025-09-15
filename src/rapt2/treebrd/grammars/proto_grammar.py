@@ -19,8 +19,23 @@ ParserElement.enablePackrat()
 # Type variable for syntax type
 SyntaxType = TypeVar('SyntaxType', bound=BaseSyntax)
 
+class Grammar(Generic[SyntaxType]):
+    """
+    A grammar with fundamental rules for characters, strings, and
+    numbers.
+    """
+    syntax: SyntaxType
 
-class ProtoGrammar(Generic[SyntaxType]):
+    def __init__(self, syntax: SyntaxType):
+        """
+        Initializes a Grammar. Uses the default syntax if none
+        is provided.
+
+        :param syntax: a syntax for this grammar.
+        """
+        self.syntax = syntax
+
+class ProtoGrammar(Grammar[BaseSyntax]):
     """
     A grammar with fundamental rules for characters, strings, and
     numbers.
@@ -29,16 +44,14 @@ class ProtoGrammar(Generic[SyntaxType]):
     specification refer to the associated grammar file.
     """
 
-    syntax: SyntaxType
-
-    def __init__(self, syntax: SyntaxType = BaseSyntax()):
+    def __init__(self, syntax: BaseSyntax = BaseSyntax()):
         """
         Initializes a ProtoGrammar. Uses the default syntax if none
         is provided.
 
         :param syntax: a syntax for this grammar.
         """
-        self.syntax = syntax
+        super().__init__(syntax)
 
     def parse(self, instring):
         """

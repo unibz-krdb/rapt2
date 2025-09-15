@@ -22,8 +22,9 @@ class CoreGrammar(ConditionGrammar):
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
+    syntax: CoreSyntax
 
-    def __init__(self, syntax=CoreSyntax()):
+    def __init__(self, syntax: CoreSyntax = CoreSyntax()):
         """
         Initializes a CoreGrammar. Uses the default syntax if none
         is provided.

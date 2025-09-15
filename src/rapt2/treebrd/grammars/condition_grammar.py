@@ -34,8 +34,9 @@ class ConditionGrammar(ProtoGrammar):
     """
     A grammar for condition expressions.
     """
+    syntax: ConditionSyntax
 
-    def __init__(self, syntax=ConditionSyntax()):
+    def __init__(self, syntax: ConditionSyntax = ConditionSyntax()):
         """
         Initializes a ConditionGrammar. Uses the default syntax if none
         is provided.

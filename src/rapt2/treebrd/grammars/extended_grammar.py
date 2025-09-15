@@ -17,8 +17,9 @@ class ExtendedGrammar(CoreGrammar):
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
+    syntax: ExtendedSyntax
 
-    def __init__(self, syntax=ExtendedSyntax()):
+    def __init__(self, syntax: ExtendedSyntax = ExtendedSyntax()):
         """
         Initializes an ExtendedGrammar. Uses the default syntax if none
         is provided.

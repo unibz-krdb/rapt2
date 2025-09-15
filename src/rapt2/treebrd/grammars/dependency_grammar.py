@@ -16,8 +16,9 @@ class DependencyGrammar(ExtendedGrammar):
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
+    syntax: DependencySyntax
 
-    def __init__(self, syntax=DependencySyntax()):
+    def __init__(self, syntax: DependencySyntax = DependencySyntax()):
         """
         Initializes a DependencyGrammar. Uses the default syntax if none
         is provided.
