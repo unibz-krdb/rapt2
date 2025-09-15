@@ -23,6 +23,11 @@ class BaseTranslator:
             Operator.union: self.union,
             Operator.difference: self.difference,
             Operator.intersect: self.intersect,
+            Operator.primary_key: self.primary_key,
+            Operator.multivalued_dependency: self.multivalued_dependency,
+            Operator.functional_dependency: self.functional_dependency,
+            Operator.inclusion_equivalence: self.inclusion_equivalence,
+            Operator.inclusion_subsumption: self.inclusion_subsumption,
         }
 
     def translate(self, node):
@@ -76,6 +81,21 @@ class BaseTranslator:
         raise NotImplementedError("Must be implemented by translation modules.")
 
     def intersect(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def primary_key(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def multivalued_dependency(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def functional_dependency(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def inclusion_equivalence(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def inclusion_subsumption(self, node):
         raise NotImplementedError("Must be implemented by translation modules.")
 
 

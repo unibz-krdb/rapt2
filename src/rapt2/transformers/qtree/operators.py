@@ -15,4 +15,9 @@ latex_operator = {
     Operator.union: UNION_OP,
     Operator.difference: DIFFERENCE_OP,
     Operator.intersect: INTERSECT_OP,
+    Operator.primary_key: PRIMARY_KEY_OP,
+    Operator.multivalued_dependency: MULTIVALUED_DEPENDENCY_OP,
+    Operator.functional_dependency: FUNCTIONAL_DEPENDENCY_OP,
+    Operator.inclusion_equivalence: INCLUSION_EQUIVALENCE_OP,
+    Operator.inclusion_subsumption: INCLUSION_SUBSUMPTION_OP,
 }

@@ -177,6 +177,75 @@ class Translator(BaseTranslator):
             right=self.translate(node.right),
         )
 
+    def primary_key(self, node):
+        """
+        Translate a primary key dependency node into a latex qtree node.
+        :param node: a dependency node
+        :return: a qtree subtree rooted at the node
+        """
+        attributes = ", ".join(node.attributes)
+        return "[.${op}_{{{attributes}}}({relation})$ ]".format(
+            op=latex_operator[node.operator],
+            attributes=attributes,
+            relation=node.relation_name,
+        )
+
+    def multivalued_dependency(self, node):
+        """
+        Translate a multivalued dependency node into a latex qtree node.
+        :param node: a dependency node
+        :return: a qtree subtree rooted at the node
+        """
+        attributes = ", ".join(node.attributes)
+        return "[.${op}_{{{attributes}}}({relation})$ ]".format(
+            op=latex_operator[node.operator],
+            attributes=attributes,
+            relation=node.relation_name,
+        )
+
+    def functional_dependency(self, node):
+        """
+        Translate a functional dependency node into a latex qtree node.
+        :param node: a dependency node
+        :return: a qtree subtree rooted at the node
+        """
+        attributes = ", ".join(node.attributes)
+        conditions = node.conditions.to_latex()
+        return "[.${op}_{{{attributes}}}_{{{conditions}}}({relation})$ ]".format(
+            op=latex_operator[node.operator],
+            attributes=attributes,
+            conditions=conditions,
+            relation=node.relation_name,
+        )
+
+    def inclusion_equivalence(self, node):
+        """
+        Translate an inclusion equivalence dependency node into a latex qtree node.
+        :param node: a dependency node
+        :return: a qtree subtree rooted at the node
+        """
+        attributes = ", ".join(node.attributes)
+        relations = ", ".join(node.relation_names)
+        return "[.${op}_{{{attributes}}}({relations})$ ]".format(
+            op=latex_operator[node.operator],
+            attributes=attributes,
+            relations=relations,
+        )
+
+    def inclusion_subsumption(self, node):
+        """
+        Translate an inclusion subsumption dependency node into a latex qtree node.
+        :param node: a dependency node
+        :return: a qtree subtree rooted at the node
+        """
+        attributes = ", ".join(node.attributes)
+        relations = ", ".join(node.relation_names)
+        return "[.${op}_{{{attributes}}}({relations})$ ]".format(
+            op=latex_operator[node.operator],
+            attributes=attributes,
+            relations=relations,
+        )
+
 
 def translate(roots):
     """
