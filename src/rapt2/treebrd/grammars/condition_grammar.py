@@ -2,7 +2,7 @@ from pyparsing import oneOf, CaselessKeyword, opAssoc, Group
 from pyparsing.helpers import infix_notation
 
 from .proto_grammar import ProtoGrammar
-from .syntax import Syntax
+from .syntax import ConditionSyntax
 
 
 def get_attribute_references(instring):
@@ -42,7 +42,7 @@ class ConditionGrammar(ProtoGrammar):
 
         :param syntax: a syntax for this grammar.
         """
-        self.syntax = syntax or Syntax()
+        self.syntax = syntax or ConditionSyntax()
 
     @property
     def comparator_op(self):

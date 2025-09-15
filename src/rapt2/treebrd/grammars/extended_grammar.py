@@ -7,6 +7,7 @@ from pyparsing import (
 )
 
 from .core_grammar import CoreGrammar
+from .syntax import ExtendedSyntax
 
 
 class ExtendedGrammar(CoreGrammar):
@@ -16,6 +17,15 @@ class ExtendedGrammar(CoreGrammar):
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
+
+    def __init__(self, syntax=None):
+        """
+        Initializes an ExtendedGrammar. Uses the default syntax if none
+        is provided.
+
+        :param syntax: a syntax for this grammar.
+        """
+        super().__init__(syntax or ExtendedSyntax())
 
     @property
     def natural_join(self):

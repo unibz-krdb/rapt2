@@ -12,6 +12,7 @@ from pyparsing import (
 )
 
 from .condition_grammar import ConditionGrammar
+from .syntax import CoreSyntax
 
 
 class CoreGrammar(ConditionGrammar):
@@ -21,6 +22,15 @@ class CoreGrammar(ConditionGrammar):
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
+
+    def __init__(self, syntax=None):
+        """
+        Initializes a CoreGrammar. Uses the default syntax if none
+        is provided.
+
+        :param syntax: a syntax for this grammar.
+        """
+        super().__init__(syntax or CoreSyntax())
 
     def parse(self, instring):
         instring = r"" + instring

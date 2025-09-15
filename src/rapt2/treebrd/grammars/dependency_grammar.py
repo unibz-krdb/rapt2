@@ -3,10 +3,10 @@ from pyparsing import (
     Suppress,
     OneOrMore,
     Literal,
-    CaselessKeyword,
 )
 
 from .extended_grammar import ExtendedGrammar
+from .syntax import DependencySyntax
 
 
 class DependencyGrammar(ExtendedGrammar):
@@ -16,6 +16,15 @@ class DependencyGrammar(ExtendedGrammar):
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
+
+    def __init__(self, syntax=None):
+        """
+        Initializes a DependencyGrammar. Uses the default syntax if none
+        is provided.
+
+        :param syntax: a syntax for this grammar.
+        """
+        super().__init__(syntax or DependencySyntax())
 
     def parse(self, instring):
         instring = r"" + instring

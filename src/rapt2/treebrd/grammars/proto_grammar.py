@@ -11,6 +11,8 @@ from pyparsing import (
     pyparsing_common,
 )
 
+from .syntax import BaseSyntax
+
 ParserElement.enablePackrat()
 
 
@@ -22,6 +24,15 @@ class ProtoGrammar:
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
+
+    def __init__(self, syntax=None):
+        """
+        Initializes a ProtoGrammar. Uses the default syntax if none
+        is provided.
+
+        :param syntax: a syntax for this grammar.
+        """
+        self.syntax = syntax or BaseSyntax()
 
     def parse(self, instring):
         """
@@ -53,7 +64,7 @@ class ProtoGrammar:
         post-parsed operations.
         """
         return quotedString.setParseAction(
-            lambda s, l, t: "'{string}'".format(string=removeQuotes(s, l, t))
+            lambda s, loc, t: "'{string}'".format(string=removeQuotes(s, loc, t))
         )
 
     @property
