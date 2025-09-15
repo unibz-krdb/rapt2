@@ -257,19 +257,19 @@ class TreeBRD:
         """
         operator = exp[0]
 
-        if operator == "pk":
+        if operator == self.grammar.syntax.pk_op:
             # pk_{attributes} relation
             attributes = exp[1]
             relation_name = exp[2]
             return PrimaryKeyNode(relation_name, attributes)
 
-        elif operator == "mvd":
+        elif operator == self.grammar.syntax.mvd_op:
             # mvd_{attribute1, attribute2} relation
             attributes = exp[1]
             relation_name = exp[2]
             return MultivaluedDependencyNode(relation_name, attributes)
 
-        elif operator == "fd":
+        elif operator == self.grammar.syntax.fd_op:
             # fd_{attribute1, attribute2} relation OR fd_{attribute1, attribute2} \select_{conditions} relation
             attributes = exp[1]
             if len(exp) == 3:
@@ -284,13 +284,13 @@ class TreeBRD:
                 condition_node = self.create_condition_node(conditions[0])
                 return FunctionalDependencyNode(relation_name, attributes, condition_node)
 
-        elif operator == "inc=":
+        elif operator == self.grammar.syntax.inc_equiv_op:
             # inc=_{attributes} (relation1, relation2)
             attributes = exp[1]
             relation_names = exp[2]
             return InclusionEquivalenceNode(relation_names, attributes)
 
-        elif operator == "inc⊆":
+        elif operator == self.grammar.syntax.inc_subset_op:
             # inc⊆_{attributes} (relation1, relation2)
             attributes = exp[1]
             relation_names = exp[2]
