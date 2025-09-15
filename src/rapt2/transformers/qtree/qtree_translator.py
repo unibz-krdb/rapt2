@@ -242,8 +242,11 @@ class Translator(BaseTranslator):
         """
         left_attr, right_attr = node.attributes
         op = self._get_latex_operator(node.operator)
-        child = self.translate(node.child)
-        return f"[.${left_attr} {op} {right_attr}$ {child} ]"
+        if isinstance(node.child, SelectNode):
+            select_str = f"{self._get_latex_operator(node.child.operator)}_{{{node.child.conditions.to_latex()}}} ({node.child.name})"
+            return f"[.${select_str} : {left_attr} {op} {right_attr}$ ]"
+        else:
+            return f"[.${node.child.name} : {left_attr} {op} {right_attr}$ ]"
 
     def inclusion_equivalence(self, node: InclusionEquivalenceNode) -> str:
         """

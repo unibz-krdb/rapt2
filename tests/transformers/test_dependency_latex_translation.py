@@ -47,6 +47,73 @@ class TestDependencyLatexTranslation:
         assert len(latex) == 1
         assert "a \\rightarrow b" in latex[0]
 
+    def test_functional_dependency_with_select_conditions(self):
+        """Test functional dependencies with various select conditions."""
+        # Test simple equality condition
+        latex = self.rapt.to_qtree("fd_{a, b} \\select_{a = 1} R;", self.schema)
+        assert len(latex) == 1
+        assert "\\sigma_{(a \\eq 1)} (r)" in latex[0]
+        assert "a \\rightarrow b" in latex[0]
+
+        # Test inequality condition
+        latex = self.rapt.to_qtree("fd_{a, b} \\select_{a > 0} R;", self.schema)
+        assert len(latex) == 1
+        assert "\\sigma_{(a \\gt 0)} (r)" in latex[0]
+        assert "a \\rightarrow b" in latex[0]
+
+        # Test OR condition
+        latex = self.rapt.to_qtree("fd_{a, b} \\select_{a = 1 or a = 2} R;", self.schema)
+        assert len(latex) == 1
+        assert "\\sigma_{((a \\eq 1) \\lor (a \\eq 2))} (r)" in latex[0]
+        assert "a \\rightarrow b" in latex[0]
+
+        # Test NOT condition
+        latex = self.rapt.to_qtree("fd_{a, b} \\select_{not(a = 1)} R;", self.schema)
+        assert len(latex) == 1
+        assert "\\sigma_{\\neg (a \\eq 1)} (r)" in latex[0]
+        assert "a \\rightarrow b" in latex[0]
+
+        # Test complex AND condition
+        latex = self.rapt.to_qtree("fd_{a, b} \\select_{a = 1 and b > 0 and c < 10} R;", self.schema)
+        assert len(latex) == 1
+        assert "\\sigma_{((a \\eq 1) \\land ((b \\gt 0) \\land (c \\lt 10)))} (r)" in latex[0]
+        assert "a \\rightarrow b" in latex[0]
+
+    def test_functional_dependency_without_select(self):
+        """Test functional dependencies without select conditions."""
+        # Test simple functional dependency without select
+        latex = self.rapt.to_qtree("fd_{a, b} R;", self.schema)
+        assert len(latex) == 1
+        assert "r : a \\rightarrow b" in latex[0]
+        assert "\\sigma" not in latex[0]  # Should not contain select operation
+
+        # Test with different attributes
+        latex = self.rapt.to_qtree("fd_{id, name} T;", self.schema)
+        assert len(latex) == 1
+        assert "t : id \\rightarrow name" in latex[0]
+        assert "\\sigma" not in latex[0]
+
+    def test_functional_dependency_format_consistency(self):
+        """Test that functional dependency LaTeX format is consistent."""
+        # Test with select
+        latex = self.rapt.to_qtree("fd_{a, b} \\select_{a = 1} R;", self.schema)
+        assert len(latex) == 1
+        # Should follow pattern: \Tree[.$\sigma_{condition} (relation) : attr1 \rightarrow attr2$ ]
+        assert latex[0].startswith("\\Tree[.$")
+        assert latex[0].endswith("$ ]")
+        assert "\\sigma" in latex[0]
+        assert "(r)" in latex[0]
+        assert "a \\rightarrow b" in latex[0]
+
+        # Test without select
+        latex = self.rapt.to_qtree("fd_{a, b} R;", self.schema)
+        assert len(latex) == 1
+        # Should follow pattern: \Tree[.$relation : attr1 \rightarrow attr2$ ]
+        assert latex[0].startswith("\\Tree[.$")
+        assert latex[0].endswith("$ ]")
+        assert "\\sigma" not in latex[0]
+        assert "r : a \\rightarrow b" in latex[0]
+
     def test_inclusion_equivalence_latex_translation(self):
         """Test LaTeX translation of inclusion equivalence dependencies."""
         latex = self.rapt.to_qtree("inc=_{a, b} (R, S);", self.schema)

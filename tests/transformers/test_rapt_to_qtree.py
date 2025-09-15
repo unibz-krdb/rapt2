@@ -2,12 +2,19 @@ from rapt2.rapt import Rapt
 
 from rapt2.transformers.qtree.constants import *
 from rapt2.treebrd.grammars.extended_grammar import ExtendedGrammar
+from rapt2.treebrd.grammars.dependency_grammar import DependencyGrammar
 from tests.transformers.test_transfomer import TestTransformer
 
 
 class TestQTreeTransformer(TestTransformer):
     def setUp(self):
         self.translate = self.translate_func(Rapt(grammar="Extended Grammar").to_qtree)
+
+
+class TestQTreeDependencyTransformer(TestTransformer):
+    def setUp(self):
+        self.rapt = Rapt(grammar="Dependency Grammar")
+        self.translate = self.translate_func(self.rapt.to_qtree)
 
 
 class TestRelation(TestQTreeTransformer):
@@ -200,5 +207,67 @@ class TestDifference(TestQTreeTransformer):
     def test_simple(self):
         ra = r"gamma \difference gammatwin;"
         expected = [r"\Tree[.${}$ [.$gamma$ ] [.$gammatwin$ ] ]".format(DIFFERENCE_OP)]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+
+class TestFunctionalDependency(TestQTreeDependencyTransformer):
+    def setUp(self):
+        """Set up test fixtures with proper schema."""
+        super().setUp()
+        # Override the schema to include the attributes we need for functional dependencies
+        self.schema = {"alpha": ["a", "b", "c"], "beta": ["c", "d", "e"], "gamma": ["id", "name", "value"]}
+        # Update the translate function to use our custom schema
+        self.translate = self.translate_func(self.rapt.to_qtree, schema=self.schema)
+
+    def test_simple_functional_dependency(self):
+        """Test simple functional dependency without select condition."""
+        ra = "fd_{a, b} alpha;"
+        expected = [r"\Tree[.$alpha : a \rightarrow b$ ]"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_functional_dependency_with_simple_select(self):
+        """Test functional dependency with simple select condition."""
+        ra = "fd_{a, b} \\select_{a = 1} alpha;"
+        expected = [r"\Tree[.$\sigma_{(a \eq 1)} (alpha) : a \rightarrow b$ ]"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_functional_dependency_with_complex_select(self):
+        """Test functional dependency with complex select condition."""
+        ra = "fd_{a, b} \\select_{a = 1 and b > 0} alpha;"
+        expected = [r"\Tree[.$\sigma_{((a \eq 1) \land (b \gt 0))} (alpha) : a \rightarrow b$ ]"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_functional_dependency_with_different_attributes(self):
+        """Test functional dependency with different attribute names."""
+        ra = "fd_{id, name} \\select_{id > 0} gamma;"
+        expected = [r"\Tree[.$\sigma_{(id \gt 0)} (gamma) : id \rightarrow name$ ]"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_functional_dependency_with_or_condition(self):
+        """Test functional dependency with OR condition in select."""
+        ra = "fd_{a, b} \\select_{a = 1 or a = 2} alpha;"
+        expected = [r"\Tree[.$\sigma_{((a \eq 1) \lor (a \eq 2))} (alpha) : a \rightarrow b$ ]"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_functional_dependency_with_not_condition(self):
+        """Test functional dependency with NOT condition in select."""
+        ra = "fd_{a, b} \\select_{not(a = 1)} alpha;"
+        expected = [r"\Tree[.$\sigma_{\neg (a \eq 1)} (alpha) : a \rightarrow b$ ]"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_multiple_functional_dependencies(self):
+        """Test multiple functional dependencies in one statement."""
+        ra = "fd_{a, b} \\select_{a = 1} alpha; fd_{c, d} \\select_{c > 0} beta;"
+        expected = [
+            r"\Tree[.$\sigma_{(a \eq 1)} (alpha) : a \rightarrow b$ ]",
+            r"\Tree[.$\sigma_{(c \gt 0)} (beta) : c \rightarrow d$ ]"
+        ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
