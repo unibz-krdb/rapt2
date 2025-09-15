@@ -158,7 +158,7 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     @property
     def statement(self):
         """
-        statement ::= dep_statement | super().statement
+        statement ::= dep_statement | statement
         """
         return self.dep_statement | super().statement
 
