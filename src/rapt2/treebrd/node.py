@@ -308,6 +308,93 @@ class IntersectNode(SetOperatorNode):
         super().__init__(Operator.intersect, left, right)
 
 
+class DependencyNode(Node):
+    """
+    Base class for dependency nodes.
+    """
+
+    def __init__(self, operator, relation_name, attributes):
+        super().__init__(operator)
+        self.relation_name = relation_name
+        self.attributes = attributes
+
+    def __eq__(self, other):
+        return (
+            super().__eq__(other) and
+            self.relation_name == other.relation_name and
+            self.attributes == other.attributes
+        )
+
+    def post_order(self):
+        return [self]
+
+
+class PrimaryKeyNode(DependencyNode):
+    """
+    A node representing a primary key dependency.
+    """
+
+    def __init__(self, relation_name, attributes):
+        super().__init__(Operator.primary_key, relation_name, attributes)
+
+
+class MultivaluedDependencyNode(DependencyNode):
+    """
+    A node representing a multivalued dependency.
+    """
+
+    def __init__(self, relation_name, attributes):
+        super().__init__(Operator.multivalued_dependency, relation_name, attributes)
+
+
+class FunctionalDependencyNode(DependencyNode):
+    """
+    A node representing a functional dependency.
+    """
+
+    def __init__(self, relation_name, attributes, conditions):
+        super().__init__(Operator.functional_dependency, relation_name, attributes)
+        self.conditions = conditions
+
+    def __eq__(self, other):
+        return (
+            super().__eq__(other) and
+            self.conditions == other.conditions
+        )
+
+
+class InclusionEquivalenceNode(DependencyNode):
+    """
+    A node representing an inclusion equivalence dependency.
+    """
+
+    def __init__(self, relation_names, attributes):
+        super().__init__(Operator.inclusion_equivalence, relation_names, attributes)
+        self.relation_names = relation_names
+
+    def __eq__(self, other):
+        return (
+            super().__eq__(other) and
+            self.relation_names == other.relation_names
+        )
+
+
+class InclusionSubsumptionNode(DependencyNode):
+    """
+    A node representing an inclusion subsumption dependency.
+    """
+
+    def __init__(self, relation_names, attributes):
+        super().__init__(Operator.inclusion_subsumption, relation_names, attributes)
+        self.relation_names = relation_names
+
+    def __eq__(self, other):
+        return (
+            super().__eq__(other) and
+            self.relation_names == other.relation_names
+        )
+
+
 class Operator(Enum):
     """
     A type of relational algebra operation.
@@ -332,3 +419,10 @@ class Operator(Enum):
     difference = 48
     union = 49
     intersect = 50
+
+    # Dependency operations.
+    primary_key = 60
+    multivalued_dependency = 61
+    functional_dependency = 62
+    inclusion_equivalence = 63
+    inclusion_subsumption = 64
