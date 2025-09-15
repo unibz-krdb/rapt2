@@ -37,7 +37,7 @@ class Rapt:
         :return: a SQL translation string
         """
         root_list = self.to_syntax_tree(instring, schema)
-        return sql_translator.translate(root_list, use_bag_semantics)
+        return sql_translator.translate(root_list, use_bag_semantics, self.builder.grammar.syntax)  # type: ignore
 
     def to_sql_sequence(self, instring, schema, use_bag_semantics=False):
         """
@@ -51,7 +51,7 @@ class Rapt:
         """
         root_list = self.to_syntax_tree(instring, schema)
         return [
-            sql_translator.translate(root.post_order(), use_bag_semantics)
+            sql_translator.translate(root.post_order(), use_bag_semantics, self.builder.grammar.syntax)  # type: ignore
             for root in root_list
         ]
 
@@ -61,4 +61,4 @@ class Rapt:
         latex tree, using the grammar.
         """
         root_list = self.to_syntax_tree(instring, schema)
-        return qtree_translator.translate(root_list)
+        return qtree_translator.translate(root_list, self.builder.grammar.syntax)  # type: ignore

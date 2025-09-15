@@ -1,4 +1,5 @@
 from ..treebrd.node import Operator
+from ..treebrd.grammars.syntax import Syntax
 
 
 class BaseTranslator:
@@ -7,7 +8,8 @@ class BaseTranslator:
     statement into some output format.
     """
 
-    def __init__(self):
+    def __init__(self, syntax: Syntax | None = None):
+        self.syntax = syntax or Syntax()
         self._translate_functions = {
             Operator.relation: self.relation,
             Operator.select: self.select,

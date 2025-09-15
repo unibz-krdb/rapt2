@@ -62,8 +62,7 @@ class Translator(BaseTranslator):
     def _get_temp_name(cls, node):
         return node.name or "_{}".format(id(node))
 
-    @classmethod
-    def _get_sql_operator(cls, node):
+    def _get_sql_operator(self, node):
         operators = {
             Operator.union: "UNION",
             Operator.difference: "EXCEPT",
@@ -293,13 +292,14 @@ class SetTranslator(Translator):
         return self.query(select_block=select_block, from_block=from_block)
 
 
-def translate(root_list, use_bag_semantics=False):
+def translate(root_list, use_bag_semantics=False, syntax=None):
     """
     Translate a list of relational algebra trees into SQL statements.
 
     :param root_list: a list of tree roots
     :param use_bag_semantics: flag for using relational algebra bag semantics
+    :param syntax: syntax instance for custom operators
     :return: a list of SQL statements
     """
-    translator = Translator() if use_bag_semantics else SetTranslator()
+    translator = Translator(syntax) if use_bag_semantics else SetTranslator(syntax)  # type: ignore
     return [translator.translate(root).to_sql() for root in root_list]

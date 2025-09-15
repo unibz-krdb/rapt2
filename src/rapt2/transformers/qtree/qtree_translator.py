@@ -8,6 +8,14 @@ class Translator(BaseTranslator):
     statement into a latex tree output.
     """
 
+    def _get_latex_operator(self, operator):
+        """
+        Get the LaTeX operator for a given operator.
+        For now, we use the hardcoded mapping, but this could be extended
+        to use syntax-based mappings in the future.
+        """
+        return latex_operator[operator]
+
     def relation(self, node):
         """
         Translate a relation node into latex qtree node.
@@ -24,7 +32,7 @@ class Translator(BaseTranslator):
         """
         child = self.translate(node.child)
         return "[.${op}_{{{conditions}}}$ {child} ]".format(
-            op=latex_operator[node.operator],
+            op=self._get_latex_operator(node.operator),
             conditions=node.conditions.to_latex(),
             child=child,
         )
@@ -37,7 +45,7 @@ class Translator(BaseTranslator):
         """
         child = self.translate(node.child)
         return "[.${op}_{{{attributes}}}$ {child} ]".format(
-            op=latex_operator[node.operator],
+            op=self._get_latex_operator(node.operator),
             attributes=", ".join(node.attributes.names),
             child=child,
         )
@@ -53,7 +61,7 @@ class Translator(BaseTranslator):
         if node.attributes:
             attributes = "({})".format(", ".join(node.attributes.names))
         return "[.${op}_{{{name}{attributes}}}$ {child} ]".format(
-            op=latex_operator[node.operator],
+            op=self._get_latex_operator(node.operator),
             name=node.name,
             attributes=attributes,
             child=child,
@@ -80,7 +88,7 @@ class Translator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
-            op=latex_operator[node.operator],
+            op=self._get_latex_operator(node.operator),
             conditions=node.conditions.to_latex(),
             left=self.translate(node.left),
             right=self.translate(node.right),
@@ -109,7 +117,7 @@ class Translator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
-            op=latex_operator[node.operator],
+            op=self._get_latex_operator(node.operator),
             conditions=node.conditions.to_latex(),
             left=self.translate(node.left),
             right=self.translate(node.right),
@@ -122,7 +130,7 @@ class Translator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
-            op=latex_operator[node.operator],
+            op=self._get_latex_operator(node.operator),
             conditions=node.conditions.to_latex(),
             left=self.translate(node.left),
             right=self.translate(node.right),
@@ -135,7 +143,7 @@ class Translator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
-            op=latex_operator[node.operator],
+            op=self._get_latex_operator(node.operator),
             conditions=node.conditions.to_latex(),
             left=self.translate(node.left),
             right=self.translate(node.right),
@@ -172,7 +180,7 @@ class Translator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         return "[.${op}$ {left} {right} ]".format(
-            op=latex_operator[node.operator],
+            op=self._get_latex_operator(node.operator),
             left=self.translate(node.left),
             right=self.translate(node.right),
         )
@@ -185,7 +193,7 @@ class Translator(BaseTranslator):
         """
         attributes = ", ".join(node.attributes)
         return "[.${op}_{{{attributes}}}({relation})$ ]".format(
-            op=latex_operator[node.operator],
+            op=self._get_latex_operator(node.operator),
             attributes=attributes,
             relation=node.relation_name,
         )
@@ -198,7 +206,7 @@ class Translator(BaseTranslator):
         """
         attributes = ", ".join(node.attributes)
         return "[.${op}_{{{attributes}}}({relation})$ ]".format(
-            op=latex_operator[node.operator],
+            op=self._get_latex_operator(node.operator),
             attributes=attributes,
             relation=node.relation_name,
         )
@@ -212,7 +220,7 @@ class Translator(BaseTranslator):
         left_attr, right_attr = node.attributes
         conditions = node.conditions.to_latex()
         relation = node.relation_name
-        op = latex_operator[node.operator]
+        op = self._get_latex_operator(node.operator)
         return f"[.${relation} : {left_attr} {op} {right_attr}$ ]"
 
     def inclusion_equivalence(self, node):
@@ -223,7 +231,7 @@ class Translator(BaseTranslator):
         """
         rel1, rel2 = node.relation_names
         attr1, attr2 = node.attributes
-        op = latex_operator[node.operator]
+        op = self._get_latex_operator(node.operator)
 
         return f"[.${rel1}[{attr1}] {op} {rel2}[{attr2}]$ ]"
 
@@ -236,15 +244,16 @@ class Translator(BaseTranslator):
 
         rel1, rel2 = node.relation_names
         attr1, attr2 = node.attributes
-        op = latex_operator[node.operator]
+        op = self._get_latex_operator(node.operator)
 
         return f"[.${rel1}[{attr1}] {op} {rel2}[{attr2}]$ ]"
 
 
-def translate(roots):
+def translate(roots, syntax=None):
     """
     Translate a treebrd tree rooted at root into latex tree.
-    :param root: a treebrd node
+    :param roots: a list of treebrd nodes
+    :param syntax: syntax instance for custom operators
     :return:  a string representing a latex qtree rooted at root
     """
-    return ["\\Tree{root}".format(root=Translator().translate(root)) for root in roots]
+    return ["\\Tree{root}".format(root=Translator(syntax).translate(root)) for root in roots]  # type: ignore

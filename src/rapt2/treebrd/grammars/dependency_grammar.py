@@ -26,7 +26,7 @@ class DependencyGrammar(ExtendedGrammar):
         """
         pk ::= "pk"
         """
-        return Literal("pk")
+        return Literal(self.syntax.pk_op)
 
     @property
     def pk_dep(self):
@@ -40,7 +40,7 @@ class DependencyGrammar(ExtendedGrammar):
         """
         mvd ::= "mvd"
         """
-        return Literal("mvd")
+        return Literal(self.syntax.mvd_op)
 
     @property
     def mvd_dep(self):
@@ -60,7 +60,7 @@ class DependencyGrammar(ExtendedGrammar):
         """
         fd ::= "fd"
         """
-        return Literal("fd")
+        return Literal(self.syntax.fd_op)
 
     @property
     def fd_dep(self):
@@ -83,7 +83,7 @@ class DependencyGrammar(ExtendedGrammar):
         """
         inc_eq ::= "inc="
         """
-        return Literal("inc=")
+        return Literal(self.syntax.inc_equiv_op)
 
     @property
     def inc_eq_dep(self):
@@ -105,7 +105,7 @@ class DependencyGrammar(ExtendedGrammar):
         """
         inc_subs ::= "inc⊆"
         """
-        return Literal("inc⊆")
+        return Literal(self.syntax.inc_subset_op)
 
     @property
     def inc_subs_dep(self):
