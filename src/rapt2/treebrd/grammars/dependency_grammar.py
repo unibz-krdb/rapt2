@@ -149,15 +149,22 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
         )
 
     @property
-    def statement(self):
+    def dep_statement(self):
         """
-        statement ::= dep terminate | statement
+        dep_statement ::= dep terminate
         """
         return self.dep + Suppress(self.syntax.terminator)
 
     @property
+    def statement(self):
+        """
+        statement ::= dep_statement | super().statement
+        """
+        return self.dep_statement | super().statement
+
+    @property
     def statements(self):
         """
-        An ordered collection of dependency statements.
+        An ordered collection of dependency and relational algebra statements.
         """
         return OneOrMore(self.statement)

@@ -8,7 +8,7 @@ from rapt2.treebrd.condition_node import (
     IdentityConditionNode,
 )
 from rapt2.treebrd.errors import RelationReferenceError
-from rapt2.treebrd.grammars import ExtendedGrammar
+from rapt2.treebrd.grammars import DependencyGrammar
 from rapt2.treebrd.node import (
     RelationNode,
     ProjectNode,
@@ -27,7 +27,7 @@ class TreeBRDTestCase(TestCase):
 
     @classmethod
     def create_build_function(cls, schema):
-        builder = TreeBRD(ExtendedGrammar())
+        builder = TreeBRD(DependencyGrammar())
         return functools.partial(builder.build, schema=schema)
 
 
