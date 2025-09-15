@@ -1,3 +1,4 @@
+from typing import TypeVar, Generic
 from pyparsing import (
     alphanums,
     Regex,
@@ -15,8 +16,11 @@ from .syntax import BaseSyntax
 
 ParserElement.enablePackrat()
 
+# Type variable for syntax type
+SyntaxType = TypeVar('SyntaxType', bound=BaseSyntax)
 
-class ProtoGrammar:
+
+class ProtoGrammar(Generic[SyntaxType]):
     """
     A grammar with fundamental rules for characters, strings, and
     numbers.
@@ -25,9 +29,9 @@ class ProtoGrammar:
     specification refer to the associated grammar file.
     """
 
-    syntax: BaseSyntax
+    syntax: SyntaxType
 
-    def __init__(self, syntax=BaseSyntax()):
+    def __init__(self, syntax: SyntaxType = BaseSyntax()):
         """
         Initializes a ProtoGrammar. Uses the default syntax if none
         is provided.
