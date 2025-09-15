@@ -42,6 +42,13 @@ class Syntax:
         # Defined operator.
         self.defined_op = "defined"
 
+        # Dependency operators.
+        self.pk_op = "pk"
+        self.mvd_op = "mvd"
+        self.fd_op = "fd"
+        self.inc_equiv_op = "inc="
+        self.inc_subset_op = "inc⊆"
+
         # Now set any user defined syntax.
         for key in kwargs:
             if hasattr(self, key):

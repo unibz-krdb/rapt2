@@ -239,9 +239,13 @@ class TreeBRD:
         if not exp or len(exp) < 2:
             return False
 
-        # Check if the first element is a dependency operator
-        dependency_operators = {"pk", "mvd", "fd", "inc=", "inc⊆"}
-        return exp[0] in dependency_operators
+        return exp[0] in [
+            self.grammar.syntax.pk_op,
+            self.grammar.syntax.mvd_op,
+            self.grammar.syntax.fd_op,
+            self.grammar.syntax.inc_equiv_op,
+            self.grammar.syntax.inc_subset_op,
+        ]
 
     def create_dependency_node(self, exp: ParseResults, schema):
         """
