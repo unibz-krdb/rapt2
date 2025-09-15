@@ -14,7 +14,7 @@ mvd_dep ::= mvd param_start attribute_name delim attribute_name param_stop relat
 mvd ::= "mvd"
 
 ; functional dependency
-fd_dep ::= fd param_start attribute_name delim attribute_name param_stop param_start conditions param_stop relation_name
+fd_dep ::= fd param_start attribute_name delim attribute_name param_stop ((select param_start conditions param_stop relation_name) | relation_name)
 fd ::= "fd"
 
 ; inclusion equivalence

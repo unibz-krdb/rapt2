@@ -46,20 +46,38 @@ class TestDependencyGrammar:
 
     def test_functional_dependency_parsing(self):
         """Test parsing of functional dependencies."""
-        # Test simple functional dependency
-        result = self.grammar.parse("fd_{a, b}_{a = 1} R;")
+        # Test simple functional dependency (without conditions)
+        result = self.grammar.parse("fd_{a, b} R;")
         assert len(result) == 1
         assert result[0][0] == "fd"
         assert list(result[0][1]) == ["a", "b"]
-        assert list(result[0][2][0]) == ["a", "=", "1"]
-        assert result[0][3] == "r"
+        assert result[0][2] == "r"
 
-        # Test complex functional dependency
-        result = self.grammar.parse("fd_{a, b}_{a = 1 and b > 0} R;")
+        # Test functional dependency with conditions
+        result = self.grammar.parse("fd_{a, b} \\select_{a = 1} R;")
         assert len(result) == 1
         assert result[0][0] == "fd"
         assert list(result[0][1]) == ["a", "b"]
-        assert result[0][3] == "r"
+        assert result[0][2] == "\\select"
+        assert list(result[0][3][0]) == ["a", "=", "1"]
+        assert result[0][4] == "r"
+
+        # Test complex functional dependency with conditions
+        result = self.grammar.parse("fd_{a, b} \\select_{a = 1 and b > 0} R;")
+        assert len(result) == 1
+        assert result[0][0] == "fd"
+        assert list(result[0][1]) == ["a", "b"]
+        assert result[0][2] == "\\select"
+        assert result[0][4] == "r"
+
+    def test_simple_functional_dependency_parsing(self):
+        """Test parsing of simple functional dependencies without conditions."""
+        # Test simple functional dependency without conditions
+        result = self.grammar.parse("fd_{a, b} R;")
+        assert len(result) == 1
+        assert result[0][0] == "fd"
+        assert list(result[0][1]) == ["a", "b"]
+        assert result[0][2] == "r"
 
     def test_inclusion_equivalence_parsing(self):
         """Test parsing of inclusion equivalence dependencies."""
@@ -79,7 +97,7 @@ class TestDependencyGrammar:
 
     def test_multiple_statements_parsing(self):
         """Test parsing of multiple dependency statements."""
-        result = self.grammar.parse("pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T;")
+        result = self.grammar.parse("pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} T;")
         assert len(result) == 3
 
         # Check first statement (primary key)
@@ -95,7 +113,8 @@ class TestDependencyGrammar:
         # Check third statement (functional dependency)
         assert result[2][0] == "fd"
         assert list(result[2][1]) == ["x", "y"]
-        assert result[2][3] == "t"
+        assert result[2][2] == "\\select"
+        assert result[2][4] == "t"
 
     def test_invalid_syntax_raises_error(self):
         """Test that invalid syntax raises parsing errors."""
@@ -142,7 +161,7 @@ class TestDependencyGrammarIntegration:
 
     def test_functional_dependency_node_creation(self):
         """Test creation of FunctionalDependencyNode from dependency statements."""
-        trees = self.builder.build("fd_{a, b}_{a = 1} R;", self.schema)
+        trees = self.builder.build("fd_{a, b} \\select_{a = 1} R;", self.schema)
         assert len(trees) == 1
 
         node = trees[0]
@@ -177,7 +196,7 @@ class TestDependencyGrammarIntegration:
     def test_multiple_dependency_statements(self):
         """Test parsing multiple dependency statements into multiple nodes."""
         trees = self.builder.build(
-            "pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T;", self.schema
+            "pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} T;", self.schema
         )
         assert len(trees) == 3
 
@@ -243,7 +262,7 @@ class TestDependencyGrammarWithRapt:
     def test_multiple_dependency_syntax_trees(self):
         """Test generation of multiple syntax trees for multiple dependency statements."""
         trees = self.rapt.to_syntax_tree(
-            "pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T;", self.schema
+            "pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} T;", self.schema
         )
         assert len(trees) == 3
         assert isinstance(trees[0], PrimaryKeyNode)

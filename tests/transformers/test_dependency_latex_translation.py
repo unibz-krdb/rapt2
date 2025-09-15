@@ -35,13 +35,13 @@ class TestDependencyLatexTranslation:
     def test_functional_dependency_latex_translation(self):
         """Test LaTeX translation of functional dependencies."""
         # Test simple functional dependency
-        latex = self.rapt.to_qtree("fd_{a, b}_{a = 1} R;", self.schema)
+        latex = self.rapt.to_qtree("fd_{a, b} \\select_{a = 1} R;", self.schema)
         assert len(latex) == 1
         assert "r : a \\rightarrow b" in latex[0]
         assert "\\Tree" in latex[0]
 
         # Test complex functional dependency
-        latex = self.rapt.to_qtree("fd_{a, b}_{a = 1 and b > 0} R;", self.schema)
+        latex = self.rapt.to_qtree("fd_{a, b} \\select_{a = 1 and b > 0} R;", self.schema)
         assert len(latex) == 1
         assert "r : a \\rightarrow b" in latex[0]
 
@@ -62,7 +62,7 @@ class TestDependencyLatexTranslation:
     def test_multiple_dependency_statements_latex_translation(self):
         """Test LaTeX translation of multiple dependency statements."""
         latex = self.rapt.to_qtree(
-            "pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);",
+            "pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);",
             self.schema,
         )
         assert len(latex) == 5
@@ -87,7 +87,7 @@ class TestDependencyLatexTranslation:
         test_cases = [
             "pk_{a, b} R;",
             "mvd_{x, y} S;",
-            "fd_{id, name}_{id > 0} T;",
+            "fd_{id, name} \\select_{id > 0} T;",
             "inc=_{a, b} (R, S);",
             "inc⊆_{x, y} (S, T);",
         ]
@@ -110,7 +110,7 @@ class TestDependencyLatexTranslation:
         test_mappings = [
             ("pk_{a} R;", "\\text{pk}"),
             ("mvd_{a, b} R;", "\\text{mvd}"),
-            ("fd_{a, b}_{a = 1} R;", "\\rightarrow"),
+            ("fd_{a, b} \\select_{a = 1} R;", "\\rightarrow"),
             ("inc=_{a, b} (R, S);", "\\equiv"),
             ("inc⊆_{a, b} (R, S);", "\\subseteq"),
         ]
@@ -144,7 +144,7 @@ class TestDependencyLatexTranslation:
 
     def test_latex_conditions_formatting(self):
         """Test that conditions are properly formatted in LaTeX output."""
-        latex = self.rapt.to_qtree("fd_{a, b}_{a = 1 and b > 0} R;", self.schema)
+        latex = self.rapt.to_qtree("fd_{a, b} \\select_{a = 1 and b > 0} R;", self.schema)
         assert "r : a \\rightarrow b" in latex[0]
         # Note: Conditions are not currently included in the new functional dependency format
 
@@ -213,7 +213,7 @@ class TestDependencyLatexTranslationIntegration:
         """Test LaTeX translation of all dependency types in one go."""
         from src.rapt2.transformers.qtree import qtree_translator
 
-        test_input = "pk_{a} R; mvd_{b, c} S; fd_{x, y}_{x > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);"
+        test_input = "pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} T; inc=_{a, b} (R, S); inc⊆_{x, y} (S, T);"
         trees = self.builder.build(test_input, self.schema)
         assert len(trees) == 5
 

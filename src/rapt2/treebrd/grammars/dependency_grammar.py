@@ -3,6 +3,7 @@ from pyparsing import (
     Suppress,
     OneOrMore,
     Literal,
+    CaselessKeyword,
 )
 
 from .extended_grammar import ExtendedGrammar
@@ -64,15 +65,17 @@ class DependencyGrammar(ExtendedGrammar):
     @property
     def fd_dep(self):
         """
-        fd_dep ::= fd param_start attribute_name delim attribute_name param_stop param_start conditions param_stop relation_name
+        fd_dep ::= fd param_start attribute_name delim attribute_name param_stop ((select param_start conditions param_stop relation_name) | relation_name)
         """
         return Group(
             self.fd
             + self.parameter(
                 self.attribute_name + Suppress(self.syntax.delim) + self.attribute_name
             )
-            + self.parameter(self.conditions)
-            + self.relation_name
+            + (
+                (Literal(self.syntax.select_op) + self.parameter(self.conditions) + self.relation_name)
+                | self.relation_name
+            )
         )
 
     @property

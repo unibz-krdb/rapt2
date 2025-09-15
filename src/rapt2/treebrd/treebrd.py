@@ -266,12 +266,19 @@ class TreeBRD:
             return MultivaluedDependencyNode(relation_name, attributes)
 
         elif operator == "fd":
-            # fd_{attribute1, attribute2}_{conditions} relation
+            # fd_{attribute1, attribute2} relation OR fd_{attribute1, attribute2} \select_{conditions} relation
             attributes = exp[1]
-            conditions = exp[2]
-            relation_name = exp[3]
-            condition_node = self.create_condition_node(conditions[0])
-            return FunctionalDependencyNode(relation_name, attributes, condition_node)
+            if len(exp) == 3:
+                # Simple form: fd_{attributes} relation
+                relation_name = exp[2]
+                return FunctionalDependencyNode(relation_name, attributes, None)
+            else:
+                # With conditions: fd_{attributes} \select_{conditions} relation
+                # exp[2] = "\select", exp[3] = conditions, exp[4] = relation_name
+                conditions = exp[3]
+                relation_name = exp[4]
+                condition_node = self.create_condition_node(conditions[0])
+                return FunctionalDependencyNode(relation_name, attributes, condition_node)
 
         elif operator == "inc=":
             # inc=_{attributes} (relation1, relation2)
