@@ -18,14 +18,14 @@ class ExtendedGrammar(CoreGrammar):
     specification refer to the associated grammar file.
     """
 
-    def __init__(self, syntax=None):
+    def __init__(self, syntax=ExtendedSyntax()):
         """
         Initializes an ExtendedGrammar. Uses the default syntax if none
         is provided.
 
         :param syntax: a syntax for this grammar.
         """
-        super().__init__(syntax or ExtendedSyntax())
+        super().__init__(syntax)
 
     @property
     def natural_join(self):

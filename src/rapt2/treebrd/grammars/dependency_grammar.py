@@ -17,14 +17,14 @@ class DependencyGrammar(ExtendedGrammar):
     specification refer to the associated grammar file.
     """
 
-    def __init__(self, syntax=None):
+    def __init__(self, syntax=DependencySyntax()):
         """
         Initializes a DependencyGrammar. Uses the default syntax if none
         is provided.
 
         :param syntax: a syntax for this grammar.
         """
-        super().__init__(syntax or DependencySyntax())
+        super().__init__(syntax)
 
     def parse(self, instring):
         instring = r"" + instring

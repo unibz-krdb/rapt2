@@ -25,14 +25,16 @@ class ProtoGrammar:
     specification refer to the associated grammar file.
     """
 
-    def __init__(self, syntax=None):
+    syntax: BaseSyntax
+
+    def __init__(self, syntax=BaseSyntax()):
         """
         Initializes a ProtoGrammar. Uses the default syntax if none
         is provided.
 
         :param syntax: a syntax for this grammar.
         """
-        self.syntax = syntax or BaseSyntax()
+        self.syntax = syntax
 
     def parse(self, instring):
         """

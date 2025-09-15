@@ -35,14 +35,14 @@ class ConditionGrammar(ProtoGrammar):
     A grammar for condition expressions.
     """
 
-    def __init__(self, syntax=None):
+    def __init__(self, syntax=ConditionSyntax()):
         """
         Initializes a ConditionGrammar. Uses the default syntax if none
         is provided.
 
         :param syntax: a syntax for this grammar.
         """
-        self.syntax = syntax or ConditionSyntax()
+        super().__init__(syntax)
 
     @property
     def comparator_op(self):
