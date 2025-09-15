@@ -1,6 +1,5 @@
 import pytest
 from src.rapt2.treebrd.grammars.dependency_grammar import DependencyGrammar
-from src.rapt2.treebrd.grammars.syntax import Syntax
 from src.rapt2.treebrd.treebrd import TreeBRD
 from src.rapt2.treebrd.node import (
     PrimaryKeyNode,
