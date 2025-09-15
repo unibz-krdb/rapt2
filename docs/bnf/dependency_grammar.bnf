@@ -1,0 +1,26 @@
+; Relational grammar rules for database dependencies.
+; Uses rules from extended_grammar.
+
+statement ::= dep terminate | statement
+
+dep ::= pk_dep | mvd_dep | fd_dep | inc_eq_dep | inc_subs_dep
+
+; primary key
+pk_dep ::= pk param_start attribute_list param_stop relation_name
+pk ::= "pk"
+
+; multivalued dependency
+mvd_dep ::= mvd param_start attribute_name delim attribute_name param_stop relation_name
+mvd ::= "mvd"
+
+; functional dependency
+fd_dep ::= fd param_start attribute_name delim attribute_name param_stop param_start conditions param_stop relation_name
+fd ::= "fd"
+
+; inclusion equivalence
+inc_eq_dep ::= inc_eq param_start attribute_name delim attribute_name param_stop paren_left relation_name delim relation_name paren_right
+inc_eq ::= "inc="
+
+; inclusion subsumption
+inc_subs_dep ::= inc_subs param_start attribute_name delim attribute_name param_stop paren_left relation_name delim relation_name paren_right
+inc_subs ::= "inc⊆"
