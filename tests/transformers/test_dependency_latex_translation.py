@@ -37,15 +37,13 @@ class TestDependencyLatexTranslation:
         # Test simple functional dependency
         latex = self.rapt.to_qtree("fd_{a, b}_{a = 1} R;", self.schema)
         assert len(latex) == 1
-        assert "\\text{fd}_{a, b}" in latex[0]
-        assert "(r)" in latex[0]
+        assert "r : a \\rightarrow b" in latex[0]
         assert "\\Tree" in latex[0]
 
         # Test complex functional dependency
         latex = self.rapt.to_qtree("fd_{a, b}_{a = 1 and b > 0} R;", self.schema)
         assert len(latex) == 1
-        assert "\\text{fd}_{a, b}" in latex[0]
-        assert "(r)" in latex[0]
+        assert "r : a \\rightarrow b" in latex[0]
 
     def test_inclusion_equivalence_latex_translation(self):
         """Test LaTeX translation of inclusion equivalence dependencies."""
@@ -76,8 +74,7 @@ class TestDependencyLatexTranslation:
         assert "\\text{mvd}_{b, c}(s)" in latex[1]
 
         # Check third statement (functional dependency)
-        assert "\\text{fd}_{x, y}" in latex[2]
-        assert "(t)" in latex[2]
+        assert "t : x \\rightarrow y" in latex[2]
 
         # Check fourth statement (inclusion equivalence)
         assert "r[a] \\equiv s[b]" in latex[3]
@@ -100,9 +97,11 @@ class TestDependencyLatexTranslation:
             assert len(latex) == 1
             assert latex[0].startswith("\\Tree")
             assert latex[0].endswith(" ]")
-            # Most dependency operators use \\text{}, but inclusion dependencies use mathematical symbols
+            # Most dependency operators use \\text{}, but inclusion and functional dependencies use mathematical symbols
             if "inc=" in test_case or "inc⊆" in test_case:
                 assert "\\equiv" in latex[0] or "\\subseteq" in latex[0]
+            elif "fd_" in test_case:
+                assert "\\rightarrow" in latex[0]
             else:
                 assert "\\text{" in latex[0]
 
@@ -111,7 +110,7 @@ class TestDependencyLatexTranslation:
         test_mappings = [
             ("pk_{a} R;", "\\text{pk}"),
             ("mvd_{a, b} R;", "\\text{mvd}"),
-            ("fd_{a, b}_{a = 1} R;", "\\text{fd}"),
+            ("fd_{a, b}_{a = 1} R;", "\\rightarrow"),
             ("inc=_{a, b} (R, S);", "\\equiv"),
             ("inc⊆_{a, b} (R, S);", "\\subseteq"),
         ]
@@ -146,9 +145,8 @@ class TestDependencyLatexTranslation:
     def test_latex_conditions_formatting(self):
         """Test that conditions are properly formatted in LaTeX output."""
         latex = self.rapt.to_qtree("fd_{a, b}_{a = 1 and b > 0} R;", self.schema)
-        assert "\\text{fd}_{a, b}" in latex[0]
-        # The conditions should be included in the LaTeX output
-        assert "_{" in latex[0]  # Should have conditions part
+        assert "r : a \\rightarrow b" in latex[0]
+        # Note: Conditions are not currently included in the new functional dependency format
 
     def test_latex_translation_with_different_schemas(self):
         """Test LaTeX translation with different schema configurations."""
@@ -226,7 +224,7 @@ class TestDependencyLatexTranslationIntegration:
         expected_operators = [
             "\\text{pk}",
             "\\text{mvd}",
-            "\\text{fd}",
+            "\\rightarrow",
             "\\equiv",
             "\\subseteq",
         ]

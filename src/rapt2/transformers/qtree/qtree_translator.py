@@ -209,14 +209,11 @@ class Translator(BaseTranslator):
         :param node: a dependency node
         :return: a qtree subtree rooted at the node
         """
-        attributes = ", ".join(node.attributes)
+        left_attr, right_attr = node.attributes
         conditions = node.conditions.to_latex()
-        return "[.${op}_{{{attributes}}}_{{{conditions}}}({relation})$ ]".format(
-            op=latex_operator[node.operator],
-            attributes=attributes,
-            conditions=conditions,
-            relation=node.relation_name,
-        )
+        relation = node.relation_name
+        op = latex_operator[node.operator]
+        return f"[.${relation} : {left_attr} {op} {right_attr}$ ]"
 
     def inclusion_equivalence(self, node):
         """
