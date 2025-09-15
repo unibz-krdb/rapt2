@@ -41,7 +41,9 @@ class TestDependencyLatexTranslation:
         assert "\\Tree" in latex[0]
 
         # Test complex functional dependency
-        latex = self.rapt.to_qtree("fd_{a, b} \\select_{a = 1 and b > 0} R;", self.schema)
+        latex = self.rapt.to_qtree(
+            "fd_{a, b} \\select_{a = 1 and b > 0} R;", self.schema
+        )
         assert len(latex) == 1
         assert "r : a \\rightarrow b" in latex[0]
 
@@ -144,7 +146,9 @@ class TestDependencyLatexTranslation:
 
     def test_latex_conditions_formatting(self):
         """Test that conditions are properly formatted in LaTeX output."""
-        latex = self.rapt.to_qtree("fd_{a, b} \\select_{a = 1 and b > 0} R;", self.schema)
+        latex = self.rapt.to_qtree(
+            "fd_{a, b} \\select_{a = 1 and b > 0} R;", self.schema
+        )
         assert "r : a \\rightarrow b" in latex[0]
         # Note: Conditions are not currently included in the new functional dependency format
 

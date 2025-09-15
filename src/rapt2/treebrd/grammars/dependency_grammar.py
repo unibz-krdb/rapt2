@@ -9,7 +9,7 @@ from pyparsing import (
 from .extended_grammar import ExtendedGrammar
 from .syntax import DependencySyntax
 
-TDependencySyntax = TypeVar('TDependencySyntax', bound=DependencySyntax)
+TDependencySyntax = TypeVar("TDependencySyntax", bound=DependencySyntax)
 
 
 class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
@@ -19,6 +19,7 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
     """
+
     syntax: TDependencySyntax
 
     def __init__(self, syntax: TDependencySyntax = DependencySyntax()):
@@ -86,7 +87,11 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
                 self.attribute_name + Suppress(self.syntax.delim) + self.attribute_name
             )
             + (
-                (Literal(self.syntax.select_op) + self.parameter(self.conditions) + self.relation_name)
+                (
+                    Literal(self.syntax.select_op)
+                    + self.parameter(self.conditions)
+                    + self.relation_name
+                )
                 | self.relation_name
             )
         )

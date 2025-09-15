@@ -2,6 +2,7 @@ class BaseSyntax:
     """
     Base syntax class containing common tokens used by all grammars.
     """
+
     # General tokens.
     terminator = ";"
     delim = ","
@@ -21,6 +22,7 @@ class ConditionSyntax(BaseSyntax):
     """
     Syntax class for condition expressions containing logical and comparison operators.
     """
+
     # Logical tokens.
     not_op = "not"
     and_op = "and"
@@ -40,6 +42,7 @@ class CoreSyntax(ConditionSyntax):
     """
     Syntax class for core relational algebra containing basic operators.
     """
+
     # Relational algebra operators.
     project_op = "\\project"
     rename_op = "\\rename"
@@ -54,6 +57,7 @@ class ExtendedSyntax(CoreSyntax):
     """
     Syntax class for extended relational algebra containing additional join operators.
     """
+
     # Additional join operators.
     theta_join_op = "\\theta_join"
     natural_join_op = "\\natural_join"
@@ -70,6 +74,7 @@ class DependencySyntax(ExtendedSyntax):
     """
     Syntax class for dependency grammar containing dependency-specific operators.
     """
+
     # Dependency operators.
     pk_op = "pk"
     mvd_op = "mvd"

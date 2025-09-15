@@ -282,7 +282,9 @@ class TreeBRD:
                 conditions = exp[3]
                 relation_name = exp[4]
                 condition_node = self.create_condition_node(conditions[0])
-                return FunctionalDependencyNode(relation_name, attributes, condition_node)
+                return FunctionalDependencyNode(
+                    relation_name, attributes, condition_node
+                )
 
         elif operator == self.grammar.syntax.inc_equiv_op:
             # inc=_{attributes} (relation1, relation2)

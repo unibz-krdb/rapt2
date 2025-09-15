@@ -16,7 +16,8 @@ from .syntax import BaseSyntax
 
 ParserElement.enablePackrat()
 
-TSyntax = TypeVar('TSyntax', bound=BaseSyntax)
+TSyntax = TypeVar("TSyntax", bound=BaseSyntax)
+
 
 class ProtoGrammar(Generic[TSyntax]):
     """

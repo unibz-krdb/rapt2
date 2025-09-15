@@ -5,7 +5,7 @@ from pyparsing.helpers import infix_notation
 from .proto_grammar import ProtoGrammar
 from .syntax import ConditionSyntax
 
-TConditionSyntax = TypeVar('TConditionSyntax', bound=ConditionSyntax)
+TConditionSyntax = TypeVar("TConditionSyntax", bound=ConditionSyntax)
 
 
 def get_attribute_references(instring):

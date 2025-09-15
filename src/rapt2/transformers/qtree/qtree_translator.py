@@ -256,4 +256,6 @@ def translate(roots, syntax=None):
     :param syntax: syntax instance for custom operators
     :return:  a string representing a latex qtree rooted at root
     """
-    return ["\\Tree{root}".format(root=Translator(syntax).translate(root)) for root in roots]  # type: ignore
+    return [
+        "\\Tree{root}".format(root=Translator(syntax).translate(root)) for root in roots
+    ]  # type: ignore

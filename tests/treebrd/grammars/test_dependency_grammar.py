@@ -97,7 +97,9 @@ class TestDependencyGrammar:
 
     def test_multiple_statements_parsing(self):
         """Test parsing of multiple dependency statements."""
-        result = self.grammar.parse("pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} T;")
+        result = self.grammar.parse(
+            "pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} T;"
+        )
         assert len(result) == 3
 
         # Check first statement (primary key)
