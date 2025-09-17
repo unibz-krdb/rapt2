@@ -61,6 +61,19 @@ class RelationNode(Node):
         return [self]
 
 
+class DefinitionNode(Node):
+    """
+    A relation definition.
+    """
+
+    def __init__(self, name: str, attributes: list, schema):
+        super().__init__(Operator.definition, name)
+        self.attributes = AttributeList(attributes, name)
+
+    def post_order(self):
+        return [self]
+
+
 class UnaryNode(Node):
     """
     A Node with one child.
@@ -396,6 +409,7 @@ class Operator(Enum):
     # Basic operations
     relation = auto()
     assign = auto()
+    definition = auto()
     project = auto()
     rename = auto()
     select = auto()

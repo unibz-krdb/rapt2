@@ -83,6 +83,41 @@ class TestAssignment(TestQTreeTransformer):
         self.assertEqual(expected, actual)
 
 
+class TestDefinition(TestQTreeTransformer):
+    def test_single_attribute(self):
+        ra = "R(a);"
+        expected = [r"\Tree[.$r(a)$ ]"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_multiple_attributes(self):
+        ra = "R(a, b, c);"
+        expected = [r"\Tree[.$r(a, b, c)$ ]"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_two_attributes(self):
+        ra = "R(a, b);"
+        expected = [r"\Tree[.$r(a, b)$ ]"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_multiple_definitions(self):
+        ra = "R1(a, b); R2(c, d);"
+        expected = [
+            r"\Tree[.$r1(a, b)$ ]",
+            r"\Tree[.$r2(c, d)$ ]"
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_definition_with_spacing(self):
+        ra = "R ( a , b , c ) ;"
+        expected = [r"\Tree[.$r(a, b, c)$ ]"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+
 class TestJoin(TestQTreeTransformer):
     def test_relation(self):
         ra = r"alpha \join beta;"

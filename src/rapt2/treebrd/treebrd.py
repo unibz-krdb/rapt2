@@ -7,7 +7,7 @@ from rapt2.treebrd.condition_node import (BinaryConditionalOperator,
                                           UnaryConditionNode)
 
 from .grammars.proto_grammar import ProtoGrammar
-from .node import (AssignNode, CrossJoinNode, DifferenceNode,
+from .node import (AssignNode, CrossJoinNode, DefinitionNode, DifferenceNode,
                    FullOuterJoinNode, FunctionalDependencyNode,
                    InclusionEquivalenceNode, InclusionSubsumptionNode,
                    IntersectNode, LeftOuterJoinNode, MultivaluedDependencyNode,
@@ -64,6 +64,12 @@ class TreeBRD:
             node = self.create_unary_node(
                 operator=exp[0], child=child, param=exp[1], schema=schema
             )
+
+        # Definition.
+        elif len(exp) == 2 and isinstance(exp[0], str) and isinstance(exp[1], ParseResults):
+            name = exp[0]
+            attributes = list(exp[1])  # Convert ParseResults to list
+            node = DefinitionNode(name=name, attributes=attributes, schema=schema)
 
         # Assignment.
         elif exp[1] is self.grammar.syntax.assign_op:
@@ -224,13 +230,20 @@ class TreeBRD:
         if not exp or len(exp) < 2:
             return False
 
-        return exp[0] in [
-            self.grammar.syntax.pk_op,
-            self.grammar.syntax.mvd_op,
-            self.grammar.syntax.fd_op,
-            self.grammar.syntax.inc_equiv_op,
-            self.grammar.syntax.inc_subset_op,
-        ]
+        # Check if the syntax has dependency operators
+        dependency_ops = []
+        if hasattr(self.grammar.syntax, 'pk_op'):
+            dependency_ops.append(self.grammar.syntax.pk_op)
+        if hasattr(self.grammar.syntax, 'mvd_op'):
+            dependency_ops.append(self.grammar.syntax.mvd_op)
+        if hasattr(self.grammar.syntax, 'fd_op'):
+            dependency_ops.append(self.grammar.syntax.fd_op)
+        if hasattr(self.grammar.syntax, 'inc_equiv_op'):
+            dependency_ops.append(self.grammar.syntax.inc_equiv_op)
+        if hasattr(self.grammar.syntax, 'inc_subset_op'):
+            dependency_ops.append(self.grammar.syntax.inc_subset_op)
+
+        return exp[0] in dependency_ops
 
     def create_dependency_node(self, exp: ParseResults, schema):
         """
