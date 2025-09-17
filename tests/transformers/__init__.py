@@ -1,2 +1,1 @@
-from .sql_translator import test_translation_sequence
-from .sql_translator import test_translation_sql
+from .sql_translator import test_translation_sequence, test_translation_sql

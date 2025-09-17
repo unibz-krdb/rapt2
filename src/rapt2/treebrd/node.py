@@ -1,9 +1,9 @@
 import copy
 from enum import Enum, auto
 
-from .errors import InputError, RelationReferenceError
 from .attributes import AttributeList
 from .condition_node import ConditionNode
+from .errors import InputError, RelationReferenceError
 
 
 class Node:
@@ -46,6 +46,7 @@ class Node:
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
 
 class RelationNode(Node):
     """

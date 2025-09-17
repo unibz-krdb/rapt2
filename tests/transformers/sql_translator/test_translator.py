@@ -1,6 +1,6 @@
+import functools
 from unittest import TestCase
 
-import functools
 import psycopg2
 
 from rapt2 import Rapt

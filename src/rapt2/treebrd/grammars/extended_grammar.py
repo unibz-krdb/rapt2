@@ -1,11 +1,6 @@
 from typing import TypeVar
-from pyparsing import (
-    CaselessKeyword,
-    infixNotation,
-    opAssoc,
-    Literal,
-    Group,
-)
+
+from pyparsing import CaselessKeyword, Group, Literal, infixNotation, opAssoc
 
 from .core_grammar import CoreGrammar
 from .syntax import ExtendedSyntax

@@ -1,9 +1,9 @@
 import pytest
-from rapt2.rapt import Rapt
 
+from rapt2.rapt import Rapt
 from rapt2.transformers.qtree.constants import *
-from rapt2.treebrd.grammars.extended_grammar import ExtendedGrammar
 from rapt2.treebrd.grammars.dependency_grammar import DependencyGrammar
+from rapt2.treebrd.grammars.extended_grammar import ExtendedGrammar
 from rapt2.treebrd.treebrd import TreeBRD
 from tests.transformers.test_transfomer import TestTransformer
 
@@ -218,7 +218,11 @@ class TestFunctionalDependency(TestQTreeDependencyTransformer):
         """Set up test fixtures with proper schema."""
         super().setUp()
         # Override the schema to include the attributes we need for functional dependencies
-        self.schema = {"alpha": ["a", "b", "c"], "beta": ["c", "d", "e"], "gamma": ["id", "name", "value"]}
+        self.schema = {
+            "alpha": ["a", "b", "c"],
+            "beta": ["c", "d", "e"],
+            "gamma": ["id", "name", "value"],
+        }
         # Update the translate function to use our custom schema
         self.translate = self.translate_func(self.rapt.to_qtree, schema=self.schema)
 
@@ -239,7 +243,9 @@ class TestFunctionalDependency(TestQTreeDependencyTransformer):
     def test_functional_dependency_with_complex_select(self):
         """Test functional dependency with complex select condition."""
         ra = "fd_{a, b} \\select_{a = 1 and b > 0} alpha;"
-        expected = [r"\Tree[.$\sigma_{((a \eq 1) \land (b \gt 0))} (alpha) : a \rightarrow b$ ]"]
+        expected = [
+            r"\Tree[.$\sigma_{((a \eq 1) \land (b \gt 0))} (alpha) : a \rightarrow b$ ]"
+        ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
@@ -253,7 +259,9 @@ class TestFunctionalDependency(TestQTreeDependencyTransformer):
     def test_functional_dependency_with_or_condition(self):
         """Test functional dependency with OR condition in select."""
         ra = "fd_{a, b} \\select_{a = 1 or a = 2} alpha;"
-        expected = [r"\Tree[.$\sigma_{((a \eq 1) \lor (a \eq 2))} (alpha) : a \rightarrow b$ ]"]
+        expected = [
+            r"\Tree[.$\sigma_{((a \eq 1) \lor (a \eq 2))} (alpha) : a \rightarrow b$ ]"
+        ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
@@ -269,7 +277,7 @@ class TestFunctionalDependency(TestQTreeDependencyTransformer):
         ra = "fd_{a, b} \\select_{a = 1} alpha; fd_{c, d} \\select_{c > 0} beta;"
         expected = [
             r"\Tree[.$\sigma_{(a \eq 1)} (alpha) : a \rightarrow b$ ]",
-            r"\Tree[.$\sigma_{(c \gt 0)} (beta) : c \rightarrow d$ ]"
+            r"\Tree[.$\sigma_{(c \gt 0)} (beta) : c \rightarrow d$ ]",
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
@@ -302,7 +310,6 @@ class TestDependencyLatexTranslation:
         assert len(latex) == 1
         assert "\\text{mvd}_{a, b}(r)" in latex[0]
         assert "\\Tree" in latex[0]
-
 
     def test_inclusion_equivalence_latex_translation(self):
         """Test LaTeX translation of inclusion equivalence dependencies."""
@@ -393,7 +400,6 @@ class TestDependencyLatexTranslation:
 
         latex = self.rapt.to_qtree("inc⊆_{x, y} (S, T);", self.schema)
         assert "s[x]" in latex[0] and "t[y]" in latex[0]
-
 
     def test_latex_translation_with_different_schemas(self):
         """Test LaTeX translation with different schema configurations."""

@@ -1,21 +1,13 @@
+import functools
 from unittest import TestCase
 
-import functools
-
-from rapt2.treebrd.condition_node import (
-    BinaryConditionNode,
-    BinaryConditionalOperator,
-    IdentityConditionNode,
-)
+from rapt2.treebrd.condition_node import (BinaryConditionalOperator,
+                                          BinaryConditionNode,
+                                          IdentityConditionNode)
 from rapt2.treebrd.errors import RelationReferenceError
 from rapt2.treebrd.grammars import DependencyGrammar
-from rapt2.treebrd.node import (
-    RelationNode,
-    ProjectNode,
-    CrossJoinNode,
-    NaturalJoinNode,
-    ThetaJoinNode,
-)
+from rapt2.treebrd.node import (CrossJoinNode, NaturalJoinNode, ProjectNode,
+                                RelationNode, ThetaJoinNode)
 from rapt2.treebrd.schema import Schema
 from rapt2.treebrd.treebrd import TreeBRD
 

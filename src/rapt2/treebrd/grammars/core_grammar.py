@@ -1,16 +1,8 @@
 from typing import TypeVar
-from pyparsing import (
-    delimitedList,
-    Group,
-    Optional,
-    CaselessKeyword,
-    infixNotation,
-    opAssoc,
-    Keyword,
-    Suppress,
-    OneOrMore,
-    alphanums,
-)
+
+from pyparsing import (CaselessKeyword, Group, Keyword, OneOrMore, Optional,
+                       Suppress, alphanums, delimitedList, infixNotation,
+                       opAssoc)
 
 from .condition_grammar import ConditionGrammar
 from .syntax import CoreSyntax

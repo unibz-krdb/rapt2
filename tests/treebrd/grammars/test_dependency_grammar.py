@@ -1,16 +1,12 @@
 import pytest
+
 from src.rapt2.treebrd.grammars.dependency_grammar import DependencyGrammar
+from src.rapt2.treebrd.node import (FunctionalDependencyNode,
+                                    InclusionEquivalenceNode,
+                                    InclusionSubsumptionNode,
+                                    MultivaluedDependencyNode, Operator,
+                                    PrimaryKeyNode, RelationNode, SelectNode)
 from src.rapt2.treebrd.treebrd import TreeBRD
-from src.rapt2.treebrd.node import (
-    PrimaryKeyNode,
-    MultivaluedDependencyNode,
-    FunctionalDependencyNode,
-    InclusionEquivalenceNode,
-    InclusionSubsumptionNode,
-    RelationNode,
-    SelectNode,
-    Operator,
-)
 
 
 class TestDependencyGrammar:

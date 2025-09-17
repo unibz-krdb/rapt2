@@ -1,5 +1,6 @@
 from typing import TypeVar
-from pyparsing import oneOf, CaselessKeyword, opAssoc, Group
+
+from pyparsing import CaselessKeyword, Group, oneOf, opAssoc
 from pyparsing.helpers import infix_notation
 
 from .proto_grammar import ProtoGrammar

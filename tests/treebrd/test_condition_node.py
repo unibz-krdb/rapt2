@@ -1,11 +1,10 @@
 from unittest import TestCase
-from rapt2.treebrd.condition_node import (
-    IdentityConditionNode,
-    UnaryConditionNode,
-    UnaryConditionalOperator,
-    BinaryConditionalOperator,
-    BinaryConditionNode,
-)
+
+from rapt2.treebrd.condition_node import (BinaryConditionalOperator,
+                                          BinaryConditionNode,
+                                          IdentityConditionNode,
+                                          UnaryConditionalOperator,
+                                          UnaryConditionNode)
 from rapt2.treebrd.schema import Schema
 
 

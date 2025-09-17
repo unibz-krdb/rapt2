@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from rapt2.treebrd.errors import RelationReferenceError
 from rapt2.treebrd.schema import Schema
 

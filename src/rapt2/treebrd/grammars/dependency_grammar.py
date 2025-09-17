@@ -1,10 +1,6 @@
 from typing import TypeVar
-from pyparsing import (
-    Group,
-    Suppress,
-    OneOrMore,
-    Literal,
-)
+
+from pyparsing import Group, Literal, OneOrMore, Suppress
 
 from .extended_grammar import ExtendedGrammar
 from .syntax import DependencySyntax

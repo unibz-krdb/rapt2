@@ -1,28 +1,16 @@
-from typing import Union, List
+from typing import List, Union
+
+from ...treebrd.node import (AssignNode, CrossJoinNode, DifferenceNode,
+                             FullOuterJoinNode, FunctionalDependencyNode,
+                             InclusionEquivalenceNode,
+                             InclusionSubsumptionNode, IntersectNode,
+                             LeftOuterJoinNode, MultivaluedDependencyNode,
+                             NaturalJoinNode, Node, PrimaryKeyNode,
+                             ProjectNode, RelationNode, RenameNode,
+                             RightOuterJoinNode, SelectNode, ThetaJoinNode,
+                             UnionNode)
 from ..base_translator import BaseTranslator
 from .operators import latex_operator
-from ...treebrd.node import (
-    Node,
-    RelationNode,
-    SelectNode,
-    ProjectNode,
-    RenameNode,
-    AssignNode,
-    ThetaJoinNode,
-    CrossJoinNode,
-    NaturalJoinNode,
-    FullOuterJoinNode,
-    LeftOuterJoinNode,
-    RightOuterJoinNode,
-    UnionNode,
-    DifferenceNode,
-    IntersectNode,
-    PrimaryKeyNode,
-    MultivaluedDependencyNode,
-    FunctionalDependencyNode,
-    InclusionEquivalenceNode,
-    InclusionSubsumptionNode,
-)
 
 
 class Translator(BaseTranslator):
@@ -196,7 +184,12 @@ class Translator(BaseTranslator):
         """
         return self._binary(node)
 
-    def _binary(self, node: Union[CrossJoinNode, NaturalJoinNode, UnionNode, DifferenceNode, IntersectNode]) -> str:
+    def _binary(
+        self,
+        node: Union[
+            CrossJoinNode, NaturalJoinNode, UnionNode, DifferenceNode, IntersectNode
+        ],
+    ) -> str:
         """
         Translate a binary node into latex qtree node.
         :param node: a treebrd node

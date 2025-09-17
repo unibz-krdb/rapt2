@@ -1,23 +1,11 @@
-from rapt2.treebrd.condition_node import (
-    BinaryConditionNode,
-    BinaryConditionalOperator,
-    IdentityConditionNode,
-)
-from rapt2.treebrd.errors import (
-    AttributeReferenceError,
-    InputError,
-    InputReferenceError,
-)
-from rapt2.treebrd.node import (
-    ProjectNode,
-    RenameNode,
-    SelectNode,
-    UnaryNode,
-    Operator,
-    AssignNode,
-    Node,
-)
 from rapt2.treebrd.attributes import AttributeList
+from rapt2.treebrd.condition_node import (BinaryConditionalOperator,
+                                          BinaryConditionNode,
+                                          IdentityConditionNode)
+from rapt2.treebrd.errors import (AttributeReferenceError, InputError,
+                                  InputReferenceError)
+from rapt2.treebrd.node import (AssignNode, Node, Operator, ProjectNode,
+                                RenameNode, SelectNode, UnaryNode)
 from tests.treebrd.test_node import NodeTestCase
 
 

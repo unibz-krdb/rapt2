@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from rapt2.treebrd.grammars.syntax import Syntax
 
 

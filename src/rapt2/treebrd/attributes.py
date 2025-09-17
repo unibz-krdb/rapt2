@@ -1,7 +1,7 @@
-from collections import namedtuple
 import itertools
+from collections import namedtuple
 
-from .errors import InputError, AttributeReferenceError
+from .errors import AttributeReferenceError, InputError
 
 
 class Attribute(namedtuple("Attribute", ["name", "prefix"])):

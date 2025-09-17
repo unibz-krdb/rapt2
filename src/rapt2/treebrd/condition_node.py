@@ -1,6 +1,6 @@
-from enum import Enum, auto
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from enum import Enum, auto
 
 from rapt2.treebrd.grammars.condition_grammar import ConditionGrammar
 from rapt2.treebrd.grammars.syntax import Syntax

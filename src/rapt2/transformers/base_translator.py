@@ -1,5 +1,5 @@
-from ..treebrd.node import Operator
 from ..treebrd.grammars.syntax import Syntax
+from ..treebrd.node import Operator
 
 
 class BaseTranslator:

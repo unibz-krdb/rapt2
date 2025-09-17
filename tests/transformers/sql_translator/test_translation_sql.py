@@ -2,11 +2,10 @@ import functools
 
 from rapt2.rapt import Rapt
 from rapt2.transformers.sql import sql_translator
+from rapt2.treebrd.errors import AttributeReferenceError
 from rapt2.treebrd.grammars import CoreGrammar
 from rapt2.treebrd.grammars.extended_grammar import ExtendedGrammar
-from rapt2.treebrd.errors import AttributeReferenceError
 from rapt2.treebrd.treebrd import TreeBRD
-
 from tests.transformers.test_transfomer import TestTransformer
 
 

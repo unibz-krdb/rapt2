@@ -1,35 +1,20 @@
 from pyparsing import ParseResults
-from rapt2.treebrd.condition_node import (
-    IdentityConditionNode,
-    BinaryConditionNode,
-    BinaryConditionalOperator,
-    ConditionNode,
-    UnaryConditionNode,
-    UnaryConditionalOperator,
-)
-from .schema import Schema
-from .node import (
-    SelectNode,
-    ProjectNode,
-    RenameNode,
-    AssignNode,
-    CrossJoinNode,
-    NaturalJoinNode,
-    UnionNode,
-    DifferenceNode,
-    IntersectNode,
-    ThetaJoinNode,
-    FullOuterJoinNode,
-    LeftOuterJoinNode,
-    RightOuterJoinNode,
-    RelationNode,
-    PrimaryKeyNode,
-    MultivaluedDependencyNode,
-    FunctionalDependencyNode,
-    InclusionEquivalenceNode,
-    InclusionSubsumptionNode,
-)
+
+from rapt2.treebrd.condition_node import (BinaryConditionalOperator,
+                                          BinaryConditionNode, ConditionNode,
+                                          IdentityConditionNode,
+                                          UnaryConditionalOperator,
+                                          UnaryConditionNode)
+
 from .grammars.proto_grammar import ProtoGrammar
+from .node import (AssignNode, CrossJoinNode, DifferenceNode,
+                   FullOuterJoinNode, FunctionalDependencyNode,
+                   InclusionEquivalenceNode, InclusionSubsumptionNode,
+                   IntersectNode, LeftOuterJoinNode, MultivaluedDependencyNode,
+                   NaturalJoinNode, PrimaryKeyNode, ProjectNode, RelationNode,
+                   RenameNode, RightOuterJoinNode, SelectNode, ThetaJoinNode,
+                   UnionNode)
+from .schema import Schema
 
 
 class TreeBRD:
@@ -276,7 +261,9 @@ class TreeBRD:
                 # Simple form: fd_{attributes} relation
                 relation_name = exp[2]
                 relation_node = RelationNode(relation_name, schema)
-                return FunctionalDependencyNode(relation_name, attributes, relation_node)
+                return FunctionalDependencyNode(
+                    relation_name, attributes, relation_node
+                )
             else:
                 # With conditions: fd_{attributes} \select_{conditions} relation
                 # exp[2] = "\select", exp[3] = conditions, exp[4] = relation_name
@@ -285,9 +272,7 @@ class TreeBRD:
                 condition_node = self.create_condition_node(conditions[0])
                 base_relation = RelationNode(relation_name, schema)
                 select_node = SelectNode(base_relation, condition_node)
-                return FunctionalDependencyNode(
-                    relation_name, attributes, select_node
-                )
+                return FunctionalDependencyNode(relation_name, attributes, select_node)
 
         elif operator == self.grammar.syntax.inc_equiv_op:
             # inc=_{attributes} (relation1, relation2)

@@ -1,6 +1,6 @@
 from .core_grammar import CoreGrammar
-from .extended_grammar import ExtendedGrammar
 from .dependency_grammar import DependencyGrammar
+from .extended_grammar import ExtendedGrammar
 
 GRAMMARS = {
     "Core Grammar": CoreGrammar,
