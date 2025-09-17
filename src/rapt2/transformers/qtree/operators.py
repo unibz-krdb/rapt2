@@ -1,4 +1,5 @@
 from ...treebrd.node import Operator
+from ...treebrd.condition_node import BinaryConditionalOperator, UnaryConditionalOperator
 from .constants import *
 
 latex_operator = {
@@ -20,4 +21,20 @@ latex_operator = {
     Operator.functional_dependency: FUNCTIONAL_DEPENDENCY_OP,
     Operator.inclusion_equivalence: INCLUSION_EQUIVALENCE_OP,
     Operator.inclusion_subsumption: INCLUSION_SUBSUMPTION_OP,
+}
+
+# Conditional operator mappings
+conditional_latex_operator = {
+    # Binary operators
+    BinaryConditionalOperator.AND: AND_OP,
+    BinaryConditionalOperator.OR: OR_OP,
+    BinaryConditionalOperator.EQUAL: EQUAL_OP,
+    BinaryConditionalOperator.NOT_EQUAL: NOT_EQUAL_OP,
+    BinaryConditionalOperator.LESS_THAN: LESS_THAN_OP,
+    BinaryConditionalOperator.LESS_THAN_EQUAL: LESS_THAN_EQUAL_OP,
+    BinaryConditionalOperator.GREATER_THAN: GREATER_THAN_OP,
+    BinaryConditionalOperator.GREATER_THAN_EQUAL: GREATER_THAN_EQUAL_OP,
+    # Unary operators
+    UnaryConditionalOperator.NOT: NOT_OP,
+    UnaryConditionalOperator.DEFINED: DEFINED_OP,
 }

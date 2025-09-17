@@ -9,8 +9,11 @@ from ...treebrd.node import (AssignNode, CrossJoinNode, DifferenceNode,
                              ProjectNode, RelationNode, RenameNode,
                              RightOuterJoinNode, SelectNode, ThetaJoinNode,
                              UnionNode)
+from ...treebrd.condition_node import (BinaryConditionNode, ConditionNode,
+                                       IdentityConditionNode, UnaryConditionNode,
+                                       UnaryConditionalOperator)
 from ..base_translator import BaseTranslator
-from .operators import latex_operator
+from .operators import latex_operator, conditional_latex_operator
 
 
 class Translator(BaseTranslator):
@@ -26,6 +29,12 @@ class Translator(BaseTranslator):
         to use syntax-based mappings in the future.
         """
         return latex_operator[operator]
+
+    def _get_conditional_latex_operator(self, operator):
+        """
+        Get the LaTeX operator for a given conditional operator.
+        """
+        return conditional_latex_operator[operator]
 
     def relation(self, node: RelationNode) -> str:
         """
@@ -44,7 +53,7 @@ class Translator(BaseTranslator):
         child = self.translate(node.child)
         return "[.${op}_{{{conditions}}}$ {child} ]".format(
             op=self._get_latex_operator(node.operator),
-            conditions=node.conditions.to_latex(),
+            conditions=self.translate_condition(node.conditions),
             child=child,
         )
 
@@ -100,7 +109,7 @@ class Translator(BaseTranslator):
         """
         return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
             op=self._get_latex_operator(node.operator),
-            conditions=node.conditions.to_latex(),
+            conditions=self.translate_condition(node.conditions),
             left=self.translate(node.left),
             right=self.translate(node.right),
         )
@@ -129,7 +138,7 @@ class Translator(BaseTranslator):
         """
         return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
             op=self._get_latex_operator(node.operator),
-            conditions=node.conditions.to_latex(),
+            conditions=self.translate_condition(node.conditions),
             left=self.translate(node.left),
             right=self.translate(node.right),
         )
@@ -142,7 +151,7 @@ class Translator(BaseTranslator):
         """
         return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
             op=self._get_latex_operator(node.operator),
-            conditions=node.conditions.to_latex(),
+            conditions=self.translate_condition(node.conditions),
             left=self.translate(node.left),
             right=self.translate(node.right),
         )
@@ -155,7 +164,7 @@ class Translator(BaseTranslator):
         """
         return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
             op=self._get_latex_operator(node.operator),
-            conditions=node.conditions.to_latex(),
+            conditions=self.translate_condition(node.conditions),
             left=self.translate(node.left),
             right=self.translate(node.right),
         )
@@ -236,7 +245,7 @@ class Translator(BaseTranslator):
         left_attr, right_attr = node.attributes
         op = self._get_latex_operator(node.operator)
         if isinstance(node.child, SelectNode):
-            select_str = f"{self._get_latex_operator(node.child.operator)}_{{{node.child.conditions.to_latex()}}} ({node.child.name})"
+            select_str = f"{self._get_latex_operator(node.child.operator)}_{{{self.translate_condition(node.child.conditions)}}} ({node.child.name})"
             return f"[.${select_str} : {left_attr} {op} {right_attr}$ ]"
         else:
             return f"[.${node.child.name} : {left_attr} {op} {right_attr}$ ]"
@@ -265,6 +274,50 @@ class Translator(BaseTranslator):
         op = self._get_latex_operator(node.operator)
 
         return f"[.${rel1}[{attr1}] {op} {rel2}[{attr2}]$ ]"
+
+    def identity_condition(self, node: IdentityConditionNode) -> str:
+        """
+        Translate an identity condition node into LaTeX.
+        :param node: an identity condition node
+        :return: LaTeX representation of the condition
+        """
+        return node.ident
+
+    def unary_condition(self, node: UnaryConditionNode) -> str:
+        """
+        Translate a unary condition node into LaTeX.
+        :param node: a unary condition node
+        :return: LaTeX representation of the condition
+        """
+        op = self._get_conditional_latex_operator(node.op)
+        if node.op == UnaryConditionalOperator.DEFINED:
+            return f"{op}({self.translate_condition(node.child)})"
+        else:
+            return f"{op} {self.translate_condition(node.child)}"
+
+    def binary_condition(self, node: BinaryConditionNode) -> str:
+        """
+        Translate a binary condition node into LaTeX.
+        :param node: a binary condition node
+        :return: LaTeX representation of the condition
+        """
+        op = self._get_conditional_latex_operator(node.op)
+        return f"({self.translate_condition(node.left)} {op} {self.translate_condition(node.right)})"
+
+    def translate_condition(self, condition: ConditionNode) -> str:
+        """
+        Translate a condition node into LaTeX.
+        :param condition: a condition node
+        :return: LaTeX representation of the condition
+        """
+        if isinstance(condition, IdentityConditionNode):
+            return self.identity_condition(condition)
+        elif isinstance(condition, UnaryConditionNode):
+            return self.unary_condition(condition)
+        elif isinstance(condition, BinaryConditionNode):
+            return self.binary_condition(condition)
+        else:
+            raise ValueError(f"Unknown condition node type: {type(condition)}")
 
 
 def translate(roots: List[Node], syntax=None) -> List[str]:

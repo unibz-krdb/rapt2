@@ -1,4 +1,7 @@
 from ...treebrd.node import Operator
+from ...treebrd.condition_node import (BinaryConditionNode, ConditionNode,
+                                       IdentityConditionNode, UnaryConditionNode,
+                                       BinaryConditionalOperator, UnaryConditionalOperator)
 from ..base_translator import BaseTranslator
 
 
@@ -92,10 +95,10 @@ class Translator(BaseTranslator):
         """
 
         child_object = self.translate(node.child)
-        where_block = node.conditions.to_sql()
+        where_block = self.translate_condition(node.conditions)
         if child_object.where_block:
             where_block = "({0}) AND ({1})".format(
-                child_object.where_block, node.conditions.to_sql()
+                child_object.where_block, self.translate_condition(node.conditions)
             )
         child_object.where_block = where_block
         if not child_object.select_block:
@@ -247,7 +250,7 @@ class Translator(BaseTranslator):
             Operator.right_outer_join,
         }:
             from_block = "{from_block} ON {conditions}".format(
-                from_block=from_block, conditions=node.conditions.to_sql()
+                from_block=from_block, conditions=self.translate_condition(node.conditions)
             )
 
         return self.query(select_block, from_block, "")
@@ -266,6 +269,69 @@ class Translator(BaseTranslator):
             name=self._get_temp_name(node),
         )
         return self.query(select_block=select_block, from_block=from_block)
+
+    def identity_condition(self, node: IdentityConditionNode) -> str:
+        """
+        Translate an identity condition node into SQL.
+        :param node: an identity condition node
+        :return: SQL representation of the condition
+        """
+        return node.ident
+
+    def unary_condition(self, node: UnaryConditionNode) -> str:
+        """
+        Translate a unary condition node into SQL.
+        :param node: a unary condition node
+        :return: SQL representation of the condition
+        """
+        match node.op:
+            case UnaryConditionalOperator.NOT:
+                return f"NOT {self.translate_condition(node.child)}"
+            case UnaryConditionalOperator.DEFINED:
+                return f"{self.translate_condition(node.child)} IS NOT NULL"
+            case _:
+                raise ValueError
+
+    def binary_condition(self, node: BinaryConditionNode) -> str:
+        """
+        Translate a binary condition node into SQL.
+        :param node: a binary condition node
+        :return: SQL representation of the condition
+        """
+        match node.op:
+            case BinaryConditionalOperator.AND:
+                return f"({self.translate_condition(node.left)} AND {self.translate_condition(node.right)})"
+            case BinaryConditionalOperator.OR:
+                return f"({self.translate_condition(node.left)} OR {self.translate_condition(node.right)})"
+            case BinaryConditionalOperator.EQUAL:
+                return f"({self.translate_condition(node.left)} = {self.translate_condition(node.right)})"
+            case BinaryConditionalOperator.NOT_EQUAL:
+                return f"({self.translate_condition(node.left)} != {self.translate_condition(node.right)})"
+            case BinaryConditionalOperator.LESS_THAN:
+                return f"({self.translate_condition(node.left)} < {self.translate_condition(node.right)})"
+            case BinaryConditionalOperator.LESS_THAN_EQUAL:
+                return f"({self.translate_condition(node.left)} <= {self.translate_condition(node.right)})"
+            case BinaryConditionalOperator.GREATER_THAN:
+                return f"({self.translate_condition(node.left)} > {self.translate_condition(node.right)})"
+            case BinaryConditionalOperator.GREATER_THAN_EQUAL:
+                return f"({self.translate_condition(node.left)} >= {self.translate_condition(node.right)})"
+            case _:
+                raise ValueError
+
+    def translate_condition(self, condition: ConditionNode) -> str:
+        """
+        Translate a condition node into SQL.
+        :param condition: a condition node
+        :return: SQL representation of the condition
+        """
+        if isinstance(condition, IdentityConditionNode):
+            return self.identity_condition(condition)
+        elif isinstance(condition, UnaryConditionNode):
+            return self.unary_condition(condition)
+        elif isinstance(condition, BinaryConditionNode):
+            return self.binary_condition(condition)
+        else:
+            raise ValueError(f"Unknown condition node type: {type(condition)}")
 
 
 class SetTranslator(Translator):

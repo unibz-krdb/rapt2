@@ -57,14 +57,6 @@ class BinaryConditionalOperator(Enum):
 @dataclass(frozen=True)
 class ConditionNode(ABC):
     @abstractmethod
-    def to_latex(self) -> str:
-        raise NotImplementedError()
-
-    @abstractmethod
-    def to_sql(self) -> str:
-        raise NotImplementedError()
-
-    @abstractmethod
     def attribute_references(self) -> list[str]:
         """
         Return a list of attribute references in this condition node.
@@ -75,12 +67,6 @@ class ConditionNode(ABC):
 @dataclass(frozen=True)
 class IdentityConditionNode(ConditionNode):
     ident: str
-
-    def to_latex(self) -> str:
-        return self.ident
-
-    def to_sql(self) -> str:
-        return self.ident
 
     def attribute_references(self) -> list[str]:
         try:
@@ -95,24 +81,6 @@ class UnaryConditionNode(ConditionNode):
     op: UnaryConditionalOperator
     child: ConditionNode
 
-    def to_latex(self) -> str:
-        match self.op:
-            case UnaryConditionalOperator.NOT:
-                return f"\\neg {self.child.to_latex()}"
-            case UnaryConditionalOperator.DEFINED:
-                return f"\\text{{defined}}({self.child.to_latex()})"
-            case _:
-                raise ValueError
-
-    def to_sql(self) -> str:
-        match self.op:
-            case UnaryConditionalOperator.NOT:
-                return f"NOT {self.child.to_sql()}"
-            case UnaryConditionalOperator.DEFINED:
-                return f"{self.child.to_sql()} IS NOT NULL"
-            case _:
-                raise ValueError
-
     def attribute_references(self) -> list[str]:
         return self.child.attribute_references()
 
@@ -122,48 +90,6 @@ class BinaryConditionNode(ConditionNode):
     op: BinaryConditionalOperator
     left: ConditionNode
     right: ConditionNode
-
-    def to_latex(self) -> str:
-        match self.op:
-            case BinaryConditionalOperator.AND:
-                return f"({self.left.to_latex()} \\land {self.right.to_latex()})"
-            case BinaryConditionalOperator.OR:
-                return f"({self.left.to_latex()} \\lor {self.right.to_latex()})"
-            case BinaryConditionalOperator.EQUAL:
-                return f"({self.left.to_latex()} \\eq {self.right.to_latex()})"
-            case BinaryConditionalOperator.NOT_EQUAL:
-                return f"({self.left.to_latex()} \\neq {self.right.to_latex()})"
-            case BinaryConditionalOperator.LESS_THAN:
-                return f"({self.left.to_latex()} \\lt {self.right.to_latex()})"
-            case BinaryConditionalOperator.LESS_THAN_EQUAL:
-                return f"({self.left.to_latex()} \\leq {self.right.to_latex()})"
-            case BinaryConditionalOperator.GREATER_THAN:
-                return f"({self.left.to_latex()} \\gt {self.right.to_latex()})"
-            case BinaryConditionalOperator.GREATER_THAN_EQUAL:
-                return f"({self.left.to_latex()} \\geq {self.right.to_latex()})"
-            case _:
-                raise ValueError
-
-    def to_sql(self) -> str:
-        match self.op:
-            case BinaryConditionalOperator.AND:
-                return f"({self.left.to_sql()} AND {self.right.to_sql()})"
-            case BinaryConditionalOperator.OR:
-                return f"({self.left.to_sql()} OR {self.right.to_sql()})"
-            case BinaryConditionalOperator.EQUAL:
-                return f"({self.left.to_sql()} = {self.right.to_sql()})"
-            case BinaryConditionalOperator.NOT_EQUAL:
-                return f"({self.left.to_sql()} != {self.right.to_sql()})"
-            case BinaryConditionalOperator.LESS_THAN:
-                return f"({self.left.to_sql()} < {self.right.to_sql()})"
-            case BinaryConditionalOperator.LESS_THAN_EQUAL:
-                return f"({self.left.to_sql()} <= {self.right.to_sql()})"
-            case BinaryConditionalOperator.GREATER_THAN:
-                return f"({self.left.to_sql()} > {self.right.to_sql()})"
-            case BinaryConditionalOperator.GREATER_THAN_EQUAL:
-                return f"({self.left.to_sql()} >= {self.right.to_sql()})"
-            case _:
-                raise ValueError
 
     def attribute_references(self) -> list[str]:
         return list(
