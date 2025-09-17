@@ -225,12 +225,8 @@ class QTreeTranslator(BaseTranslator):
         :param node: a dependency node
         :return: a qtree subtree rooted at the node
         """
-        attributes = ", ".join(node.attributes)
-        return "[.${op}_{{{attributes}}}({relation})$ ]".format(
-            op=self._get_latex_operator(node.operator),
-            attributes=attributes,
-            relation=node.relation_name,
-        )
+        left_attr, right_attr = node.attributes
+        return f"[.${node.relation_name} : {left_attr} {self._get_latex_operator(node.operator)} {right_attr}$ ]"
 
     def functional_dependency(self, node: FunctionalDependencyNode) -> str:
         """

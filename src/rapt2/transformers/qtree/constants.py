@@ -18,7 +18,7 @@ INTERSECT_OP = "\\cap"
 
 # Dependency operators
 PRIMARY_KEY_OP = "\\text{PK}"
-MULTIVALUED_DEPENDENCY_OP = "\\text{mvd}"
+MULTIVALUED_DEPENDENCY_OP = "\\twoheadrightarrow"
 FUNCTIONAL_DEPENDENCY_OP = "\\rightarrow"
 INCLUSION_EQUIVALENCE_OP = "\\equiv"
 INCLUSION_SUBSUMPTION_OP = "\\subseteq"

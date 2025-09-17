@@ -308,7 +308,7 @@ class TestDependencyLatexTranslation:
         """Test LaTeX translation of multivalued dependencies."""
         latex = self.rapt.to_qtree("mvd_{a, b} R;", self.schema)
         assert len(latex) == 1
-        assert "\\text{mvd}_{a, b}(r)" in latex[0]
+        assert "r : a \\twoheadrightarrow b" in latex[0]
         assert "\\Tree" in latex[0]
 
     def test_inclusion_equivalence_latex_translation(self):
@@ -337,7 +337,7 @@ class TestDependencyLatexTranslation:
         assert "\\text{PK}(r) \\eq {a}" in latex[0]
 
         # Check second statement (multivalued dependency)
-        assert "\\text{mvd}_{x, y}(s)" in latex[1]
+        assert "s : x \\twoheadrightarrow y" in latex[1]
 
         # Check third statement (inclusion equivalence)
         assert "r[a] \\equiv s[b]" in latex[2]
@@ -359,9 +359,11 @@ class TestDependencyLatexTranslation:
             assert len(latex) == 1
             assert latex[0].startswith("\\Tree")
             assert latex[0].endswith(" ]")
-            # Most dependency operators use \\text{}, but inclusion dependencies use mathematical symbols
+            # Check for appropriate operators based on dependency type
             if "inc=" in test_case or "inc⊆" in test_case:
                 assert "\\equiv" in latex[0] or "\\subseteq" in latex[0]
+            elif "mvd" in test_case:
+                assert "\\twoheadrightarrow" in latex[0]
             else:
                 assert "\\text{" in latex[0]
 
@@ -369,7 +371,7 @@ class TestDependencyLatexTranslation:
         """Test that correct LaTeX operators are used for each dependency type."""
         test_mappings = [
             ("pk_{a} R;", "\\text{PK}"),
-            ("mvd_{a, b} R;", "\\text{mvd}"),
+            ("mvd_{a, b} R;", "\\twoheadrightarrow"),
             ("inc=_{a, b} (R, S);", "\\equiv"),
             ("inc⊆_{a, b} (R, S);", "\\subseteq"),
         ]
@@ -476,7 +478,7 @@ class TestDependencyLatexTranslationIntegration:
         # Check each dependency type is properly translated
         expected_operators = [
             "\\text{PK}",
-            "\\text{mvd}",
+            "\\twoheadrightarrow",
             "\\equiv",
             "\\subseteq",
         ]
