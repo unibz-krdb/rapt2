@@ -296,13 +296,13 @@ class TestDependencyLatexTranslation:
         # Test single attribute primary key
         latex = self.rapt.to_qtree("pk_{a} R;", self.schema)
         assert len(latex) == 1
-        assert "\\text{pk}_{a}(r)" in latex[0]
+        assert "\\text{PK}(r) \\eq {a}" in latex[0]
         assert "\\Tree" in latex[0]
 
         # Test multiple attributes primary key
         latex = self.rapt.to_qtree("pk_{a, b} R;", self.schema)
         assert len(latex) == 1
-        assert "\\text{pk}_{a, b}(r)" in latex[0]
+        assert "\\text{PK}(r) \\eq {a, b}" in latex[0]
 
     def test_multivalued_dependency_latex_translation(self):
         """Test LaTeX translation of multivalued dependencies."""
@@ -334,7 +334,7 @@ class TestDependencyLatexTranslation:
         assert len(latex) == 4
 
         # Check first statement (primary key)
-        assert "\\text{pk}_{a}(r)" in latex[0]
+        assert "\\text{PK}(r) \\eq {a}" in latex[0]
 
         # Check second statement (multivalued dependency)
         assert "\\text{mvd}_{x, y}(s)" in latex[1]
@@ -368,7 +368,7 @@ class TestDependencyLatexTranslation:
     def test_latex_operators_mapping(self):
         """Test that correct LaTeX operators are used for each dependency type."""
         test_mappings = [
-            ("pk_{a} R;", "\\text{pk}"),
+            ("pk_{a} R;", "\\text{PK}"),
             ("mvd_{a, b} R;", "\\text{mvd}"),
             ("inc=_{a, b} (R, S);", "\\equiv"),
             ("inc⊆_{a, b} (R, S);", "\\subseteq"),
@@ -382,11 +382,11 @@ class TestDependencyLatexTranslation:
         """Test that attributes are properly formatted in LaTeX output."""
         # Test single attribute
         latex = self.rapt.to_qtree("pk_{a} R;", self.schema)
-        assert "_{a}" in latex[0]
+        assert "\\eq {a}" in latex[0]
 
         # Test multiple attributes
         latex = self.rapt.to_qtree("pk_{a, b, c} R;", self.schema)
-        assert "_{a, b, c}" in latex[0]
+        assert "\\eq {a, b, c}" in latex[0]
 
     def test_latex_relation_names_formatting(self):
         """Test that relation names are properly formatted in LaTeX output."""
@@ -411,7 +411,7 @@ class TestDependencyLatexTranslation:
 
         # Test with schema1
         latex1 = self.rapt.to_qtree("pk_{id} Users;", schema1)
-        assert "\\text{pk}_{id}(users)" in latex1[0]
+        assert "\\text{PK}(users) \\eq {id}" in latex1[0]
 
         # Test with schema2
         latex2 = self.rapt.to_qtree("inc=_{id, name} (Products, Orders);", schema2)
@@ -460,7 +460,7 @@ class TestDependencyLatexTranslationIntegration:
         # Translate to LaTeX
         latex = qtree_translator.translate(list(trees))
         assert len(latex) == 1
-        assert "\\text{pk}_{a, b}(r)" in latex[0]
+        assert "\\text{PK}(r) \\eq {a, b}" in latex[0]
 
     def test_multiple_dependency_types_latex_translation(self):
         """Test LaTeX translation of all dependency types in one go."""
@@ -475,7 +475,7 @@ class TestDependencyLatexTranslationIntegration:
 
         # Check each dependency type is properly translated
         expected_operators = [
-            "\\text{pk}",
+            "\\text{PK}",
             "\\text{mvd}",
             "\\equiv",
             "\\subseteq",

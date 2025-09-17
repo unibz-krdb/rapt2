@@ -17,7 +17,7 @@ UNION_OP = "\\cup"
 INTERSECT_OP = "\\cap"
 
 # Dependency operators
-PRIMARY_KEY_OP = "\\text{pk}"
+PRIMARY_KEY_OP = "\\text{PK}"
 MULTIVALUED_DEPENDENCY_OP = "\\text{mvd}"
 FUNCTIONAL_DEPENDENCY_OP = "\\rightarrow"
 INCLUSION_EQUIVALENCE_OP = "\\equiv"

@@ -217,11 +217,7 @@ class QTreeTranslator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         attributes = ", ".join(node.attributes)
-        return "[.${op}_{{{attributes}}}({relation})$ ]".format(
-            op=self._get_latex_operator(node.operator),
-            attributes=attributes,
-            relation=node.relation_name,
-        )
+        return f"[.${self._get_latex_operator(node.operator)}({node.relation_name}) \\eq {{{attributes}}}$ ]"
 
     def multivalued_dependency(self, node: MultivaluedDependencyNode) -> str:
         """
