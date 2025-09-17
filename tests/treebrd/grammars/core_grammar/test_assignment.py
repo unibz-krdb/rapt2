@@ -70,3 +70,27 @@ class TestAssignment(unittest.TestCase):
         self.assertRaises(
             ParseException, self.parser.statements.parseString, expression, CoreGrammar
         )
+
+    # Definition tests
+
+    def test_definition_with_assignments(self):
+        expression = "R1(a, b); R2 := R1; R3(c, d);"
+        expected = [
+            ["r1", ["a", "b"]],
+            [["r2"], ":=", ["r1"]],
+            ["r3", ["c", "d"]],
+        ]
+        actual = self.parser.statements.parseString(expression).asList()
+        self.assertEqual(expected, actual)
+
+    def test_definition_only(self):
+        expression = "R(a, b, c);"
+        expected = [["r", ["a", "b", "c"]]]
+        actual = self.parser.statements.parseString(expression).asList()
+        self.assertEqual(expected, actual)
+
+    def test_definition_single_attribute(self):
+        expression = "R(a);"
+        expected = [["r", ["a"]]]
+        actual = self.parser.statements.parseString(expression).asList()
+        self.assertEqual(expected, actual)

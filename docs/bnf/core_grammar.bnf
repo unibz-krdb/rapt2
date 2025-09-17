@@ -1,10 +1,12 @@
 ; Core relational algebra grammar rules.
 ; Uses rules from proto_grammar.bnf, condition_grammar.bnf.
 
-statement ::= (assignment | expression) terminate
+statement ::= (assignment | definition | expression) terminate
 
 assignment ::= relation_name assign expression |
-               relation_name param_start attribute_list param_stop assign expression
+               relation_name param_left attribute_list param_right assign expression
+
+definition ::= relation_name paren_left attribute_list paren_right
 
 expression ::= paren_left expression paren_right |
                project_expr | rename_expr | select_expr |
