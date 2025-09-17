@@ -1,6 +1,13 @@
 from ...treebrd.node import Operator
 from ...treebrd.condition_node import BinaryConditionalOperator, UnaryConditionalOperator
-from .constants import *
+from .constants import (
+    SELECT_OP, PROJECT_OP, RENAME_OP, ASSIGN_OP, JOIN_OP, NATURAL_JOIN_OP, THETA_JOIN_OP,
+    FULL_OUTER_JOIN_OP, LEFT_OUTER_JOIN_OP, RIGHT_OUTER_JOIN_OP, UNION_OP, DIFFERENCE_OP,
+    INTERSECT_OP, PRIMARY_KEY_OP, MULTIVALUED_DEPENDENCY_OP, FUNCTIONAL_DEPENDENCY_OP,
+    INCLUSION_EQUIVALENCE_OP, INCLUSION_SUBSUMPTION_OP, AND_OP, OR_OP, EQUAL_OP,
+    NOT_EQUAL_OP, LESS_THAN_OP, LESS_THAN_EQUAL_OP, GREATER_THAN_OP, GREATER_THAN_EQUAL_OP,
+    NOT_OP, DEFINED_OP
+)
 
 latex_operator = {
     Operator.select: SELECT_OP,
