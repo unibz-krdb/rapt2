@@ -53,7 +53,7 @@ class SQLSetQuery(SQLQuery):
         return "{prefix}SELECT DISTINCT {select} FROM {relation}"
 
 
-class Translator(BaseTranslator):
+class SQLTranslator(BaseTranslator):
     """
     A Translator defining the operations for translating a relational algebra
     statement into a SQL statement using bag semantics.
@@ -334,7 +334,7 @@ class Translator(BaseTranslator):
             raise ValueError(f"Unknown condition node type: {type(condition)}")
 
 
-class SetTranslator(Translator):
+class SetTranslator(SQLTranslator):
     """
     A Translator defining the operations for translating a relational algebra
     statement into a SQL statement using set semantics.
@@ -367,5 +367,5 @@ def translate(root_list, use_bag_semantics=False, syntax=None):
     :param syntax: syntax instance for custom operators
     :return: a list of SQL statements
     """
-    translator = Translator(syntax) if use_bag_semantics else SetTranslator(syntax)  # type: ignore
+    translator = SQLTranslator(syntax) if use_bag_semantics else SetTranslator(syntax)  # type: ignore
     return [translator.translate(root).to_sql() for root in root_list]

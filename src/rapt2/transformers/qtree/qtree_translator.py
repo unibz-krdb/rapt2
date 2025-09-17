@@ -16,7 +16,7 @@ from ..base_translator import BaseTranslator
 from .operators import latex_operator, conditional_latex_operator
 
 
-class Translator(BaseTranslator):
+class QTreeTranslator(BaseTranslator):
     """
     A Translator defining the operations for translating a relational algebra
     statement into a latex tree output.
@@ -328,5 +328,5 @@ def translate(roots: List[Node], syntax=None) -> List[str]:
     :return:  a string representing a latex qtree rooted at root
     """
     return [
-        "\\Tree{root}".format(root=Translator(syntax).translate(root)) for root in roots
+        "\\Tree{root}".format(root=QTreeTranslator(syntax).translate(root)) for root in roots
     ]

@@ -6,8 +6,8 @@ from rapt2.treebrd.condition_node import (BinaryConditionalOperator,
                                           UnaryConditionalOperator,
                                           UnaryConditionNode)
 from rapt2.treebrd.schema import Schema
-from rapt2.transformers.qtree.qtree_translator import Translator as QTreeTranslator
-from rapt2.transformers.sql.sql_translator import Translator as SQLTranslator
+from rapt2.transformers.qtree.qtree_translator import QTreeTranslator as QTreeTranslator
+from rapt2.transformers.sql.sql_translator import SQLTranslator as SQLTranslator
 
 
 class ConditionNodeTestCase(TestCase):
