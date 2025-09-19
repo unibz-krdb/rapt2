@@ -42,7 +42,7 @@ class QTreeTranslator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        return "[.${}$ ]".format(node.name)
+        return "[.${}$ ]".format(node.name.replace('_', r'\_') if node.name else '')
 
     def select(self, node: SelectNode) -> str:
         """
@@ -66,7 +66,7 @@ class QTreeTranslator(BaseTranslator):
         child = self.translate(node.child)
         return "[.${op}_{{{attributes}}}$ {child} ]".format(
             op=self._get_latex_operator(node.operator),
-            attributes=", ".join(node.attributes.names),
+            attributes=r",\,".join(node.attributes.names),
             child=child,
         )
 
@@ -79,10 +79,10 @@ class QTreeTranslator(BaseTranslator):
         child = self.translate(node.child)
         attributes = ""
         if node.attributes:
-            attributes = "({})".format(", ".join(node.attributes.names))
+            attributes = "({})".format(r",\,".join(node.attributes.names))
         return "[.${op}_{{{name}{attributes}}}$ {child} ]".format(
             op=self._get_latex_operator(node.operator),
-            name=node.name,
+            name=node.name.replace('_', r'\_') if node.name else '',
             attributes=attributes,
             child=child,
         )
@@ -96,9 +96,9 @@ class QTreeTranslator(BaseTranslator):
         child = self.translate(node.child)
         attributes = ""
         if node.attributes:
-            attributes = "({})".format(",".join(node.attributes.names))
+            attributes = "({})".format(r",\,".join(node.attributes.names))
         return "[.${name}{attributes}$ {child} ]".format(
-            name=node.name, attributes=attributes, child=child
+            name=node.name.replace('_', r'\_') if node.name else '', attributes=attributes, child=child
         )
 
     def definition(self, node: DefinitionNode) -> str:
@@ -107,8 +107,9 @@ class QTreeTranslator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        attributes = f"({', '.join(node.attributes.names)})"
-        return f"[.${node.name}{attributes}$ ]"
+        attributes = f"({r',\,'.join(node.attributes.names)})"
+
+        return f"[.${(node.name.replace('_', r'\_') if node.name else '')}{attributes}$ ]"
 
     def theta_join(self, node: ThetaJoinNode) -> str:
         """
@@ -225,7 +226,7 @@ class QTreeTranslator(BaseTranslator):
         :param node: a dependency node
         :return: a qtree subtree rooted at the node
         """
-        attributes = ", ".join(node.attributes)
+        attributes = r",\,".join(node.attributes)
         return f"[.${self._get_latex_operator(node.operator)}({node.relation_name}) \\eq {{{attributes}}}$ ]"
 
     def multivalued_dependency(self, node: MultivaluedDependencyNode) -> str:

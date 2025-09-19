@@ -16,6 +16,8 @@ class Node:
         - A method of mutating a collection of tuples
     """
 
+    name: str | None
+
     def __init__(self, operator, name=None):
         """
         Construct a node.
