@@ -261,43 +261,10 @@ class TreeBRD:
             relation_name = exp[2]
             return PrimaryKeyNode(relation_name, attributes)
 
-        elif operator == self.grammar.syntax.mvd_op:
+        elif operator in (self.grammar.syntax.mvd_op, self.grammar.syntax.fd_op):
             # mvd_{attribute1, attribute2} relation OR mvd_{attribute1, attribute2} \select_{conditions} relation
-            attributes = exp[1]
-            if len(exp) == 3:
-                # Simple form: mvd_{attributes} relation
-                relation_name = exp[2]
-                relation_node = RelationNode(relation_name, schema)
-                return MultivaluedDependencyNode(relation_name, attributes, relation_node)
-            else:
-                # With conditions: mvd_{attributes} \select_{conditions} relation
-                # exp[2] = "\select", exp[3] = conditions, exp[4] = relation_name
-                conditions = exp[3]
-                relation_name = exp[4]
-                condition_node = self.create_condition_node(conditions[0])
-                base_relation = RelationNode(relation_name, schema)
-                select_node = SelectNode(base_relation, condition_node)
-                return MultivaluedDependencyNode(relation_name, attributes, select_node)
-
-        elif operator == self.grammar.syntax.fd_op:
             # fd_{attribute1, attribute2} relation OR fd_{attribute1, attribute2} \select_{conditions} relation
-            attributes = exp[1]
-            if len(exp) == 3:
-                # Simple form: fd_{attributes} relation
-                relation_name = exp[2]
-                relation_node = RelationNode(relation_name, schema)
-                return FunctionalDependencyNode(
-                    relation_name, attributes, relation_node
-                )
-            else:
-                # With conditions: fd_{attributes} \select_{conditions} relation
-                # exp[2] = "\select", exp[3] = conditions, exp[4] = relation_name
-                conditions = exp[3]
-                relation_name = exp[4]
-                condition_node = self.create_condition_node(conditions[0])
-                base_relation = RelationNode(relation_name, schema)
-                select_node = SelectNode(base_relation, condition_node)
-                return FunctionalDependencyNode(relation_name, attributes, select_node)
+            return self._create_dependency_with_optional_select(exp, schema, operator)
 
         elif operator == self.grammar.syntax.inc_equiv_op:
             # inc=_{attributes} (relation1, relation2)
@@ -313,3 +280,34 @@ class TreeBRD:
 
         else:
             raise ValueError(f"Unknown dependency operator: {operator}")
+
+    def _create_dependency_with_optional_select(self, exp, schema, operator):
+        """
+        Create a dependency node (MVD or FD) with optional select conditions.
+        
+        :param exp: Parsed expression containing attributes and optional select
+        :param schema: Schema for relation validation
+        :param operator: The dependency operator (mvd_op or fd_op)
+        :return: MultivaluedDependencyNode or FunctionalDependencyNode
+        """
+        attributes = exp[1]
+        if len(exp) == 3:
+            # Simple form: {operator}_{attributes} relation
+            relation_name = exp[2]
+            relation_node = RelationNode(relation_name, schema)
+            if operator == self.grammar.syntax.mvd_op:
+                return MultivaluedDependencyNode(relation_name, attributes, relation_node)
+            else:  # fd_op
+                return FunctionalDependencyNode(relation_name, attributes, relation_node)
+        else:
+            # With conditions: {operator}_{attributes} \select_{conditions} relation
+            # exp[2] = "\select", exp[3] = conditions, exp[4] = relation_name
+            conditions = exp[3]
+            relation_name = exp[4]
+            condition_node = self.create_condition_node(conditions[0])
+            base_relation = RelationNode(relation_name, schema)
+            select_node = SelectNode(base_relation, condition_node)
+            if operator == self.grammar.syntax.mvd_op:
+                return MultivaluedDependencyNode(relation_name, attributes, select_node)
+            else:  # fd_op
+                return FunctionalDependencyNode(relation_name, attributes, select_node)
