@@ -1,6 +1,6 @@
 from pyparsing import ParseResults
 
-from rapt2.treebrd.condition_node import (BinaryConditionalOperator,
+from .condition_node import (BinaryConditionalOperator,
                                           BinaryConditionNode, ConditionNode,
                                           IdentityConditionNode,
                                           UnaryConditionalOperator,
