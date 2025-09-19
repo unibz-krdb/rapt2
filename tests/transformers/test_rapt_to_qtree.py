@@ -44,7 +44,7 @@ class TestSelect(TestQTreeTransformer):
 class TestProject(TestQTreeTransformer):
     def test_simple(self):
         ra = r"\project_{a1, a2, a3} alpha;"
-        expected = [r"\Tree[.${}_{{a1, a2, a3}}$ [.$alpha$ ] ]".format(PROJECT_OP)]
+        expected = [r"\Tree[.${}_{{a1,\,a2,\,a3}}$ [.$alpha$ ] ]".format(PROJECT_OP)]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
@@ -52,19 +52,19 @@ class TestProject(TestQTreeTransformer):
 class TestRename(TestQTreeTransformer):
     def test_rename_relation(self):
         ra = r"\rename_{Apex} alpha;"
-        expected = [r"\Tree[.${}_{{apex(a1, a2, a3)}}$ [.$alpha$ ] ]".format(RENAME_OP)]
+        expected = [r"\Tree[.${}_{{apex(a1,\,a2,\,a3)}}$ [.$alpha$ ] ]".format(RENAME_OP)]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_rename_attributes(self):
         ra = r"\rename_{(a, b, c)} alpha;"
-        expected = [r"\Tree[.${}_{{alpha(a, b, c)}}$ [.$alpha$ ] ]".format(RENAME_OP)]
+        expected = [r"\Tree[.${}_{{alpha(a,\,b,\,c)}}$ [.$alpha$ ] ]".format(RENAME_OP)]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_rename_relation_and_attributes(self):
         ra = r"\rename_{apex(a, b, c)} alpha;"
-        expected = [r"\Tree[.${}_{{apex(a, b, c)}}$ [.$alpha$ ] ]".format(RENAME_OP)]
+        expected = [r"\Tree[.${}_{{apex(a,\,b,\,c)}}$ [.$alpha$ ] ]".format(RENAME_OP)]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
@@ -72,13 +72,13 @@ class TestRename(TestQTreeTransformer):
 class TestAssignment(TestQTreeTransformer):
     def test_relation(self):
         ra = "new_alpha := alpha;"
-        expected = [r"\Tree[.$new_alpha(a1,a2,a3)$ [.$alpha$ ] ]"]
+        expected = [r"\Tree[.$new\_alpha(a1,\,a2,\,a3)$ [.$alpha$ ] ]"]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_relation_with_attributes(self):
         ra = "new_alpha(a, b, c) := alpha;"
-        expected = [r"\Tree[.$new_alpha(a,b,c)$ [.$alpha$ ] ]"]
+        expected = [r"\Tree[.$new\_alpha(a,\,b,\,c)$ [.$alpha$ ] ]"]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
@@ -92,28 +92,28 @@ class TestDefinition(TestQTreeTransformer):
 
     def test_multiple_attributes(self):
         ra = "R(a, b, c);"
-        expected = [r"\Tree[.$r(a, b, c)$ ]"]
+        expected = [r"\Tree[.$r(a,\,b,\,c)$ ]"]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_two_attributes(self):
         ra = "R(a, b);"
-        expected = [r"\Tree[.$r(a, b)$ ]"]
+        expected = [r"\Tree[.$r(a,\,b)$ ]"]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_multiple_definitions(self):
         ra = "R1(a, b); R2(c, d);"
         expected = [
-            r"\Tree[.$r1(a, b)$ ]",
-            r"\Tree[.$r2(c, d)$ ]"
+            r"\Tree[.$r1(a,\,b)$ ]",
+            r"\Tree[.$r2(c,\,d)$ ]"
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
     def test_definition_with_spacing(self):
         ra = "R ( a , b , c ) ;"
-        expected = [r"\Tree[.$r(a, b, c)$ ]"]
+        expected = [r"\Tree[.$r(a,\,b,\,c)$ ]"]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
@@ -337,7 +337,7 @@ class TestDependencyLatexTranslation:
         # Test multiple attributes primary key
         latex = self.rapt.to_qtree("pk_{a, b} R;", self.schema)
         assert len(latex) == 1
-        assert "\\text{PK}(r) \\eq {a, b}" in latex[0]
+        assert "\\text{PK}(r) \\eq {a,\\,b}" in latex[0]
 
     def test_multivalued_dependency_latex_translation(self):
         """Test LaTeX translation of multivalued dependencies."""
@@ -423,7 +423,7 @@ class TestDependencyLatexTranslation:
 
         # Test multiple attributes
         latex = self.rapt.to_qtree("pk_{a, b, c} R;", self.schema)
-        assert "\\eq {a, b, c}" in latex[0]
+        assert "\\eq {a,\\,b,\\,c}" in latex[0]
 
     def test_latex_relation_names_formatting(self):
         """Test that relation names are properly formatted in LaTeX output."""
@@ -497,7 +497,7 @@ class TestDependencyLatexTranslationIntegration:
         # Translate to LaTeX
         latex = qtree_translator.translate(list(trees))
         assert len(latex) == 1
-        assert "\\text{PK}(r) \\eq {a, b}" in latex[0]
+        assert "\\text{PK}(r) \\eq {a,\\,b}" in latex[0]
 
     def test_multiple_dependency_types_latex_translation(self):
         """Test LaTeX translation of all dependency types in one go."""
