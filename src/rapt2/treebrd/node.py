@@ -69,6 +69,7 @@ class DefinitionNode(Node):
     def __init__(self, name: str, attributes: list, schema):
         super().__init__(Operator.definition, name)
         self.attributes = AttributeList(attributes, name)
+        schema.add(name, self.attributes.names)
 
     def post_order(self):
         return [self]
