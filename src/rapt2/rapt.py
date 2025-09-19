@@ -17,7 +17,7 @@ class Rapt:
         grammar = self.configure_grammar(**config)
         self.builder = TreeBRD(grammar)
 
-    def to_syntax_tree(self, instring, schema):
+    def to_syntax_tree(self, instring, schema={}):
         """
         Return a list of syntax trees that represent the instring.
 
@@ -27,7 +27,7 @@ class Rapt:
         """
         return self.builder.build(instring, schema)
 
-    def to_sql(self, instring, schema, use_bag_semantics=False):
+    def to_sql(self, instring, schema={}, use_bag_semantics=False):
         """
         Translate a relational algebra string into a SQL string.
 
@@ -41,7 +41,7 @@ class Rapt:
             root_list, use_bag_semantics, self.builder.grammar.syntax
         )  # type: ignore
 
-    def to_sql_sequence(self, instring, schema, use_bag_semantics=False):
+    def to_sql_sequence(self, instring, schema={}, use_bag_semantics=False):
         """
         Translate a relational algebra string into a list of SQL strings generated
         by a post-order traversal of the parse tree for the input string.
@@ -59,7 +59,7 @@ class Rapt:
             for root in root_list
         ]
 
-    def to_qtree(self, instring, schema):
+    def to_qtree(self, instring, schema={}):
         """
         Translate a relational algebra string into a string representing a
         latex tree, using the grammar.
