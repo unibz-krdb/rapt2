@@ -1,4 +1,10 @@
-from ...treebrd.node import Operator
+from typing import Union
+from ...treebrd.node import (Operator, AssignNode, CrossJoinNode, 
+                            DifferenceNode, FullOuterJoinNode,
+                            IntersectNode, LeftOuterJoinNode,
+                            NaturalJoinNode, PrimaryKeyNode, ProjectNode, RelationNode,
+                            RenameNode, RightOuterJoinNode, SelectNode, ThetaJoinNode,
+                            UnionNode)
 from ...treebrd.condition_node import (BinaryConditionNode, ConditionNode,
                                        IdentityConditionNode, UnaryConditionNode,
                                        BinaryConditionalOperator, UnaryConditionalOperator)
@@ -90,7 +96,9 @@ class SQLTranslator(BaseTranslator):
     def _get_temp_name(cls, node):
         return node.name or "_{}".format(id(node))
 
-    def _get_sql_operator(self, node):
+    def _get_sql_operator(self, node: Union[NaturalJoinNode, ThetaJoinNode, CrossJoinNode, 
+                                           FullOuterJoinNode, LeftOuterJoinNode, RightOuterJoinNode,
+                                           UnionNode, DifferenceNode, IntersectNode]) -> str:
         operators = {
             Operator.union: "UNION",
             Operator.difference: "EXCEPT",
@@ -104,7 +112,7 @@ class SQLTranslator(BaseTranslator):
         }
         return operators[node.operator]
 
-    def relation(self, node):
+    def relation(self, node: RelationNode) -> SQLQuery:
         """
         Translate a relation node into SQLQuery.
         :param node: a treebrd node
@@ -112,7 +120,7 @@ class SQLTranslator(BaseTranslator):
         """
         return self.query(select_block=str(node.attributes), from_block=node.name)
 
-    def select(self, node):
+    def select(self, node: SelectNode) -> SQLQuery:
         """
         Translate a select node into SQLQuery.
         :param node: a treebrd node
@@ -130,7 +138,7 @@ class SQLTranslator(BaseTranslator):
             child_object.select_block = str(node.attributes)
         return child_object
 
-    def project(self, node):
+    def project(self, node: ProjectNode) -> SQLQuery:
         """
         Translate a project node into SQLQuery.
         :param node: a treebrd node
@@ -140,7 +148,7 @@ class SQLTranslator(BaseTranslator):
         child_object.select_block = str(node.attributes)
         return child_object
 
-    def rename(self, node):
+    def rename(self, node: RenameNode) -> SQLQuery:
         """
         Translate a rename node into SQLQuery.
         :param node: a treebrd node
@@ -154,7 +162,7 @@ class SQLTranslator(BaseTranslator):
         )
         return self.query(str(node.attributes), from_block=from_block)
 
-    def assign(self, node):
+    def assign(self, node: AssignNode) -> SQLQuery:
         """
         Translate an assign node into SQLQuery.
         :param node: a treebrd node
@@ -166,7 +174,7 @@ class SQLTranslator(BaseTranslator):
         )
         return child_object
 
-    def natural_join(self, node):
+    def natural_join(self, node: NaturalJoinNode) -> SQLQuery:
         """
         Translate an assign node into SQLQuery.
         :param node: a treebrd node
@@ -174,7 +182,7 @@ class SQLTranslator(BaseTranslator):
         """
         return self._join(node)
 
-    def theta_join(self, node):
+    def theta_join(self, node: ThetaJoinNode) -> SQLQuery:
         """
         Translate an assign node into SQLQuery.
         :param node: a treebrd node
@@ -182,7 +190,7 @@ class SQLTranslator(BaseTranslator):
         """
         return self._join(node)
 
-    def cross_join(self, node):
+    def cross_join(self, node: CrossJoinNode) -> SQLQuery:
         """
         Translate a cross join node into SQLQuery.
         :param node: a treebrd node
@@ -190,7 +198,7 @@ class SQLTranslator(BaseTranslator):
         """
         return self._join(node)
 
-    def full_outer_join(self, node):
+    def full_outer_join(self, node: FullOuterJoinNode) -> SQLQuery:
         """
         Translate a full outer join node into SQLQuery.
         :param node: a treebrd node
@@ -198,7 +206,7 @@ class SQLTranslator(BaseTranslator):
         """
         return self._join(node)
 
-    def left_outer_join(self, node):
+    def left_outer_join(self, node: LeftOuterJoinNode) -> SQLQuery:
         """
         Translate a left outer join node into SQLQuery.
         :param node: a treebrd node
@@ -206,7 +214,7 @@ class SQLTranslator(BaseTranslator):
         """
         return self._join(node)
 
-    def right_outer_join(self, node):
+    def right_outer_join(self, node: RightOuterJoinNode) -> SQLQuery:
         """
         Translate a right outer join node into SQLQuery.
         :param node: a treebrd node
@@ -214,7 +222,7 @@ class SQLTranslator(BaseTranslator):
         """
         return self._join(node)
 
-    def union(self, node):
+    def union(self, node: UnionNode) -> SQLQuery:
         """
         Translate a union node into SQLQuery.
         :param node: a treebrd node
@@ -222,7 +230,7 @@ class SQLTranslator(BaseTranslator):
         """
         return self._set_op(node)
 
-    def intersect(self, node):
+    def intersect(self, node: IntersectNode) -> SQLQuery:
         """
         Translate an intersection node into SQLQuery.
         :param node: a treebrd node
@@ -230,7 +238,7 @@ class SQLTranslator(BaseTranslator):
         """
         return self._set_op(node)
 
-    def difference(self, node):
+    def difference(self, node: DifferenceNode) -> SQLQuery:
         """
         Translate an difference node into SQLQuery.
         :param node: a treebrd node
@@ -238,7 +246,10 @@ class SQLTranslator(BaseTranslator):
         """
         return self._set_op(node)
 
-    def _join_helper(self, node):
+    def _join_helper(self, node: Union[RelationNode, SelectNode, ProjectNode, RenameNode, 
+                                      NaturalJoinNode, ThetaJoinNode, CrossJoinNode,
+                                      FullOuterJoinNode, LeftOuterJoinNode, RightOuterJoinNode,
+                                      UnionNode, DifferenceNode, IntersectNode]) -> str:
         sobject = self.translate(node)
         if node.operator in {
             Operator.cross_join,
@@ -254,7 +265,8 @@ class SQLTranslator(BaseTranslator):
                 subquery=sobject.to_sql(), name=self._get_temp_name(node)
             )
 
-    def _join(self, node):
+    def _join(self, node: Union[NaturalJoinNode, ThetaJoinNode, CrossJoinNode,
+                               FullOuterJoinNode, LeftOuterJoinNode, RightOuterJoinNode]) -> SQLQuery:
         """
         Translate a join node into SQLQuery.
         :param node: a treebrd node
@@ -274,13 +286,16 @@ class SQLTranslator(BaseTranslator):
             Operator.left_outer_join,
             Operator.right_outer_join,
         }:
-            from_block = "{from_block} ON {conditions}".format(
-                from_block=from_block, conditions=self.translate_condition(node.conditions)
-            )
+            # Only theta joins and outer joins have conditions
+            if hasattr(node, 'conditions') and getattr(node, 'conditions', None) is not None:
+                conditions = getattr(node, 'conditions')
+                from_block = "{from_block} ON {conditions}".format(
+                    from_block=from_block, conditions=self.translate_condition(conditions)
+                )
 
         return self.query(select_block, from_block, "")
 
-    def _set_op(self, node):
+    def _set_op(self, node: Union[UnionNode, DifferenceNode, IntersectNode]) -> SQLQuery:
         """
         Translate a set operator node into SQLQuery.
         :param node: a treebrd node
@@ -343,7 +358,7 @@ class SQLTranslator(BaseTranslator):
             case _:
                 raise ValueError
 
-    def primary_key(self, node):
+    def primary_key(self, node: PrimaryKeyNode) -> SQLAlterTableQuery:
         """
         Translate a primary key dependency node into SQL.
         :param node: a PrimaryKeyNode
@@ -361,7 +376,8 @@ class SQLTranslator(BaseTranslator):
             attributes=attributes_str
         )
 
-    def translate_condition(self, condition: ConditionNode) -> str:
+    def translate_condition(self, condition: Union[ConditionNode, BinaryConditionNode, 
+                                                 UnaryConditionNode, IdentityConditionNode]) -> str:
         """
         Translate a condition node into SQL.
         :param condition: a condition node
@@ -385,7 +401,7 @@ class SetTranslator(SQLTranslator):
 
     query = SQLSetQuery
 
-    def _set_op(self, node):
+    def _set_op(self, node: Union[UnionNode, DifferenceNode, IntersectNode]) -> SQLSetQuery:
         """
         Translate a set operator node into SQLQuery, using set semantics.
         :param node: a treebrd node
