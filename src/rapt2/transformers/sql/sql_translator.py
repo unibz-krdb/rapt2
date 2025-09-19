@@ -53,6 +53,31 @@ class SQLSetQuery(SQLQuery):
         return "{prefix}SELECT DISTINCT {select} FROM {relation}"
 
 
+class SQLAlterTableQuery(SQLQuery):
+    """
+    Structure defining an ALTER TABLE SQL statement.
+    """
+
+    def __init__(self, table_name, action, attributes):
+        """
+        Initialize an ALTER TABLE query with table name, action, and attributes.
+        :param table_name: The name of the table to alter
+        :param action: The alteration action (e.g., "ADD PRIMARY KEY")
+        :param attributes: The attributes involved in the action (as a string)
+        """
+        super().__init__(select_block="", from_block="")
+        self.table_name = table_name
+        self.action = action
+        self.attributes = attributes
+
+    def to_sql(self):
+        """
+        Return the ALTER TABLE statement directly.
+        :return: The ALTER TABLE statement
+        """
+        return f"ALTER TABLE {self.table_name} {self.action} ({self.attributes})"
+
+
 class SQLTranslator(BaseTranslator):
     """
     A Translator defining the operations for translating a relational algebra
@@ -317,6 +342,24 @@ class SQLTranslator(BaseTranslator):
                 return f"({self.translate_condition(node.left)} >= {self.translate_condition(node.right)})"
             case _:
                 raise ValueError
+
+    def primary_key(self, node):
+        """
+        Translate a primary key dependency node into SQL.
+        :param node: a PrimaryKeyNode
+        :return: a SQLAlterTableQuery object representing the primary key constraint
+        """
+        # Convert attributes to comma-separated string
+        if hasattr(node.attributes, '__iter__') and not isinstance(node.attributes, str):
+            attributes_str = ", ".join(str(attr) for attr in node.attributes)
+        else:
+            attributes_str = str(node.attributes)
+        
+        return SQLAlterTableQuery(
+            table_name=node.relation_name,
+            action="ADD PRIMARY KEY",
+            attributes=attributes_str
+        )
 
     def translate_condition(self, condition: ConditionNode) -> str:
         """

@@ -771,3 +771,45 @@ class TestIntersection(TestSQL, TestSet):
     grammar = ExtendedGrammar()
     ra_operator = "\\intersect"
     sql_operator = "INTERSECT"
+
+
+class TestPrimaryKey(TestSQL):
+    def setUp(self):
+        from rapt2.rapt import Rapt
+        import functools
+        self.rapt = Rapt(grammar="Dependency Grammar")
+        self.translate = self.translate_func(self.rapt.to_sql)
+        self.translate_set = self.translate_func(functools.partial(self.rapt.to_sql, use_bag_semantics=False))
+
+    def test_single_attribute_primary_key(self):
+        ra = "pk_{a} R;"
+        expected = ["ALTER TABLE r ADD PRIMARY KEY (a)"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_multiple_attributes_primary_key(self):
+        ra = "pk_{a, b} R;"
+        expected = ["ALTER TABLE r ADD PRIMARY KEY (a, b)"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_primary_key_with_different_relation(self):
+        ra = "pk_{id, name} Users;"
+        expected = ["ALTER TABLE users ADD PRIMARY KEY (id, name)"]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
+
+    def test_primary_key_set_semantics(self):
+        ra = "pk_{a, b} R;"
+        expected = ["ALTER TABLE r ADD PRIMARY KEY (a, b)"]
+        actual = self.translate_set(ra)
+        self.assertEqual(expected, actual)
+
+    def test_multiple_primary_key_statements(self):
+        ra = "pk_{a} R; pk_{id} Users;"
+        expected = [
+            "ALTER TABLE r ADD PRIMARY KEY (a)",
+            "ALTER TABLE users ADD PRIMARY KEY (id)"
+        ]
+        actual = self.translate(ra)
+        self.assertEqual(expected, actual)
