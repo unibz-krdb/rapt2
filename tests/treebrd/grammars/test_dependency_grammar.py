@@ -96,19 +96,52 @@ class TestDependencyGrammar:
 
     def test_inclusion_equivalence_parsing(self):
         """Test parsing of inclusion equivalence dependencies."""
+        # Test simple inclusion equivalence
         result = self.grammar.parse("inc=_{a, b} (R, S);")
         assert len(result) == 1
         assert result[0][0] == "inc="
         assert list(result[0][1]) == ["a", "b"]
-        assert list(result[0][2]) == ["r", "s"]
+        assert len(result[0][2]) == 2
+        assert result[0][2][0][0] == "r"
+        assert result[0][2][1][0] == "s"
+
+        # Test inclusion equivalence with select on left
+        result = self.grammar.parse("inc=_{a, b} (\\select_{a = 1} R, S);")
+        assert len(result) == 1
+        assert result[0][0] == "inc="
+        assert list(result[0][1]) == ["a", "b"]
+        assert len(result[0][2]) == 2
+        assert result[0][2][0][0] == "\\select"
+        assert result[0][2][1][0] == "s"
+
+        # Test inclusion equivalence with select on both sides
+        result = self.grammar.parse("inc=_{a, b} (\\select_{a = 1} R, \\select_{x > 0} S);")
+        assert len(result) == 1
+        assert result[0][0] == "inc="
+        assert list(result[0][1]) == ["a", "b"]
+        assert len(result[0][2]) == 2
+        assert result[0][2][0][0] == "\\select"
+        assert result[0][2][1][0] == "\\select"
 
     def test_inclusion_subsumption_parsing(self):
         """Test parsing of inclusion subsumption dependencies."""
+        # Test simple inclusion subsumption
         result = self.grammar.parse("inc⊆_{a, b} (R, S);")
         assert len(result) == 1
         assert result[0][0] == "inc⊆"
         assert list(result[0][1]) == ["a", "b"]
-        assert list(result[0][2]) == ["r", "s"]
+        assert len(result[0][2]) == 2
+        assert result[0][2][0][0] == "r"
+        assert result[0][2][1][0] == "s"
+
+        # Test inclusion subsumption with select on left
+        result = self.grammar.parse("inc⊆_{a, b} (\\select_{a = 1} R, S);")
+        assert len(result) == 1
+        assert result[0][0] == "inc⊆"
+        assert list(result[0][1]) == ["a", "b"]
+        assert len(result[0][2]) == 2
+        assert result[0][2][0][0] == "\\select"
+        assert result[0][2][1][0] == "s"
 
     def test_multiple_statements_parsing(self):
         """Test parsing of multiple dependency statements."""
@@ -221,6 +254,7 @@ class TestDependencyGrammarIntegration:
 
     def test_inclusion_equivalence_node_creation(self):
         """Test creation of InclusionEquivalenceNode from dependency statements."""
+        # Test simple inclusion equivalence
         trees = self.builder.build("inc=_{a, b} (R, S);", self.schema)
         assert len(trees) == 1
 
@@ -229,9 +263,25 @@ class TestDependencyGrammarIntegration:
         assert node.operator == Operator.inclusion_equivalence
         assert list(node.relation_names) == ["r", "s"]
         assert list(node.attributes) == ["a", "b"]
+        assert isinstance(node.left_child, RelationNode)
+        assert isinstance(node.right_child, RelationNode)
+
+    def test_inclusion_equivalence_node_creation_with_select(self):
+        """Test creation of InclusionEquivalenceNode with select clauses."""
+        trees = self.builder.build("inc=_{a, b} (\\select_{a = 1} R, S);", self.schema)
+        assert len(trees) == 1
+
+        node = trees[0]
+        assert isinstance(node, InclusionEquivalenceNode)
+        assert node.operator == Operator.inclusion_equivalence
+        assert list(node.relation_names) == ["r", "s"]
+        assert list(node.attributes) == ["a", "b"]
+        assert isinstance(node.left_child, SelectNode)
+        assert isinstance(node.right_child, RelationNode)
 
     def test_inclusion_subsumption_node_creation(self):
         """Test creation of InclusionSubsumptionNode from dependency statements."""
+        # Test simple inclusion subsumption
         trees = self.builder.build("inc⊆_{a, b} (R, S);", self.schema)
         assert len(trees) == 1
 
@@ -240,6 +290,21 @@ class TestDependencyGrammarIntegration:
         assert node.operator == Operator.inclusion_subsumption
         assert list(node.relation_names) == ["r", "s"]
         assert list(node.attributes) == ["a", "b"]
+        assert isinstance(node.left_child, RelationNode)
+        assert isinstance(node.right_child, RelationNode)
+
+    def test_inclusion_subsumption_node_creation_with_select(self):
+        """Test creation of InclusionSubsumptionNode with select clauses."""
+        trees = self.builder.build("inc⊆_{a, b} (\\select_{a = 1} R, S);", self.schema)
+        assert len(trees) == 1
+
+        node = trees[0]
+        assert isinstance(node, InclusionSubsumptionNode)
+        assert node.operator == Operator.inclusion_subsumption
+        assert list(node.relation_names) == ["r", "s"]
+        assert list(node.attributes) == ["a", "b"]
+        assert isinstance(node.left_child, SelectNode)
+        assert isinstance(node.right_child, RelationNode)
 
     def test_multiple_dependency_statements(self):
         """Test parsing multiple dependency statements into multiple nodes."""

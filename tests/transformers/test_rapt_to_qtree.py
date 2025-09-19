@@ -356,16 +356,40 @@ class TestDependencyLatexTranslation:
 
     def test_inclusion_equivalence_latex_translation(self):
         """Test LaTeX translation of inclusion equivalence dependencies."""
+        # Test simple inclusion equivalence
         latex = self.rapt.to_qtree("inc=_{a, b} (R, S);", self.schema)
         assert len(latex) == 1
         assert "r[a] \\equiv s[b]" in latex[0]
         assert "\\Tree" in latex[0]
 
+    def test_inclusion_equivalence_with_select_latex_translation(self):
+        """Test LaTeX translation of inclusion equivalence dependencies with select clauses."""
+        # Test with select on left
+        latex = self.rapt.to_qtree("inc=_{a, b} (\\select_{a = 1} R, S);", self.schema)
+        assert len(latex) == 1
+        assert "\\sigma_{(a \\eq 1)} (r)[a] \\equiv s[b]" in latex[0]
+        assert "\\Tree" in latex[0]
+
+        # Test with select on both sides
+        latex = self.rapt.to_qtree("inc=_{a, b} (\\select_{a = 1} R, \\select_{x > 0} S);", self.schema)
+        assert len(latex) == 1
+        assert "\\sigma_{(a \\eq 1)} (r)[a] \\equiv \\sigma_{(x \\gt 0)} (s)[b]" in latex[0]
+        assert "\\Tree" in latex[0]
+
     def test_inclusion_subsumption_latex_translation(self):
         """Test LaTeX translation of inclusion subsumption dependencies."""
+        # Test simple inclusion subsumption
         latex = self.rapt.to_qtree("inc⊆_{a, b} (R, S);", self.schema)
         assert len(latex) == 1
         assert "r[a] \\subseteq s[b]" in latex[0]
+        assert "\\Tree" in latex[0]
+
+    def test_inclusion_subsumption_with_select_latex_translation(self):
+        """Test LaTeX translation of inclusion subsumption dependencies with select clauses."""
+        # Test with select on left
+        latex = self.rapt.to_qtree("inc⊆_{a, b} (\\select_{a = 1} R, S);", self.schema)
+        assert len(latex) == 1
+        assert "\\sigma_{(a \\eq 1)} (r)[a] \\subseteq s[b]" in latex[0]
         assert "\\Tree" in latex[0]
 
     def test_multiple_dependency_statements_latex_translation(self):

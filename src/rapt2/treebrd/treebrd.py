@@ -267,16 +267,44 @@ class TreeBRD:
             return self._create_dependency_with_optional_select(exp, schema, operator)
 
         elif operator == self.grammar.syntax.inc_equiv_op:
-            # inc=_{attributes} (relation1, relation2)
+            # inc=_{attributes} (select_or_relation, select_or_relation)
             attributes = exp[1]
-            relation_names = exp[2]
-            return InclusionEquivalenceNode(relation_names, attributes)
+            relations_expr = exp[2]
+            
+            if isinstance(relations_expr[0], str):
+                # Simple form: inc=_{attributes} (relation1, relation2)
+                relation_names = relations_expr
+                left_child = RelationNode(relation_names[0], schema)
+                right_child = RelationNode(relation_names[1], schema)
+            else:
+                # Complex form: inc=_{attributes} (select_or_relation, select_or_relation)
+                # relations_expr is [[left_expr], [right_expr]] where each can be relation or [select, conditions, relation]
+                left_expr = relations_expr[0]
+                right_expr = relations_expr[1]
+                left_child = self._create_cond_dep_expr_node(left_expr, schema)
+                right_child = self._create_cond_dep_expr_node(right_expr, schema)
+                relation_names = [left_child.name, right_child.name]
+            return InclusionEquivalenceNode(relation_names, attributes, left_child, right_child)
 
         elif operator == self.grammar.syntax.inc_subset_op:
-            # inc⊆_{attributes} (relation1, relation2)
+            # inc⊆_{attributes} (select_or_relation, select_or_relation)
             attributes = exp[1]
-            relation_names = exp[2]
-            return InclusionSubsumptionNode(relation_names, attributes)
+            relations_expr = exp[2]
+            
+            if isinstance(relations_expr[0], str):
+                # Simple form: inc⊆_{attributes} (relation1, relation2)
+                relation_names = relations_expr
+                left_child = RelationNode(relation_names[0], schema)
+                right_child = RelationNode(relation_names[1], schema)
+            else:
+                # Complex form: inc⊆_{attributes} (select_or_relation, select_or_relation)
+                # relations_expr is [[left_expr], [right_expr]] where each can be relation or [select, conditions, relation]
+                left_expr = relations_expr[0]
+                right_expr = relations_expr[1]
+                left_child = self._create_cond_dep_expr_node(left_expr, schema)
+                right_child = self._create_cond_dep_expr_node(right_expr, schema)
+                relation_names = [left_child.name, right_child.name]
+            return InclusionSubsumptionNode(relation_names, attributes, left_child, right_child)
 
         else:
             raise ValueError(f"Unknown dependency operator: {operator}")
@@ -311,3 +339,25 @@ class TreeBRD:
                 return MultivaluedDependencyNode(relation_name, attributes, select_node)
             else:  # fd_op
                 return FunctionalDependencyNode(relation_name, attributes, select_node)
+
+    def _create_cond_dep_expr_node(self, expr, schema):
+        """
+        Create a node from a cond_dep_expr (either relation_name or select with relation).
+        
+        :param expr: Parsed expression (either relation_name or [select, conditions, relation_name])
+        :param schema: Schema for relation validation
+        :return: RelationNode or SelectNode
+        """
+        if isinstance(expr, str):
+            # Simple relation name
+            return RelationNode(expr, schema)
+        elif len(expr) == 1 and isinstance(expr[0], str):
+            # Simple relation name wrapped in a list
+            return RelationNode(expr[0], schema)
+        else:
+            # Select with conditions: [select, conditions, relation_name]
+            conditions = expr[1]
+            relation_name = expr[2]
+            condition_node = self.create_condition_node(conditions[0])
+            base_relation = RelationNode(relation_name, schema)
+            return SelectNode(base_relation, condition_node)

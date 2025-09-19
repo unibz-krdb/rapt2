@@ -21,7 +21,7 @@ mvd ::= "mvd"
 fd_dep ::= fd cond_dep_expr
 fd ::= "fd"
 
-inc_expr ::= param_start attribute_name delim attribute_name param_stop paren_left relation_name delim relation_name paren_right
+inc_expr ::= param_start attribute_name delim attribute_name param_stop paren_left cond_dep_expr delim cond_dep_expr paren_right
 
 ; inclusion equivalence
 inc_eq_dep ::= inc_eq inc_expr

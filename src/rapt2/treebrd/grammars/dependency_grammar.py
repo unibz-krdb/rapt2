@@ -106,12 +106,12 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     @property
     def inc_expr(self):
         """
-        inc_expr ::= param_start attribute_name delim attribute_name param_stop paren_left relation_name delim relation_name paren_right
+        inc_expr ::= param_start attribute_name delim attribute_name param_stop paren_left select_or_relation delim select_or_relation paren_right
         """
         return self.parameter(
             self.attribute_name + Suppress(self.syntax.delim) + self.attribute_name
         ) + self.parenthesize(
-            self.relation_name + Suppress(self.syntax.delim) + self.relation_name
+            Group(self.select_or_relation) + Suppress(self.syntax.delim) + Group(self.select_or_relation)
         )
 
     @property

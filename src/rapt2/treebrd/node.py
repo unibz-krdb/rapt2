@@ -389,12 +389,20 @@ class InclusionEquivalenceNode(DependencyNode):
     A node representing an inclusion equivalence dependency.
     """
 
-    def __init__(self, relation_names, attributes):
+    left_child: RelationNode | SelectNode
+    right_child: RelationNode | SelectNode
+
+    def __init__(self, relation_names, attributes, left_child, right_child):
         super().__init__(Operator.inclusion_equivalence, relation_names, attributes)
         self.relation_names = relation_names
+        self.left_child = left_child
+        self.right_child = right_child
 
     def __eq__(self, other):
-        return super().__eq__(other) and self.relation_names == other.relation_names
+        return (super().__eq__(other) and 
+                self.relation_names == other.relation_names and
+                self.left_child == other.left_child and
+                self.right_child == other.right_child)
 
 
 class InclusionSubsumptionNode(DependencyNode):
@@ -402,12 +410,20 @@ class InclusionSubsumptionNode(DependencyNode):
     A node representing an inclusion subsumption dependency.
     """
 
-    def __init__(self, relation_names, attributes):
+    left_child: RelationNode | SelectNode
+    right_child: RelationNode | SelectNode
+
+    def __init__(self, relation_names, attributes, left_child, right_child):
         super().__init__(Operator.inclusion_subsumption, relation_names, attributes)
         self.relation_names = relation_names
+        self.left_child = left_child
+        self.right_child = right_child
 
     def __eq__(self, other):
-        return super().__eq__(other) and self.relation_names == other.relation_names
+        return (super().__eq__(other) and 
+                self.relation_names == other.relation_names and
+                self.left_child == other.left_child and
+                self.right_child == other.right_child)
 
 
 class Operator(Enum):

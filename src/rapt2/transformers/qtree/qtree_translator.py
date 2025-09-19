@@ -263,11 +263,22 @@ class QTreeTranslator(BaseTranslator):
         :param node: a dependency node
         :return: a qtree subtree rooted at the node
         """
-        rel1, rel2 = node.relation_names
         attr1, attr2 = node.attributes
         op = self._get_latex_operator(node.operator)
 
-        return f"[.${rel1}[{attr1}] {op} {rel2}[{attr2}]$ ]"
+        # Handle left side
+        if isinstance(node.left_child, SelectNode):
+            left_str = f"{self._get_latex_operator(node.left_child.operator)}_{{{self.translate_condition(node.left_child.conditions)}}} ({node.left_child.name})"
+        else:
+            left_str = node.left_child.name
+
+        # Handle right side
+        if isinstance(node.right_child, SelectNode):
+            right_str = f"{self._get_latex_operator(node.right_child.operator)}_{{{self.translate_condition(node.right_child.conditions)}}} ({node.right_child.name})"
+        else:
+            right_str = node.right_child.name
+
+        return f"[.${left_str}[{attr1}] {op} {right_str}[{attr2}]$ ]"
 
     def inclusion_subsumption(self, node: InclusionSubsumptionNode) -> str:
         """
@@ -275,12 +286,22 @@ class QTreeTranslator(BaseTranslator):
         :param node: a dependency node
         :return: a qtree subtree rooted at the node
         """
-
-        rel1, rel2 = node.relation_names
         attr1, attr2 = node.attributes
         op = self._get_latex_operator(node.operator)
 
-        return f"[.${rel1}[{attr1}] {op} {rel2}[{attr2}]$ ]"
+        # Handle left side
+        if isinstance(node.left_child, SelectNode):
+            left_str = f"{self._get_latex_operator(node.left_child.operator)}_{{{self.translate_condition(node.left_child.conditions)}}} ({node.left_child.name})"
+        else:
+            left_str = node.left_child.name
+
+        # Handle right side
+        if isinstance(node.right_child, SelectNode):
+            right_str = f"{self._get_latex_operator(node.right_child.operator)}_{{{self.translate_condition(node.right_child.conditions)}}} ({node.right_child.name})"
+        else:
+            right_str = node.right_child.name
+
+        return f"[.${left_str}[{attr1}] {op} {right_str}[{attr2}]$ ]"
 
     def identity_condition(self, node: IdentityConditionNode) -> str:
         """
