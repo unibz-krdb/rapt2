@@ -341,9 +341,17 @@ class TestDependencyLatexTranslation:
 
     def test_multivalued_dependency_latex_translation(self):
         """Test LaTeX translation of multivalued dependencies."""
+        # Test simple multivalued dependency
         latex = self.rapt.to_qtree("mvd_{a, b} R;", self.schema)
         assert len(latex) == 1
         assert "r : a \\twoheadrightarrow b" in latex[0]
+        assert "\\Tree" in latex[0]
+
+    def test_multivalued_dependency_with_select_latex_translation(self):
+        """Test LaTeX translation of multivalued dependencies with select conditions."""
+        latex = self.rapt.to_qtree("mvd_{a, b} \\select_{a = 1} R;", self.schema)
+        assert len(latex) == 1
+        assert "\\sigma_{(a \\eq 1)} (r) : a \\twoheadrightarrow b" in latex[0]
         assert "\\Tree" in latex[0]
 
     def test_inclusion_equivalence_latex_translation(self):

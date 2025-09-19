@@ -262,10 +262,22 @@ class TreeBRD:
             return PrimaryKeyNode(relation_name, attributes)
 
         elif operator == self.grammar.syntax.mvd_op:
-            # mvd_{attribute1, attribute2} relation
+            # mvd_{attribute1, attribute2} relation OR mvd_{attribute1, attribute2} \select_{conditions} relation
             attributes = exp[1]
-            relation_name = exp[2]
-            return MultivaluedDependencyNode(relation_name, attributes)
+            if len(exp) == 3:
+                # Simple form: mvd_{attributes} relation
+                relation_name = exp[2]
+                relation_node = RelationNode(relation_name, schema)
+                return MultivaluedDependencyNode(relation_name, attributes, relation_node)
+            else:
+                # With conditions: mvd_{attributes} \select_{conditions} relation
+                # exp[2] = "\select", exp[3] = conditions, exp[4] = relation_name
+                conditions = exp[3]
+                relation_name = exp[4]
+                condition_node = self.create_condition_node(conditions[0])
+                base_relation = RelationNode(relation_name, schema)
+                select_node = SelectNode(base_relation, condition_node)
+                return MultivaluedDependencyNode(relation_name, attributes, select_node)
 
         elif operator == self.grammar.syntax.fd_op:
             # fd_{attribute1, attribute2} relation OR fd_{attribute1, attribute2} \select_{conditions} relation

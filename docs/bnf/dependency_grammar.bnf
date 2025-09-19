@@ -10,7 +10,7 @@ pk_dep ::= pk param_start attribute_list param_stop relation_name
 pk ::= "pk"
 
 ; multivalued dependency
-mvd_dep ::= mvd param_start attribute_name delim attribute_name param_stop relation_name
+mvd_dep ::= mvd param_start attribute_name delim attribute_name param_stop ((select param_start conditions param_stop relation_name) | relation_name)
 mvd ::= "mvd"
 
 ; functional dependency

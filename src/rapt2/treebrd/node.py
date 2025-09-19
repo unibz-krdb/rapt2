@@ -359,8 +359,14 @@ class MultivaluedDependencyNode(DependencyNode):
     A node representing a multivalued dependency.
     """
 
-    def __init__(self, relation_name, attributes):
+    child: RelationNode | SelectNode
+
+    def __init__(self, relation_name, attributes, relation_node):
         super().__init__(Operator.multivalued_dependency, relation_name, attributes)
+        self.child = relation_node
+
+    def __eq__(self, other):
+        return super().__eq__(other) and self.child == other.child
 
 
 class FunctionalDependencyNode(DependencyNode):

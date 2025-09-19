@@ -236,7 +236,12 @@ class QTreeTranslator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         left_attr, right_attr = node.attributes
-        return f"[.${node.relation_name} : {left_attr} {self._get_latex_operator(node.operator)} {right_attr}$ ]"
+        op = self._get_latex_operator(node.operator)
+        if isinstance(node.child, SelectNode):
+            select_str = f"{self._get_latex_operator(node.child.operator)}_{{{self.translate_condition(node.child.conditions)}}} ({node.child.name})"
+            return f"[.${select_str} : {left_attr} {op} {right_attr}$ ]"
+        else:
+            return f"[.${node.child.name} : {left_attr} {op} {right_attr}$ ]"
 
     def functional_dependency(self, node: FunctionalDependencyNode) -> str:
         """

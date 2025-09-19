@@ -55,14 +55,21 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     @property
     def mvd_dep(self):
         """
-        mvd_dep ::= mvd param_start attribute_name delim attribute_name param_stop relation_name
+        mvd_dep ::= mvd param_start attribute_name delim attribute_name param_stop ((select param_start conditions param_stop relation_name) | relation_name)
         """
         return Group(
             self.mvd
             + self.parameter(
                 self.attribute_name + Suppress(self.syntax.delim) + self.attribute_name
             )
-            + self.relation_name
+            + (
+                (
+                    Literal(self.syntax.select_op)
+                    + self.parameter(self.conditions)
+                    + self.relation_name
+                )
+                | self.relation_name
+            )
         )
 
     @property

@@ -35,11 +35,29 @@ class TestDependencyGrammar:
 
     def test_multivalued_dependency_parsing(self):
         """Test parsing of multivalued dependencies."""
+        # Test simple multivalued dependency (without conditions)
         result = self.grammar.parse("mvd_{a, b} R;")
         assert len(result) == 1
         assert result[0][0] == "mvd"
         assert list(result[0][1]) == ["a", "b"]
         assert result[0][2] == "r"
+
+        # Test multivalued dependency with conditions
+        result = self.grammar.parse("mvd_{a, b} \\select_{a = 1} R;")
+        assert len(result) == 1
+        assert result[0][0] == "mvd"
+        assert list(result[0][1]) == ["a", "b"]
+        assert result[0][2] == "\\select"
+        assert list(result[0][3][0]) == ["a", "=", "1"]
+        assert result[0][4] == "r"
+
+        # Test complex multivalued dependency with conditions
+        result = self.grammar.parse("mvd_{a, b} \\select_{a = 1 and b > 0} R;")
+        assert len(result) == 1
+        assert result[0][0] == "mvd"
+        assert list(result[0][1]) == ["a", "b"]
+        assert result[0][2] == "\\select"
+        assert result[0][4] == "r"
 
     def test_functional_dependency_parsing(self):
         """Test parsing of functional dependencies."""
@@ -95,7 +113,7 @@ class TestDependencyGrammar:
     def test_multiple_statements_parsing(self):
         """Test parsing of multiple dependency statements."""
         result = self.grammar.parse(
-            "pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} T;"
+            "pk_{a} R; mvd_{b, c} \\select_{b > 0} S; fd_{x, y} \\select_{x > 0} T;"
         )
         assert len(result) == 3
 
@@ -104,10 +122,11 @@ class TestDependencyGrammar:
         assert list(result[0][1]) == ["a"]
         assert result[0][2] == "r"
 
-        # Check second statement (multivalued dependency)
+        # Check second statement (multivalued dependency with select)
         assert result[1][0] == "mvd"
         assert list(result[1][1]) == ["b", "c"]
-        assert result[1][2] == "s"
+        assert result[1][2] == "\\select"
+        assert result[1][4] == "s"
 
         # Check third statement (functional dependency)
         assert result[2][0] == "fd"
@@ -149,6 +168,7 @@ class TestDependencyGrammarIntegration:
 
     def test_multivalued_dependency_node_creation(self):
         """Test creation of MultivaluedDependencyNode from dependency statements."""
+        # Test simple multivalued dependency (without conditions)
         trees = self.builder.build("mvd_{a, b} R;", self.schema)
         assert len(trees) == 1
 
@@ -157,6 +177,21 @@ class TestDependencyGrammarIntegration:
         assert node.operator == Operator.multivalued_dependency
         assert node.relation_name == "r"
         assert list(node.attributes) == ["a", "b"]
+        assert node.child is not None
+        assert isinstance(node.child, RelationNode)
+
+    def test_multivalued_dependency_node_creation_with_conditions(self):
+        """Test creation of MultivaluedDependencyNode from dependency statements with conditions."""
+        trees = self.builder.build("mvd_{a, b} \\select_{a = 1} R;", self.schema)
+        assert len(trees) == 1
+
+        node = trees[0]
+        assert isinstance(node, MultivaluedDependencyNode)
+        assert node.operator == Operator.multivalued_dependency
+        assert node.relation_name == "r"
+        assert list(node.attributes) == ["a", "b"]
+        assert node.child is not None
+        assert isinstance(node.child, SelectNode)
 
     def test_functional_dependency_node_creation_with_conditions(self):
         """Test creation of FunctionalDependencyNode from dependency statements with conditions."""
@@ -209,7 +244,7 @@ class TestDependencyGrammarIntegration:
     def test_multiple_dependency_statements(self):
         """Test parsing multiple dependency statements into multiple nodes."""
         trees = self.builder.build(
-            "pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} S;", self.schema
+            "pk_{a} R; mvd_{x, y} \\select_{x > 0} S; fd_{id, name} \\select_{id > 0} T;", self.schema
         )
         assert len(trees) == 3
 
@@ -217,13 +252,14 @@ class TestDependencyGrammarIntegration:
         assert isinstance(trees[0], PrimaryKeyNode)
         assert trees[0].relation_name == "r"
 
-        # Check second node (multivalued dependency)
+        # Check second node (multivalued dependency with select)
         assert isinstance(trees[1], MultivaluedDependencyNode)
         assert trees[1].relation_name == "s"
+        assert isinstance(trees[1].child, SelectNode)
 
         # Check third node (functional dependency)
         assert isinstance(trees[2], FunctionalDependencyNode)
-        assert trees[2].relation_name == "s"
+        assert trees[2].relation_name == "t"
 
     def test_dependency_node_equality(self):
         """Test equality comparison of dependency nodes."""
@@ -275,9 +311,10 @@ class TestDependencyGrammarWithRapt:
     def test_multiple_dependency_syntax_trees(self):
         """Test generation of multiple syntax trees for multiple dependency statements."""
         trees = self.rapt.to_syntax_tree(
-            "pk_{a} R; mvd_{b, c} S; fd_{x, y} \\select_{x > 0} S;", self.schema
+            "pk_{a} R; mvd_{x, y} \\select_{x > 0} S; fd_{id, name} \\select_{id > 0} T;", self.schema
         )
         assert len(trees) == 3
         assert isinstance(trees[0], PrimaryKeyNode)
         assert isinstance(trees[1], MultivaluedDependencyNode)
+        assert isinstance(trees[1].child, SelectNode)
         assert isinstance(trees[2], FunctionalDependencyNode)
