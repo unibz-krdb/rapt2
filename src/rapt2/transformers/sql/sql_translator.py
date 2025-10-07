@@ -174,6 +174,14 @@ class SQLTranslator(BaseTranslator):
         )
         return child_object
 
+    def definition(self, node) -> None:
+        """
+        Ignore definition nodes during SQL translation.
+        :param node: a DefinitionNode
+        :return: None
+        """
+        return None
+
     def natural_join(self, node: NaturalJoinNode) -> SQLQuery:
         """
         Translate an assign node into SQLQuery.
@@ -376,6 +384,42 @@ class SQLTranslator(BaseTranslator):
             attributes=attributes_str
         )
 
+    def multivalued_dependency(self, node) -> None:
+        """
+        Ignore multivalued dependency nodes during SQL translation.
+        :param node: a MultivaluedDependencyNode
+        :return: None
+        """
+        # TODO: Implement multivalued dependency translation
+        return None
+
+    def functional_dependency(self, node) -> None:
+        """
+        Ignore functional dependency nodes during SQL translation.
+        :param node: a FunctionalDependencyNode
+        :return: None
+        """
+        # TODO: Implement functional dependency translation
+        return None
+
+    def inclusion_equivalence(self, node) -> None:
+        """
+        Ignore inclusion equivalence nodes during SQL translation.
+        :param node: an InclusionEquivalenceNode
+        :return: None
+        """
+        # TODO: Implement inclusion equivalence translation
+        return None
+
+    def inclusion_subsumption(self, node) -> None:
+        """
+        Ignore inclusion subsumption nodes during SQL translation.
+        :param node: an InclusionSubsumptionNode
+        :return: None
+        """
+        # TODO: Implement inclusion subsumption translation
+        return None
+
     def translate_condition(self, condition: Union[ConditionNode, BinaryConditionNode, 
                                                  UnaryConditionNode, IdentityConditionNode]) -> str:
         """
@@ -427,4 +471,9 @@ def translate(root_list, use_bag_semantics=False, syntax=None):
     :return: a list of SQL statements
     """
     translator = SQLTranslator(syntax) if use_bag_semantics else SetTranslator(syntax)  # type: ignore
-    return [translator.translate(root).to_sql() for root in root_list]
+    results = []
+    for root in root_list:
+        translated = translator.translate(root)
+        if translated is not None:
+            results.append(translated.to_sql())
+    return results
