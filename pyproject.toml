@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "rapt2"
-version = "0.4.0"
+version = "0.4.1"
 description = "Relational algebra parsing tools"
 authors = [
     { name = "Aidan Bailey" }
@@ -15,7 +15,7 @@ dependencies = [
     "psycopg2-binary==2.9.10",
     "pyparsing>=3.2.3",
 ]
-license = { file = "LICENSE.txt" }
+license = { file = "LICENSE" }
 keywords = ["relational-algebra", "parser", "database", "query"]
 
 [dependency-groups]
