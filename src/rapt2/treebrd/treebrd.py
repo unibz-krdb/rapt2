@@ -7,7 +7,7 @@ from .condition_node import (BinaryConditionalOperator,
                                           UnaryConditionNode)
 
 from .grammars.proto_grammar import ProtoGrammar
-from .node import (AssignNode, CrossJoinNode, DefinitionNode, DifferenceNode,
+from .node import (Node, AssignNode, CrossJoinNode, DefinitionNode, DifferenceNode,
                    FullOuterJoinNode, FunctionalDependencyNode,
                    InclusionEquivalenceNode, InclusionSubsumptionNode,
                    IntersectNode, LeftOuterJoinNode, MultivaluedDependencyNode,
@@ -28,7 +28,7 @@ class TreeBRD:
     def __init__(self, grammar: ProtoGrammar):
         self.grammar = grammar
 
-    def build(self, instring, schema):
+    def build(self, instring, schema) -> list[Node]:
         ra = self.grammar.parse(instring)
         _schema = Schema(schema)
         return [self.to_node(statement, _schema) for statement in ra[:]]

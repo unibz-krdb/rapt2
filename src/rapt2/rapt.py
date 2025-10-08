@@ -1,3 +1,4 @@
+from .treebrd.node import Node
 from .transformers.qtree import qtree_translator
 from .transformers.sql import sql_translator
 from .treebrd.grammars import GRAMMARS, CoreGrammar
@@ -17,7 +18,7 @@ class Rapt:
         grammar = self.configure_grammar(**config)
         self.builder = TreeBRD(grammar)
 
-    def to_syntax_tree(self, instring, schema={}):
+    def to_syntax_tree(self, instring: str, schema: dict[str, list[str]]={}) -> list[Node]:
         """
         Return a list of syntax trees that represent the instring.
 

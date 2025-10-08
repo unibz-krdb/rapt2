@@ -8,7 +8,7 @@ class Schema:
     A Schema is a description of relational data.
     """
 
-    def __init__(self, definition):
+    def __init__(self, definition: dict[str, list[str]] = {}):
         self._data = {}
         for name, attributes in definition.items():
             self._data[name.lower()] = [attr.lower() for attr in attributes]
@@ -38,7 +38,7 @@ class Schema:
         """
         return copy.deepcopy(self._data)
 
-    def get_attributes(self, name):
+    def get_attributes(self, name: str):
         """
         Return the list of attributes associated with the specified relation.
         :param name: A name of a relation in the Schema.
@@ -52,7 +52,7 @@ class Schema:
             )
         return attributes[:]
 
-    def add(self, name, attributes):
+    def add(self, name: str, attributes: list[str]):
         """
         Add the relation to the Schema.
         :param name: The name of a relation.
