@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "rapt2"
-version = "0.4.1"
+version = "0.4.2"
 description = "Relational algebra parsing tools"
 authors = [
     { name = "Aidan Bailey" }
