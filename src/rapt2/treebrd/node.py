@@ -345,7 +345,16 @@ class DependencyNode(Node):
         return [self]
 
 
-class PrimaryKeyNode(DependencyNode):
+class UnaryDependencyNode(DependencyNode):
+    pass
+
+
+class BinaryDependencyNode(DependencyNode):
+    left_child: RelationNode | SelectNode
+    right_child: RelationNode | SelectNode
+
+
+class PrimaryKeyNode(UnaryDependencyNode):
     """
     A node representing a primary key dependency.
     """
@@ -354,7 +363,7 @@ class PrimaryKeyNode(DependencyNode):
         super().__init__(Operator.primary_key, relation_name, attributes)
 
 
-class MultivaluedDependencyNode(DependencyNode):
+class MultivaluedDependencyNode(UnaryDependencyNode):
     """
     A node representing a multivalued dependency.
     """
@@ -369,7 +378,7 @@ class MultivaluedDependencyNode(DependencyNode):
         return super().__eq__(other) and self.child == other.child
 
 
-class FunctionalDependencyNode(DependencyNode):
+class FunctionalDependencyNode(UnaryDependencyNode):
     """
     A node representing a functional dependency.
     """
@@ -384,7 +393,7 @@ class FunctionalDependencyNode(DependencyNode):
         return super().__eq__(other) and self.child == other.child
 
 
-class InclusionEquivalenceNode(DependencyNode):
+class InclusionEquivalenceNode(BinaryDependencyNode):
     """
     A node representing an inclusion equivalence dependency.
     """
@@ -399,13 +408,15 @@ class InclusionEquivalenceNode(DependencyNode):
         self.right_child = right_child
 
     def __eq__(self, other):
-        return (super().__eq__(other) and 
-                self.relation_names == other.relation_names and
-                self.left_child == other.left_child and
-                self.right_child == other.right_child)
+        return (
+            super().__eq__(other)
+            and self.relation_names == other.relation_names
+            and self.left_child == other.left_child
+            and self.right_child == other.right_child
+        )
 
 
-class InclusionSubsumptionNode(DependencyNode):
+class InclusionSubsumptionNode(BinaryDependencyNode):
     """
     A node representing an inclusion subsumption dependency.
     """
@@ -420,10 +431,12 @@ class InclusionSubsumptionNode(DependencyNode):
         self.right_child = right_child
 
     def __eq__(self, other):
-        return (super().__eq__(other) and 
-                self.relation_names == other.relation_names and
-                self.left_child == other.left_child and
-                self.right_child == other.right_child)
+        return (
+            super().__eq__(other)
+            and self.relation_names == other.relation_names
+            and self.left_child == other.left_child
+            and self.right_child == other.right_child
+        )
 
 
 class Operator(Enum):
