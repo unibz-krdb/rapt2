@@ -1,5 +1,7 @@
 import copy
 
+from rapt2.treebrd.attributes import AttributeList
+
 from .errors import RelationReferenceError
 
 
@@ -63,4 +65,7 @@ class Schema:
             raise RelationReferenceError(
                 "Relation '{name}' already exists.".format(name=name)
             )
-        self._data[name] = attributes[:]
+        if isinstance(attributes, AttributeList):
+            self._data[name.lower()] = attributes.to_list()
+        else:
+            self._data[name.lower()] = [attribute.lower() for attribute in attributes]

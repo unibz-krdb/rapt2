@@ -102,7 +102,7 @@ class AttributeList:
         for reference in references:
             self.get_attribute(reference)
 
-    def to_list(self):
+    def to_list(self) -> list[str]:
         """
         Return a list of attributes. If an attribute has a prefix, return a
         prefixed attribute of the form: prefix.attribute.
