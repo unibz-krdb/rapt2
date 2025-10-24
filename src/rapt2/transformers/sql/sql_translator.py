@@ -202,14 +202,6 @@ class SQLTranslator(BaseTranslator):
         )
         return child_object
 
-    def definition(self, node) -> None:
-        """
-        Ignore definition nodes during SQL translation.
-        :param node: a DefinitionNode
-        :return: None
-        """
-        return None
-
     def natural_join(self, node: NaturalJoinNode) -> SQLQuery:
         """
         Translate an assign node into SQLQuery.

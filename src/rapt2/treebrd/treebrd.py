@@ -7,7 +7,7 @@ from .condition_node import (BinaryConditionalOperator,
                                           UnaryConditionNode)
 
 from .grammars.proto_grammar import ProtoGrammar
-from .node import (Node, AssignNode, CrossJoinNode, DefinitionNode, DifferenceNode,
+from .node import (Node, AssignNode, CrossJoinNode, DifferenceNode,
                    FullOuterJoinNode, FunctionalDependencyNode,
                    InclusionEquivalenceNode, InclusionSubsumptionNode,
                    IntersectNode, LeftOuterJoinNode, MultivaluedDependencyNode,
@@ -64,12 +64,6 @@ class TreeBRD:
             node = self.create_unary_node(
                 operator=exp[0], child=child, param=exp[1], schema=schema
             )
-
-        # Definition.
-        elif len(exp) == 2 and isinstance(exp[0], str) and isinstance(exp[1], ParseResults):
-            name = exp[0]
-            attributes = list(exp[1])  # Convert ParseResults to list
-            node = DefinitionNode(name=name, attributes=attributes, schema=schema)
 
         # Assignment.
         elif exp[1] is self.grammar.syntax.assign_op:

@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from ...treebrd.node import (AssignNode, CrossJoinNode, DefinitionNode, DifferenceNode,
+from ...treebrd.node import (AssignNode, CrossJoinNode, DifferenceNode,
                              FullOuterJoinNode, FunctionalDependencyNode,
                              InclusionEquivalenceNode,
                              InclusionSubsumptionNode, IntersectNode,
@@ -100,16 +100,6 @@ class QTreeTranslator(BaseTranslator):
         return "[.${name}{attributes}$ {child} ]".format(
             name=node.name.replace('_', r'\_') if node.name else '', attributes=attributes, child=child
         )
-
-    def definition(self, node: DefinitionNode) -> str:
-        """
-        Translate a definition node into latex qtree node.
-        :param node: a treebrd node
-        :return: a qtree subtree rooted at the node
-        """
-        attributes = f"({r',\,'.join(node.attributes.names)})"
-
-        return f"[.${(node.name.replace('_', r'\_') if node.name else '')}{attributes}$ ]"
 
     def theta_join(self, node: ThetaJoinNode) -> str:
         """

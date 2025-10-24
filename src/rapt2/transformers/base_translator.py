@@ -16,7 +16,6 @@ class BaseTranslator:
             Operator.project: self.project,
             Operator.rename: self.rename,
             Operator.assign: self.assign,
-            Operator.definition: self.definition,
             Operator.cross_join: self.cross_join,
             Operator.natural_join: self.natural_join,
             Operator.theta_join: self.theta_join,
@@ -57,9 +56,6 @@ class BaseTranslator:
         raise NotImplementedError("Must be implemented by translation modules.")
 
     def assign(self, node):
-        raise NotImplementedError("Must be implemented by translation modules.")
-
-    def definition(self, node):
         raise NotImplementedError("Must be implemented by translation modules.")
 
     def cross_join(self, node):

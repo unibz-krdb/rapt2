@@ -165,20 +165,11 @@ class CoreGrammar(ConditionGrammar[TCoreSyntax]):
         return Group(lhs + Keyword(self.syntax.assign_op) + self.expression)
 
     @property
-    def definition(self):
-        """
-        definition ::= relation_name paren_left attribute_list paren_right
-        """
-        return Group(
-            self.relation_name + self.parenthesize(self.attribute_list)
-        )
-
-    @property
     def statement(self):
         """
         A terminated relational algebra statement.
         """
-        return (self.assignment ^ self.definition ^ self.expression) + Suppress(self.syntax.terminator)
+        return (self.assignment ^ self.expression) + Suppress(self.syntax.terminator)
 
     @property
     def statements(self):
