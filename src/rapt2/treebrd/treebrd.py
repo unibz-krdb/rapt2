@@ -48,6 +48,12 @@ class TreeBRD:
         :param grammar: the grammar used to parse relational algebra strings.
         """
         self.grammar = grammar
+        self._conditional_join_types = {
+            grammar.syntax.theta_join_op: ThetaJoinNode,
+            grammar.syntax.full_outer_join_op: FullOuterJoinNode,
+            grammar.syntax.left_outer_join_op: LeftOuterJoinNode,
+            grammar.syntax.right_outer_join_op: RightOuterJoinNode,
+        }
 
     def build(self, instring, schema) -> list[Node]:
         """
@@ -224,21 +230,9 @@ class TreeBRD:
         elif operator == self.grammar.syntax.natural_join_op:
             node = NaturalJoinNode(left, right)
 
-        elif operator == self.grammar.syntax.theta_join_op:
+        elif operator in self._conditional_join_types:
             condition = self.create_condition_node(param[0])
-            node = ThetaJoinNode(left, right, condition)
-
-        elif operator == self.grammar.syntax.full_outer_join_op:
-            condition = self.create_condition_node(param[0])
-            node = FullOuterJoinNode(left, right, condition)
-
-        elif operator == self.grammar.syntax.left_outer_join_op:
-            condition = self.create_condition_node(param[0])
-            node = LeftOuterJoinNode(left, right, condition)
-
-        elif operator == self.grammar.syntax.right_outer_join_op:
-            condition = self.create_condition_node(param[0])
-            node = RightOuterJoinNode(left, right, condition)
+            node = self._conditional_join_types[operator](left, right, condition)
 
         # Set operators
         elif operator == self.grammar.syntax.union_op:

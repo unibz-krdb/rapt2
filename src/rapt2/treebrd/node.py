@@ -213,13 +213,13 @@ class NaturalJoinNode(JoinNode):
         self.attributes.trim(left_attributes + right_attributes)
 
 
-class ThetaJoinNode(JoinNode):
+class ConditionalJoinNode(JoinNode):
     """
-    A relation that results from the relation algebra theta join operator.
+    A join node with a condition (theta join, outer joins).
     """
 
-    def __init__(self, left, right, conditions: ConditionNode):
-        super().__init__(Operator.theta_join, left, right)
+    def __init__(self, operator, left, right, conditions: ConditionNode):
+        super().__init__(operator, left, right)
         self.attributes.validate(conditions.attribute_references())
         self.conditions = conditions
 
@@ -227,46 +227,24 @@ class ThetaJoinNode(JoinNode):
         return self.conditions == other.conditions and super().__eq__(other)
 
 
-class FullOuterJoinNode(JoinNode):
-    """
-    A relation that results from the relation algebra full outer join operator.
-    """
-
+class ThetaJoinNode(ConditionalJoinNode):
     def __init__(self, left, right, conditions: ConditionNode):
-        super().__init__(Operator.full_outer_join, left, right)
-        self.attributes.validate(conditions.attribute_references())
-        self.conditions = conditions
-
-    def __eq__(self, other):
-        return self.conditions == other.conditions and super().__eq__(other)
+        super().__init__(Operator.theta_join, left, right, conditions)
 
 
-class LeftOuterJoinNode(JoinNode):
-    """
-    A relation that results from the relation algebra left outer join operator.
-    """
-
+class FullOuterJoinNode(ConditionalJoinNode):
     def __init__(self, left, right, conditions: ConditionNode):
-        super().__init__(Operator.left_outer_join, left, right)
-        self.attributes.validate(conditions.attribute_references())
-        self.conditions = conditions
-
-    def __eq__(self, other):
-        return self.conditions == other.conditions and super().__eq__(other)
+        super().__init__(Operator.full_outer_join, left, right, conditions)
 
 
-class RightOuterJoinNode(JoinNode):
-    """
-    A relation that results from the relation algebra right outer join operator.
-    """
-
+class LeftOuterJoinNode(ConditionalJoinNode):
     def __init__(self, left, right, conditions: ConditionNode):
-        super().__init__(Operator.right_outer_join, left, right)
-        self.attributes.validate(conditions.attribute_references())
-        self.conditions = conditions
+        super().__init__(Operator.left_outer_join, left, right, conditions)
 
-    def __eq__(self, other):
-        return self.conditions == other.conditions and super().__eq__(other)
+
+class RightOuterJoinNode(ConditionalJoinNode):
+    def __init__(self, left, right, conditions: ConditionNode):
+        super().__init__(Operator.right_outer_join, left, right, conditions)
 
 
 class SetOperatorNode(BinaryNode):
