@@ -1,8 +1,20 @@
 from unittest import TestCase
 
 from rapt2.treebrd.attributes import AttributeList
+from rapt2.treebrd.condition_node import (
+    BinaryConditionalOperator,
+    BinaryConditionNode,
+    IdentityConditionNode,
+)
 from rapt2.treebrd.errors import RelationReferenceError
-from rapt2.treebrd.node import Node, Operator, RelationNode
+from rapt2.treebrd.node import (
+    CrossJoinNode,
+    Node,
+    Operator,
+    ProjectNode,
+    RelationNode,
+    SelectNode,
+)
 from rapt2.treebrd.schema import Schema
 
 
@@ -91,3 +103,57 @@ class TestRelationNode(NodeTestCase):
         expected = AttributeList(self.schema.get_attributes("alpha"), "alpha").to_list()
         node = RelationNode("alpha", self.schema)
         self.assertEqual(expected, node.attributes.to_list())
+
+
+class TestPostOrder(NodeTestCase):
+    def test_relation_node_returns_self(self):
+        result = self.alpha.post_order()
+        self.assertEqual([self.alpha], result)
+
+    def test_unary_project_returns_child_then_self(self):
+        project = ProjectNode(self.beta, ["b1"])
+        result = project.post_order()
+        self.assertEqual(2, len(result))
+        self.assertEqual(self.beta, result[0])
+        self.assertEqual(project, result[1])
+
+    def test_unary_select_returns_child_then_self(self):
+        condition = BinaryConditionNode(
+            BinaryConditionalOperator.EQUAL,
+            IdentityConditionNode("a1"),
+            IdentityConditionNode("a1"),
+        )
+        select = SelectNode(self.alpha, condition)
+        result = select.post_order()
+        self.assertEqual(2, len(result))
+        self.assertEqual(self.alpha, result[0])
+        self.assertEqual(select, result[1])
+
+    def test_binary_join_returns_left_right_self(self):
+        join = CrossJoinNode(self.alpha, self.beta)
+        result = join.post_order()
+        self.assertEqual(3, len(result))
+        self.assertEqual(self.alpha, result[0])
+        self.assertEqual(self.beta, result[1])
+        self.assertEqual(join, result[2])
+
+    def test_nested_unary_over_binary(self):
+        join = CrossJoinNode(self.alpha, self.beta)
+        project = ProjectNode(join, ["a1"])
+        result = project.post_order()
+        self.assertEqual(4, len(result))
+        self.assertEqual(self.alpha, result[0])
+        self.assertEqual(self.beta, result[1])
+        self.assertEqual(join, result[2])
+        self.assertEqual(project, result[3])
+
+    def test_chained_binary_joins(self):
+        left_join = CrossJoinNode(self.alpha, self.beta)
+        outer_join = CrossJoinNode(left_join, self.gamma)
+        result = outer_join.post_order()
+        self.assertEqual(5, len(result))
+        self.assertEqual(self.alpha, result[0])
+        self.assertEqual(self.beta, result[1])
+        self.assertEqual(left_join, result[2])
+        self.assertEqual(self.gamma, result[3])
+        self.assertEqual(outer_join, result[4])
