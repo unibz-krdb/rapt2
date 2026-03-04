@@ -26,9 +26,20 @@ class TreeBRD:
     grammar: ProtoGrammar
 
     def __init__(self, grammar: ProtoGrammar):
+        """
+        :param grammar: the grammar used to parse relational algebra strings.
+        """
         self.grammar = grammar
 
     def build(self, instring, schema) -> list[Node]:
+        """
+        Parse a relational algebra string and build a forest of syntax trees.
+
+        :param instring: a relational algebra string (semicolon-separated
+            statements).
+        :param schema: a dict mapping relation names to attribute name lists.
+        :return: a list of root nodes, one per statement.
+        """
         ra = self.grammar.parse(instring)
         _schema = Schema(schema)
         return [self.to_node(statement, _schema) for statement in ra[:]]
@@ -99,6 +110,13 @@ class TreeBRD:
         return node
 
     def create_condition_node(self, conditions: ParseResults) -> ConditionNode:
+        """
+        Recursively build a ConditionNode tree from parsed condition tokens.
+
+        :param conditions: pyparsing result representing a condition expression.
+        :return: the root ConditionNode of the condition tree.
+        :raises ValueError: if the conditions structure is unrecognised.
+        """
         if isinstance(conditions, str):
             # Attribute Condition Node
             return IdentityConditionNode(conditions)

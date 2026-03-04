@@ -1,3 +1,5 @@
+"""LaTeX symbol constants for QTree rendering of relational algebra operators."""
+
 # Relational algebra latex operators
 
 PROJECT_OP = "\\pi"

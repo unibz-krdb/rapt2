@@ -34,6 +34,11 @@ class SQLQuery:
     """
 
     def __init__(self, select_block, from_block, where_block=""):
+        """
+        :param select_block: the SELECT column list.
+        :param from_block: the FROM clause body.
+        :param where_block: optional WHERE clause conditions.
+        """
         self.prefix = ""
         self.select_block = select_block
         self.from_block = from_block
@@ -111,6 +116,7 @@ class SQLTranslator(BaseTranslator):
 
     @classmethod
     def _get_temp_name(cls, node):
+        """Return the node's name, or a unique placeholder derived from its id."""
         return node.name or "_{}".format(id(node))
 
     def _get_sql_operator(
@@ -127,6 +133,7 @@ class SQLTranslator(BaseTranslator):
             IntersectNode,
         ],
     ) -> str:
+        """Map a binary node's operator to its SQL keyword (e.g. UNION, JOIN)."""
         operators = {
             Operator.union: "UNION",
             Operator.difference: "EXCEPT",
@@ -292,6 +299,12 @@ class SQLTranslator(BaseTranslator):
             IntersectNode,
         ],
     ) -> str:
+        """
+        Translate a child of a join node into a FROM-clause fragment.
+
+        Join children are inlined directly; other children are wrapped as
+        named sub-queries.
+        """
         sobject = self.translate(node)
         if node.operator in {
             Operator.cross_join,

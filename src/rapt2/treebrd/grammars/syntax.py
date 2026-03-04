@@ -12,6 +12,12 @@ class BaseSyntax:
     paren_right = ")"
 
     def __init__(self, **kwargs):
+        """
+        Override default tokens with user-supplied values.
+
+        :param kwargs: token names and their replacement strings. Only
+            attributes already defined on the class are accepted.
+        """
         # Set any user defined syntax.
         for key in kwargs:
             if hasattr(self, key):

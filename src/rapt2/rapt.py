@@ -7,14 +7,31 @@ from .treebrd.treebrd import TreeBRD
 
 
 class Rapt:
+    """
+    Public entry point for parsing relational algebra expressions and
+    translating them into SQL, LaTeX QTree, or syntax tree representations.
+    """
+
     @staticmethod
     def configure_grammar(**config):
+        """
+        Build a grammar instance from a configuration dictionary.
+
+        :param config: keyword arguments with optional 'syntax' dict and
+            'grammar' string (e.g. "Extended Grammar").
+        :return: a grammar instance configured with the given syntax.
+        """
         syntax = Syntax(**config.get("syntax", {}))
         grammar_class_name = config.get("grammar", "Extended Grammar")
         grammar_class = GRAMMARS.get(grammar_class_name, CoreGrammar)
         return grammar_class(syntax)
 
     def __init__(self, **config):
+        """
+        Initialize Rapt with an optional grammar/syntax configuration.
+
+        :param config: keyword arguments forwarded to :meth:`configure_grammar`.
+        """
         grammar = self.configure_grammar(**config)
         self.builder = TreeBRD(grammar)
 

@@ -46,6 +46,7 @@ class ExtendedGrammar(CoreGrammar[TExtendedSyntax]):
         return long ^ short
 
     def theta_parse_action(self, s, loc, t):
+        """Rewrite a short-form ``\\join_{cond}`` to ``\\theta_join``."""
         t[0] = self.syntax.theta_join_op
         return t
 
@@ -126,6 +127,7 @@ class ExtendedGrammar(CoreGrammar[TExtendedSyntax]):
         )
 
     def is_unary(self, operator):
+        """Return True if *operator* is an extended unary operator."""
         return operator in {
             self.syntax.select_op,
             self.syntax.project_op,
@@ -133,6 +135,7 @@ class ExtendedGrammar(CoreGrammar[TExtendedSyntax]):
         }
 
     def is_binary(self, operator):
+        """Return True if *operator* is an extended or core binary operator."""
         return operator in {
             self.syntax.intersect_op,
             self.syntax.natural_join_op,

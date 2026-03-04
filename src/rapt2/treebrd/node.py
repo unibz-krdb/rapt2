@@ -333,10 +333,14 @@ class DependencyNode(Node):
 
 
 class UnaryDependencyNode(DependencyNode):
+    """A dependency node referencing a single relation (PK, MVD, FD)."""
+
     pass
 
 
 class BinaryDependencyNode(DependencyNode):
+    """A dependency node referencing two relations (inclusion constraints)."""
+
     left_child: RelationNode | SelectNode
     right_child: RelationNode | SelectNode
 

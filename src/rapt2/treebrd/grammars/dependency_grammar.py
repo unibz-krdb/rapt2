@@ -28,6 +28,12 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
         super().__init__(syntax)
 
     def parse(self, instring):
+        """
+        Parse a string containing dependency and/or RA statements.
+
+        :param instring: the expression string to parse.
+        :return: a ParseResults containing one result per statement.
+        """
         instring = r"" + instring
         return self.statements.parseString(instring, parseAll=True)
 

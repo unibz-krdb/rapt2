@@ -11,6 +11,10 @@ class Schema:
     """
 
     def __init__(self, definition: dict[str, list[str]] = {}):
+        """
+        :param definition: a mapping of relation names to their attribute
+            lists. Names and attributes are lowercased on storage.
+        """
         self._data = {}
         for name, attributes in definition.items():
             self._data[name.lower()] = [attr.lower() for attr in attributes]

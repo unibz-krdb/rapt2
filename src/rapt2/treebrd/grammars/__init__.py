@@ -1,3 +1,5 @@
+"""Grammar registry mapping human-readable names to grammar classes."""
+
 from .core_grammar import CoreGrammar
 from .dependency_grammar import DependencyGrammar
 from .extended_grammar import ExtendedGrammar

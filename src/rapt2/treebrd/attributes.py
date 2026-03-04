@@ -12,6 +12,7 @@ class Attribute(namedtuple("Attribute", ["name", "prefix"])):
 
     @property
     def prefixed(self):
+        """Return the attribute in 'prefix.name' form, or just 'name' if no prefix."""
         if self.prefix:
             return "{pr}.{nm}".format(pr=self.prefix, nm=self.name)
         else:
@@ -58,6 +59,10 @@ class AttributeList:
         return len(set(collection)) != len(collection)
 
     def __init__(self, names, prefix):
+        """
+        :param names: a list of attribute name strings.
+        :param prefix: the relation prefix for all attributes, or None.
+        """
         self._contents = []
         self.extend(names, prefix)
 

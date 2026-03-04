@@ -50,6 +50,7 @@ class ConditionGrammar(ProtoGrammar[TConditionSyntax]):
 
     @property
     def comparator_op(self):
+        """comparator_op ::= '=' | '!=' | '<>' | '<' | '<=' | '>' | '>='"""
         return oneOf(
             [
                 self.syntax.equal_op,

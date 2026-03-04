@@ -30,6 +30,12 @@ class CoreGrammar(ConditionGrammar[TCoreSyntax]):
         super().__init__(syntax)
 
     def parse(self, instring):
+        """
+        Parse a relational algebra string into a list of statement results.
+
+        :param instring: the RA expression string to parse.
+        :return: a ParseResults containing one result per statement.
+        """
         instring = r"" + instring
         return self.statements.parseString(instring, parseAll=True)
 
@@ -179,6 +185,7 @@ class CoreGrammar(ConditionGrammar[TCoreSyntax]):
         return OneOrMore(self.statement)
 
     def parenthesize(self, parser):
+        """Wrap *parser* with suppressed parentheses and group the result."""
         return (
             Suppress(self.syntax.paren_left)
             + Group(parser)
@@ -202,6 +209,7 @@ class CoreGrammar(ConditionGrammar[TCoreSyntax]):
         return CaselessKeyword(operator, identChars=alphanums) + self.parameter(params)
 
     def is_unary(self, operator):
+        """Return True if *operator* is a core unary operator."""
         return operator in {
             self.syntax.select_op,
             self.syntax.project_op,
@@ -209,6 +217,7 @@ class CoreGrammar(ConditionGrammar[TCoreSyntax]):
         }
 
     def is_binary(self, operator):
+        """Return True if *operator* is a core binary operator."""
         return operator in {
             self.syntax.difference_op,
             self.syntax.union_op,

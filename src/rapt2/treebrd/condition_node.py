@@ -7,11 +7,21 @@ from .grammars.syntax import Syntax
 
 
 class UnaryConditionalOperator(Enum):
+    """Operators for unary condition expressions (NOT, DEFINED)."""
+
     NOT = auto()
     DEFINED = auto()
 
     @classmethod
     def from_syntax(cls, syntax: Syntax, instring: str) -> "UnaryConditionalOperator":
+        """
+        Map a syntax token string to the corresponding enum member.
+
+        :param syntax: the active syntax defining operator tokens.
+        :param instring: the parsed operator string.
+        :return: the matching UnaryConditionalOperator.
+        :raises ValueError: if the string doesn't match any known operator.
+        """
         match instring:
             case syntax.not_op:
                 return cls.NOT
@@ -22,6 +32,8 @@ class UnaryConditionalOperator(Enum):
 
 
 class BinaryConditionalOperator(Enum):
+    """Operators for binary condition expressions (AND, OR, comparisons)."""
+
     AND = auto()
     OR = auto()
     EQUAL = auto()
@@ -33,6 +45,14 @@ class BinaryConditionalOperator(Enum):
 
     @classmethod
     def from_syntax(cls, syntax: Syntax, instring: str) -> "BinaryConditionalOperator":
+        """
+        Map a syntax token string to the corresponding enum member.
+
+        :param syntax: the active syntax defining operator tokens.
+        :param instring: the parsed operator string.
+        :return: the matching BinaryConditionalOperator.
+        :raises ValueError: if the string doesn't match any known operator.
+        """
         match instring:
             case syntax.and_op:
                 return cls.AND
@@ -56,6 +76,8 @@ class BinaryConditionalOperator(Enum):
 
 @dataclass(frozen=True)
 class ConditionNode(ABC):
+    """Abstract base for nodes in a condition expression tree."""
+
     @abstractmethod
     def attribute_references(self) -> list[str]:
         """
@@ -66,6 +88,9 @@ class ConditionNode(ABC):
 
 @dataclass(frozen=True)
 class IdentityConditionNode(ConditionNode):
+    """A leaf condition node holding a single identifier (attribute reference,
+    literal, or number)."""
+
     ident: str
 
     def attribute_references(self) -> list[str]:
@@ -78,6 +103,8 @@ class IdentityConditionNode(ConditionNode):
 
 @dataclass(frozen=True)
 class UnaryConditionNode(ConditionNode):
+    """A condition node applying a unary operator (NOT, DEFINED) to a child."""
+
     op: UnaryConditionalOperator
     child: ConditionNode
 
@@ -87,6 +114,9 @@ class UnaryConditionNode(ConditionNode):
 
 @dataclass(frozen=True)
 class BinaryConditionNode(ConditionNode):
+    """A condition node applying a binary operator (AND, OR, comparison) to
+    left and right children."""
+
     op: BinaryConditionalOperator
     left: ConditionNode
     right: ConditionNode

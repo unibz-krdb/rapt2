@@ -1,3 +1,5 @@
+"""Mappings from Operator / ConditionalOperator enums to LaTeX symbol strings."""
+
 from ...treebrd.node import Operator
 from ...treebrd.condition_node import BinaryConditionalOperator, UnaryConditionalOperator
 from .constants import (
