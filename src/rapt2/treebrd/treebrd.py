@@ -263,18 +263,13 @@ class TreeBRD:
         if not exp or len(exp) < 2:
             return False
 
-        # Check if the syntax has dependency operators
-        dependency_ops = []
-        if hasattr(self.grammar.syntax, "pk_op"):
-            dependency_ops.append(self.grammar.syntax.pk_op)
-        if hasattr(self.grammar.syntax, "mvd_op"):
-            dependency_ops.append(self.grammar.syntax.mvd_op)
-        if hasattr(self.grammar.syntax, "fd_op"):
-            dependency_ops.append(self.grammar.syntax.fd_op)
-        if hasattr(self.grammar.syntax, "inc_equiv_op"):
-            dependency_ops.append(self.grammar.syntax.inc_equiv_op)
-        if hasattr(self.grammar.syntax, "inc_subset_op"):
-            dependency_ops.append(self.grammar.syntax.inc_subset_op)
+        # Collect dependency operators present in the current syntax
+        dep_attr_names = ("pk_op", "mvd_op", "fd_op", "inc_equiv_op", "inc_subset_op")
+        dependency_ops = [
+            getattr(self.grammar.syntax, attr)
+            for attr in dep_attr_names
+            if hasattr(self.grammar.syntax, attr)
+        ]
 
         return exp[0] in dependency_ops
 

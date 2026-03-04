@@ -39,6 +39,11 @@ class QTreeTranslator(BaseTranslator):
     statement into a latex tree output.
     """
 
+    @staticmethod
+    def _escape_latex(name: str) -> str:
+        """Escape underscores in a name for LaTeX."""
+        return name.replace("_", r"\_") if name else ""
+
     def _get_latex_operator(self, operator):
         """
         Get the LaTeX operator for a given operator.
@@ -59,7 +64,7 @@ class QTreeTranslator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        return "[.${}$ ]".format(node.name.replace("_", r"\_") if node.name else "")
+        return "[.${}$ ]".format(self._escape_latex(node.name))
 
     def select(self, node: SelectNode) -> str:
         """
@@ -99,7 +104,7 @@ class QTreeTranslator(BaseTranslator):
             attributes = "({})".format(r",\,".join(node.attributes.names))
         return "[.${op}_{{{name}{attributes}}}$ {child} ]".format(
             op=self._get_latex_operator(node.operator),
-            name=node.name.replace("_", r"\_") if node.name else "",
+            name=self._escape_latex(node.name),
             attributes=attributes,
             child=child,
         )
@@ -115,9 +120,23 @@ class QTreeTranslator(BaseTranslator):
         if node.attributes:
             attributes = "({})".format(r",\,".join(node.attributes.names))
         return "[.${name}{attributes}$ {child} ]".format(
-            name=node.name.replace("_", r"\_") if node.name else "",
+            name=self._escape_latex(node.name),
             attributes=attributes,
             child=child,
+        )
+
+    def _conditioned_binary(
+        self,
+        node: Union[
+            ThetaJoinNode, FullOuterJoinNode, LeftOuterJoinNode, RightOuterJoinNode
+        ],
+    ) -> str:
+        """Translate a binary node with conditions into a LaTeX qtree node."""
+        return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
+            op=self._get_latex_operator(node.operator),
+            conditions=self.translate_condition(node.conditions),
+            left=self.translate(node.left),
+            right=self.translate(node.right),
         )
 
     def theta_join(self, node: ThetaJoinNode) -> str:
@@ -126,12 +145,7 @@ class QTreeTranslator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
-            op=self._get_latex_operator(node.operator),
-            conditions=self.translate_condition(node.conditions),
-            left=self.translate(node.left),
-            right=self.translate(node.right),
-        )
+        return self._conditioned_binary(node)
 
     def cross_join(self, node: CrossJoinNode) -> str:
         """
@@ -155,12 +169,7 @@ class QTreeTranslator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
-            op=self._get_latex_operator(node.operator),
-            conditions=self.translate_condition(node.conditions),
-            left=self.translate(node.left),
-            right=self.translate(node.right),
-        )
+        return self._conditioned_binary(node)
 
     def left_outer_join(self, node: LeftOuterJoinNode) -> str:
         """
@@ -168,12 +177,7 @@ class QTreeTranslator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
-            op=self._get_latex_operator(node.operator),
-            conditions=self.translate_condition(node.conditions),
-            left=self.translate(node.left),
-            right=self.translate(node.right),
-        )
+        return self._conditioned_binary(node)
 
     def right_outer_join(self, node: RightOuterJoinNode) -> str:
         """
@@ -181,12 +185,7 @@ class QTreeTranslator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
-            op=self._get_latex_operator(node.operator),
-            conditions=self.translate_condition(node.conditions),
-            left=self.translate(node.left),
-            right=self.translate(node.right),
-        )
+        return self._conditioned_binary(node)
 
     def union(self, node: UnionNode) -> str:
         """
@@ -238,6 +237,12 @@ class QTreeTranslator(BaseTranslator):
         attributes = r",\,".join(node.attributes)
         return f"[.${self._get_latex_operator(node.operator)}({node.relation_name}) \\eq {{{attributes}}}$ ]"
 
+    def _latex_child_str(self, child: Union[SelectNode, RelationNode]) -> str:
+        """Format a dependency child node as a LaTeX string."""
+        if isinstance(child, SelectNode):
+            return f"{self._get_latex_operator(child.operator)}_{{{self.translate_condition(child.conditions)}}} ({child.name})"
+        return child.name
+
     def multivalued_dependency(self, node: MultivaluedDependencyNode) -> str:
         """
         Translate a multivalued dependency node into a latex qtree node.
@@ -246,11 +251,8 @@ class QTreeTranslator(BaseTranslator):
         """
         left_attr, right_attr = node.attributes
         op = self._get_latex_operator(node.operator)
-        if isinstance(node.child, SelectNode):
-            select_str = f"{self._get_latex_operator(node.child.operator)}_{{{self.translate_condition(node.child.conditions)}}} ({node.child.name})"
-            return f"[.${select_str} : {left_attr} {op} {right_attr}$ ]"
-        else:
-            return f"[.${node.child.name} : {left_attr} {op} {right_attr}$ ]"
+        child_str = self._latex_child_str(node.child)
+        return f"[.${child_str} : {left_attr} {op} {right_attr}$ ]"
 
     def functional_dependency(self, node: FunctionalDependencyNode) -> str:
         """
@@ -260,11 +262,8 @@ class QTreeTranslator(BaseTranslator):
         """
         left_attr, right_attr = node.attributes
         op = self._get_latex_operator(node.operator)
-        if isinstance(node.child, SelectNode):
-            select_str = f"{self._get_latex_operator(node.child.operator)}_{{{self.translate_condition(node.child.conditions)}}} ({node.child.name})"
-            return f"[.${select_str} : {left_attr} {op} {right_attr}$ ]"
-        else:
-            return f"[.${node.child.name} : {left_attr} {op} {right_attr}$ ]"
+        child_str = self._latex_child_str(node.child)
+        return f"[.${child_str} : {left_attr} {op} {right_attr}$ ]"
 
     def inclusion_equivalence(self, node: InclusionEquivalenceNode) -> str:
         """
@@ -274,19 +273,8 @@ class QTreeTranslator(BaseTranslator):
         """
         attr1, attr2 = node.attributes
         op = self._get_latex_operator(node.operator)
-
-        # Handle left side
-        if isinstance(node.left_child, SelectNode):
-            left_str = f"{self._get_latex_operator(node.left_child.operator)}_{{{self.translate_condition(node.left_child.conditions)}}} ({node.left_child.name})"
-        else:
-            left_str = node.left_child.name
-
-        # Handle right side
-        if isinstance(node.right_child, SelectNode):
-            right_str = f"{self._get_latex_operator(node.right_child.operator)}_{{{self.translate_condition(node.right_child.conditions)}}} ({node.right_child.name})"
-        else:
-            right_str = node.right_child.name
-
+        left_str = self._latex_child_str(node.left_child)
+        right_str = self._latex_child_str(node.right_child)
         return f"[.${left_str}[{attr1}] {op} {right_str}[{attr2}]$ ]"
 
     def inclusion_subsumption(self, node: InclusionSubsumptionNode) -> str:
@@ -297,19 +285,8 @@ class QTreeTranslator(BaseTranslator):
         """
         attr1, attr2 = node.attributes
         op = self._get_latex_operator(node.operator)
-
-        # Handle left side
-        if isinstance(node.left_child, SelectNode):
-            left_str = f"{self._get_latex_operator(node.left_child.operator)}_{{{self.translate_condition(node.left_child.conditions)}}} ({node.left_child.name})"
-        else:
-            left_str = node.left_child.name
-
-        # Handle right side
-        if isinstance(node.right_child, SelectNode):
-            right_str = f"{self._get_latex_operator(node.right_child.operator)}_{{{self.translate_condition(node.right_child.conditions)}}} ({node.right_child.name})"
-        else:
-            right_str = node.right_child.name
-
+        left_str = self._latex_child_str(node.left_child)
+        right_str = self._latex_child_str(node.right_child)
         return f"[.${left_str}[{attr1}] {op} {right_str}[{attr2}]$ ]"
 
     def identity_condition(self, node: IdentityConditionNode) -> str:
