@@ -4,6 +4,67 @@ from rapt2.treebrd.grammars.extended_grammar import ExtendedGrammar
 from tests.treebrd.grammars.grammar_test_case import GrammarTestCase
 
 
+class TestExtendedGrammarIsUnary(GrammarTestCase):
+    def setUp(self):
+        self.grammar = ExtendedGrammar()
+
+    def test_select_is_unary(self):
+        self.assertTrue(self.grammar.is_unary(self.grammar.syntax.select_op))
+
+    def test_project_is_unary(self):
+        self.assertTrue(self.grammar.is_unary(self.grammar.syntax.project_op))
+
+    def test_rename_is_unary(self):
+        self.assertTrue(self.grammar.is_unary(self.grammar.syntax.rename_op))
+
+    def test_join_is_not_unary(self):
+        self.assertFalse(self.grammar.is_unary(self.grammar.syntax.join_op))
+
+    def test_intersect_is_not_unary(self):
+        self.assertFalse(self.grammar.is_unary(self.grammar.syntax.intersect_op))
+
+    def test_natural_join_is_not_unary(self):
+        self.assertFalse(self.grammar.is_unary(self.grammar.syntax.natural_join_op))
+
+
+class TestExtendedGrammarIsBinary(GrammarTestCase):
+    def setUp(self):
+        self.grammar = ExtendedGrammar()
+
+    def test_intersect_is_binary(self):
+        self.assertTrue(self.grammar.is_binary(self.grammar.syntax.intersect_op))
+
+    def test_natural_join_is_binary(self):
+        self.assertTrue(self.grammar.is_binary(self.grammar.syntax.natural_join_op))
+
+    def test_theta_join_is_binary(self):
+        self.assertTrue(self.grammar.is_binary(self.grammar.syntax.theta_join_op))
+
+    def test_full_outer_join_is_binary(self):
+        self.assertTrue(self.grammar.is_binary(self.grammar.syntax.full_outer_join_op))
+
+    def test_left_outer_join_is_binary(self):
+        self.assertTrue(self.grammar.is_binary(self.grammar.syntax.left_outer_join_op))
+
+    def test_right_outer_join_is_binary(self):
+        self.assertTrue(self.grammar.is_binary(self.grammar.syntax.right_outer_join_op))
+
+    def test_inherited_join_is_binary(self):
+        self.assertTrue(self.grammar.is_binary(self.grammar.syntax.join_op))
+
+    def test_inherited_union_is_binary(self):
+        self.assertTrue(self.grammar.is_binary(self.grammar.syntax.union_op))
+
+    def test_inherited_difference_is_binary(self):
+        self.assertTrue(self.grammar.is_binary(self.grammar.syntax.difference_op))
+
+    def test_select_is_not_binary(self):
+        self.assertFalse(self.grammar.is_binary(self.grammar.syntax.select_op))
+
+    def test_unknown_is_not_binary(self):
+        self.assertFalse(self.grammar.is_binary("\\unknown"))
+
+
 class TestIntersect(GrammarTestCase):
     def setUp(self):
         self.parser = ExtendedGrammar()
