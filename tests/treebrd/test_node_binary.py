@@ -173,15 +173,20 @@ class TestJoinNode(BinaryTestCase):
         self.assertEqual(expected, node.attributes.to_list())
 
 
-class TestCrossNode(BinaryTestCase):
+class ConditionalJoinTestMixin:
+    """Shared tests for conditional join nodes (theta, full/left/right outer)."""
+
+    node_class = None
+    expected_operator = None
+
     def test_operator_on_init(self):
         condition = BinaryConditionNode(
             BinaryConditionalOperator.EQUAL,
             IdentityConditionNode("a1"),
             IdentityConditionNode("b1"),
         )
-        node = ThetaJoinNode(self.alpha, self.beta, condition)
-        self.assertEqual(Operator.theta_join, node.operator)
+        node = self.node_class(self.alpha, self.beta, condition)
+        self.assertEqual(self.expected_operator, node.operator)
 
     def test_children_on_init(self):
         condition = BinaryConditionNode(
@@ -189,7 +194,7 @@ class TestCrossNode(BinaryTestCase):
             IdentityConditionNode("a1"),
             IdentityConditionNode("b1"),
         )
-        node = ThetaJoinNode(self.alpha, self.beta, condition)
+        node = self.node_class(self.alpha, self.beta, condition)
         self.assertEqual(self.alpha, node.left)
         self.assertEqual(self.beta, node.right)
 
@@ -199,7 +204,7 @@ class TestCrossNode(BinaryTestCase):
             IdentityConditionNode("a1"),
             IdentityConditionNode("b1"),
         )
-        node = ThetaJoinNode(self.alpha, self.beta, condition)
+        node = self.node_class(self.alpha, self.beta, condition)
         expected = get_attributes(
             "alpha", self.schema, use_prefix=True
         ) + get_attributes("beta", self.schema, use_prefix=True)
@@ -211,7 +216,7 @@ class TestCrossNode(BinaryTestCase):
             IdentityConditionNode("a1"),
             IdentityConditionNode("b1"),
         )
-        actual = ThetaJoinNode(self.alpha, self.beta, condition).conditions
+        actual = self.node_class(self.alpha, self.beta, condition).conditions
         self.assertEqual(condition, actual)
 
     def test_condition_when_multiple_conditions(self):
@@ -228,7 +233,7 @@ class TestCrossNode(BinaryTestCase):
                 IdentityConditionNode("43"),
             ),
         )
-        actual = ThetaJoinNode(self.alpha, self.beta, condition).conditions
+        actual = self.node_class(self.alpha, self.beta, condition).conditions
         self.assertEqual(condition, actual)
 
     def test_condition_when_with_prefix(self):
@@ -237,7 +242,7 @@ class TestCrossNode(BinaryTestCase):
             IdentityConditionNode("alpha.a1"),
             IdentityConditionNode("41"),
         )
-        actual = ThetaJoinNode(self.alpha, self.beta, condition).conditions
+        actual = self.node_class(self.alpha, self.beta, condition).conditions
         self.assertEqual(condition, actual)
 
     def test_condition_when_multiple_conditions_with_prefix(self):
@@ -254,13 +259,13 @@ class TestCrossNode(BinaryTestCase):
                 IdentityConditionNode("43"),
             ),
         )
-        actual = ThetaJoinNode(self.alpha, self.beta, condition).conditions
+        actual = self.node_class(self.alpha, self.beta, condition).conditions
         self.assertEqual(condition, actual)
 
     def test_exception_when_first_attribute_in_condition_is_wrong(self):
         self.assertRaises(
             AttributeReferenceError,
-            ThetaJoinNode,
+            self.node_class,
             self.alpha,
             self.beta,
             BinaryConditionNode(
@@ -273,7 +278,7 @@ class TestCrossNode(BinaryTestCase):
     def test_exception_when_second_attribute_in_condition_is_wrong(self):
         self.assertRaises(
             AttributeReferenceError,
-            ThetaJoinNode,
+            self.node_class,
             self.alpha,
             self.beta,
             BinaryConditionNode(
@@ -286,7 +291,7 @@ class TestCrossNode(BinaryTestCase):
     def test_exception_when_both_attributes_in_condition_are_wrong(self):
         self.assertRaises(
             AttributeReferenceError,
-            ThetaJoinNode,
+            self.node_class,
             self.alpha,
             self.beta,
             BinaryConditionNode(
@@ -299,7 +304,7 @@ class TestCrossNode(BinaryTestCase):
     def test_exception_when_prefix_in_condition_is_wrong(self):
         self.assertRaises(
             AttributeReferenceError,
-            ThetaJoinNode,
+            self.node_class,
             self.alpha,
             self.beta,
             BinaryConditionNode(
@@ -312,7 +317,7 @@ class TestCrossNode(BinaryTestCase):
     def test_exception_when_ambiguous_attributes(self):
         self.assertRaises(
             AttributeReferenceError,
-            ThetaJoinNode,
+            self.node_class,
             self.alpha,
             self.ambiguous,
             BinaryConditionNode(
@@ -323,454 +328,24 @@ class TestCrossNode(BinaryTestCase):
         )
 
 
-class TestFullOuterJoinNode(BinaryTestCase):
-    def test_operator_on_init(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        node = FullOuterJoinNode(self.alpha, self.beta, condition)
-        self.assertEqual(Operator.full_outer_join, node.operator)
-
-    def test_children_on_init(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        node = FullOuterJoinNode(self.alpha, self.beta, condition)
-        self.assertEqual(self.alpha, node.left)
-        self.assertEqual(self.beta, node.right)
-
-    def test_attributes_on_init(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        node = FullOuterJoinNode(self.alpha, self.beta, condition)
-        expected = get_attributes(
-            "alpha", self.schema, use_prefix=True
-        ) + get_attributes("beta", self.schema, use_prefix=True)
-        self.assertEqual(expected, node.attributes.to_list())
-
-    def test_condition_when_init_has_condition(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        actual = FullOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_condition_when_multiple_conditions(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.AND,
-            BinaryConditionNode(
-                BinaryConditionalOperator.GREATER_THAN,
-                IdentityConditionNode("a1"),
-                IdentityConditionNode("41"),
-            ),
-            BinaryConditionNode(
-                BinaryConditionalOperator.LESS_THAN,
-                IdentityConditionNode("b1"),
-                IdentityConditionNode("43"),
-            ),
-        )
-        actual = FullOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_condition_when_with_prefix(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.GREATER_THAN,
-            IdentityConditionNode("alpha.a1"),
-            IdentityConditionNode("41"),
-        )
-        actual = FullOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_condition_when_multiple_conditions_with_prefix(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.AND,
-            BinaryConditionNode(
-                BinaryConditionalOperator.GREATER_THAN,
-                IdentityConditionNode("alpha.a1"),
-                IdentityConditionNode("41"),
-            ),
-            BinaryConditionNode(
-                BinaryConditionalOperator.LESS_THAN,
-                IdentityConditionNode("beta.b1"),
-                IdentityConditionNode("43"),
-            ),
-        )
-        actual = FullOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_exception_when_first_attribute_in_condition_is_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            FullOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("a2"),
-                IdentityConditionNode("42"),
-            ),
-        )
-
-    def test_exception_when_second_attribute_in_condition_is_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            FullOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("a2"),
-                IdentityConditionNode("a2"),
-            ),
-        )
-
-    def test_exception_when_both_attributes_in_condition_are_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            FullOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("a2"),
-                IdentityConditionNode("a3"),
-            ),
-        )
-
-    def test_exception_when_prefix_in_condition_is_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            FullOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("beta.a1"),
-                IdentityConditionNode("42"),
-            ),
-        )
-
-    def test_exception_when_ambiguous_attributes(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            FullOuterJoinNode,
-            self.alpha,
-            self.ambiguous,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("d1"),
-                IdentityConditionNode("42"),
-            ),
-        )
+class TestThetaJoinNode(ConditionalJoinTestMixin, BinaryTestCase):
+    node_class = ThetaJoinNode
+    expected_operator = Operator.theta_join
 
 
-class TestLeftOuterJoinNode(BinaryTestCase):
-    def test_operator_on_init(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        node = LeftOuterJoinNode(self.alpha, self.beta, condition)
-        self.assertEqual(Operator.left_outer_join, node.operator)
-
-    def test_children_on_init(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        node = LeftOuterJoinNode(self.alpha, self.beta, condition)
-        self.assertEqual(self.alpha, node.left)
-        self.assertEqual(self.beta, node.right)
-
-    def test_attributes_on_init(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        node = LeftOuterJoinNode(self.alpha, self.beta, condition)
-        expected = get_attributes(
-            "alpha", self.schema, use_prefix=True
-        ) + get_attributes("beta", self.schema, use_prefix=True)
-        self.assertEqual(expected, node.attributes.to_list())
-
-    def test_condition_when_init_has_condition(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        actual = LeftOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_condition_when_multiple_conditions(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.AND,
-            BinaryConditionNode(
-                BinaryConditionalOperator.GREATER_THAN,
-                IdentityConditionNode("a1"),
-                IdentityConditionNode("41"),
-            ),
-            BinaryConditionNode(
-                BinaryConditionalOperator.LESS_THAN,
-                IdentityConditionNode("b1"),
-                IdentityConditionNode("43"),
-            ),
-        )
-        actual = LeftOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_condition_when_with_prefix(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.GREATER_THAN,
-            IdentityConditionNode("alpha.a1"),
-            IdentityConditionNode("41"),
-        )
-        actual = LeftOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_condition_when_multiple_conditions_with_prefix(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.AND,
-            BinaryConditionNode(
-                BinaryConditionalOperator.GREATER_THAN,
-                IdentityConditionNode("alpha.a1"),
-                IdentityConditionNode("41"),
-            ),
-            BinaryConditionNode(
-                BinaryConditionalOperator.LESS_THAN,
-                IdentityConditionNode("beta.b1"),
-                IdentityConditionNode("43"),
-            ),
-        )
-        actual = LeftOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_exception_when_first_attribute_in_condition_is_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            LeftOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("a2"),
-                IdentityConditionNode("42"),
-            ),
-        )
-
-    def test_exception_when_second_attribute_in_condition_is_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            LeftOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("a2"),
-                IdentityConditionNode("a2"),
-            ),
-        )
-
-    def test_exception_when_both_attributes_in_condition_are_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            LeftOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("a2"),
-                IdentityConditionNode("a3"),
-            ),
-        )
-
-    def test_exception_when_prefix_in_condition_is_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            LeftOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("beta.a1"),
-                IdentityConditionNode("42"),
-            ),
-        )
-
-    def test_exception_when_ambiguous_attributes(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            LeftOuterJoinNode,
-            self.alpha,
-            self.ambiguous,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("d1"),
-                IdentityConditionNode("42"),
-            ),
-        )
+class TestFullOuterJoinNode(ConditionalJoinTestMixin, BinaryTestCase):
+    node_class = FullOuterJoinNode
+    expected_operator = Operator.full_outer_join
 
 
-class TestRightOuterJoinNode(BinaryTestCase):
-    def test_operator_on_init(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        node = RightOuterJoinNode(self.alpha, self.beta, condition)
-        self.assertEqual(Operator.right_outer_join, node.operator)
+class TestLeftOuterJoinNode(ConditionalJoinTestMixin, BinaryTestCase):
+    node_class = LeftOuterJoinNode
+    expected_operator = Operator.left_outer_join
 
-    def test_children_on_init(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        node = RightOuterJoinNode(self.alpha, self.beta, condition)
-        self.assertEqual(self.alpha, node.left)
-        self.assertEqual(self.beta, node.right)
 
-    def test_attributes_on_init(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        node = RightOuterJoinNode(self.alpha, self.beta, condition)
-        expected = get_attributes(
-            "alpha", self.schema, use_prefix=True
-        ) + get_attributes("beta", self.schema, use_prefix=True)
-        self.assertEqual(expected, node.attributes.to_list())
-
-    def test_condition_when_init_has_condition(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.EQUAL,
-            IdentityConditionNode("a1"),
-            IdentityConditionNode("b1"),
-        )
-        actual = RightOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_condition_when_multiple_conditions(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.AND,
-            BinaryConditionNode(
-                BinaryConditionalOperator.GREATER_THAN,
-                IdentityConditionNode("a1"),
-                IdentityConditionNode("41"),
-            ),
-            BinaryConditionNode(
-                BinaryConditionalOperator.LESS_THAN,
-                IdentityConditionNode("b1"),
-                IdentityConditionNode("43"),
-            ),
-        )
-        actual = RightOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_condition_when_with_prefix(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.GREATER_THAN,
-            IdentityConditionNode("alpha.a1"),
-            IdentityConditionNode("41"),
-        )
-        actual = RightOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_condition_when_multiple_conditions_with_prefix(self):
-        condition = BinaryConditionNode(
-            BinaryConditionalOperator.AND,
-            BinaryConditionNode(
-                BinaryConditionalOperator.GREATER_THAN,
-                IdentityConditionNode("alpha.a1"),
-                IdentityConditionNode("41"),
-            ),
-            BinaryConditionNode(
-                BinaryConditionalOperator.LESS_THAN,
-                IdentityConditionNode("beta.b1"),
-                IdentityConditionNode("43"),
-            ),
-        )
-        actual = RightOuterJoinNode(self.alpha, self.beta, condition).conditions
-        self.assertEqual(condition, actual)
-
-    def test_exception_when_first_attribute_in_condition_is_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            RightOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("a2"),
-                IdentityConditionNode("42"),
-            ),
-        )
-
-    def test_exception_when_second_attribute_in_condition_is_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            RightOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("a2"),
-                IdentityConditionNode("a2"),
-            ),
-        )
-
-    def test_exception_when_both_attributes_in_condition_are_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            RightOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("a2"),
-                IdentityConditionNode("a3"),
-            ),
-        )
-
-    def test_exception_when_prefix_in_condition_is_wrong(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            RightOuterJoinNode,
-            self.alpha,
-            self.beta,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("beta.a1"),
-                IdentityConditionNode("42"),
-            ),
-        )
-
-    def test_exception_when_ambiguous_attributes(self):
-        self.assertRaises(
-            AttributeReferenceError,
-            RightOuterJoinNode,
-            self.alpha,
-            self.ambiguous,
-            BinaryConditionNode(
-                BinaryConditionalOperator.EQUAL,
-                IdentityConditionNode("d1"),
-                IdentityConditionNode("42"),
-            ),
-        )
+class TestRightOuterJoinNode(ConditionalJoinTestMixin, BinaryTestCase):
+    node_class = RightOuterJoinNode
+    expected_operator = Operator.right_outer_join
 
 
 def get_attributes(name, schema, use_prefix=False):
