@@ -773,13 +773,20 @@ class TestIntersection(TestSQL, TestSet):
     sql_operator = "INTERSECT"
 
 
-class TestPrimaryKey(TestSQL):
+class DependencyTestSQL(TestSQL):
     def setUp(self):
         from rapt2.rapt import Rapt
         import functools
+
         self.rapt = Rapt(grammar="Dependency Grammar")
         self.translate = self.translate_func(self.rapt.to_sql)
-        self.translate_set = self.translate_func(functools.partial(self.rapt.to_sql, use_bag_semantics=False))
+        self.translate_set = self.translate_func(
+            functools.partial(self.rapt.to_sql, use_bag_semantics=False)
+        )
+
+
+class TestPrimaryKey(DependencyTestSQL):
+    pass  # setUp inherited from DependencyTestSQL
 
     def test_single_attribute_primary_key(self):
         ra = "pk_{a} R;"
@@ -809,7 +816,45 @@ class TestPrimaryKey(TestSQL):
         ra = "pk_{a} R; pk_{id} Users;"
         expected = [
             "ALTER TABLE r ADD PRIMARY KEY (a)",
-            "ALTER TABLE users ADD PRIMARY KEY (id)"
+            "ALTER TABLE users ADD PRIMARY KEY (id)",
         ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
+
+
+class TestMvdDependencyStub(DependencyTestSQL):
+    def test_mvd_returns_none(self):
+        ra = "mvd_{a1, a2} alpha;"
+        actual = self.translate(ra)
+        self.assertEqual([], actual)
+
+    def test_mvd_with_select_returns_none(self):
+        ra = "mvd_{a1, a2} \\select_{a1 = a2} alpha;"
+        actual = self.translate(ra)
+        self.assertEqual([], actual)
+
+
+class TestFdDependencyStub(DependencyTestSQL):
+    def test_fd_returns_none(self):
+        ra = "fd_{a1, a2} alpha;"
+        actual = self.translate(ra)
+        self.assertEqual([], actual)
+
+    def test_fd_with_select_returns_none(self):
+        ra = "fd_{a1, a2} \\select_{a1 = a2} alpha;"
+        actual = self.translate(ra)
+        self.assertEqual([], actual)
+
+
+class TestInclusionEquivalenceStub(DependencyTestSQL):
+    def test_inc_equiv_returns_none(self):
+        ra = "inc=_{a1, b1} (alpha, beta);"
+        actual = self.translate(ra)
+        self.assertEqual([], actual)
+
+
+class TestInclusionSubsumptionStub(DependencyTestSQL):
+    def test_inc_subset_returns_none(self):
+        ra = "inc⊆_{a1, b1} (alpha, beta);"
+        actual = self.translate(ra)
+        self.assertEqual([], actual)

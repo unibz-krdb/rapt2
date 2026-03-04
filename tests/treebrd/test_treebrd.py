@@ -1,13 +1,26 @@
 import functools
 from unittest import TestCase
 
-from rapt2.treebrd.condition_node import (BinaryConditionalOperator,
-                                          BinaryConditionNode,
-                                          IdentityConditionNode)
+from rapt2.treebrd.condition_node import (
+    BinaryConditionalOperator,
+    BinaryConditionNode,
+    IdentityConditionNode,
+)
 from rapt2.treebrd.errors import RelationReferenceError
 from rapt2.treebrd.grammars import DependencyGrammar
-from rapt2.treebrd.node import (CrossJoinNode, NaturalJoinNode, ProjectNode,
-                                RelationNode, ThetaJoinNode)
+from rapt2.treebrd.node import (
+    CrossJoinNode,
+    FunctionalDependencyNode,
+    InclusionEquivalenceNode,
+    InclusionSubsumptionNode,
+    MultivaluedDependencyNode,
+    NaturalJoinNode,
+    PrimaryKeyNode,
+    ProjectNode,
+    RelationNode,
+    SelectNode,
+    ThetaJoinNode,
+)
 from rapt2.treebrd.schema import Schema
 from rapt2.treebrd.treebrd import TreeBRD
 
@@ -256,3 +269,105 @@ class TestNaturalJoin(JoinTestCase):
         left = RelationNode("alpha", self.schema)
         right = RelationNode("alpha", self.schema)
         self.assertRaises(RelationReferenceError, NaturalJoinNode, left, right)
+
+
+class DependencyTestCase(TreeBRDTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.definition = {
+            "alpha": ["a1"],
+            "beta": ["b1", "b2"],
+        }
+        cls.schema = Schema(cls.definition)
+        cls.build = staticmethod(cls.create_build_function(cls.definition))
+
+
+class TestIsDependencyStatement(DependencyTestCase):
+    def setUp(self):
+        self.builder = TreeBRD(DependencyGrammar())
+
+    def test_pk_is_dependency(self):
+        ra = self.builder.grammar.parse("pk_{a1} alpha;")
+        self.assertTrue(self.builder.is_dependency_statement(ra[0]))
+
+    def test_mvd_is_dependency(self):
+        ra = self.builder.grammar.parse("mvd_{a1, a1} alpha;")
+        self.assertTrue(self.builder.is_dependency_statement(ra[0]))
+
+    def test_fd_is_dependency(self):
+        ra = self.builder.grammar.parse("fd_{a1, a1} alpha;")
+        self.assertTrue(self.builder.is_dependency_statement(ra[0]))
+
+    def test_relation_is_not_dependency(self):
+        ra = self.builder.grammar.parse("alpha;")
+        self.assertFalse(self.builder.is_dependency_statement(ra[0]))
+
+    def test_empty_is_not_dependency(self):
+        from pyparsing import ParseResults
+
+        self.assertFalse(self.builder.is_dependency_statement(ParseResults([])))
+
+    def test_single_element_is_not_dependency(self):
+        from pyparsing import ParseResults
+
+        self.assertFalse(self.builder.is_dependency_statement(ParseResults(["x"])))
+
+
+class TestCreateDependencyNode(DependencyTestCase):
+    def test_pk_node(self):
+        forest = self.build("pk_{a1} alpha;")
+        self.assertEqual(1, len(forest))
+        node = forest[0]
+        self.assertIsInstance(node, PrimaryKeyNode)
+        self.assertEqual(node.relation_name, "alpha")
+
+    def test_mvd_node(self):
+        forest = self.build("mvd_{a1, a1} alpha;")
+        self.assertEqual(1, len(forest))
+        node = forest[0]
+        self.assertIsInstance(node, MultivaluedDependencyNode)
+        self.assertEqual(node.relation_name, "alpha")
+        self.assertIsInstance(node.child, RelationNode)
+
+    def test_fd_node(self):
+        forest = self.build("fd_{a1, a1} alpha;")
+        self.assertEqual(1, len(forest))
+        node = forest[0]
+        self.assertIsInstance(node, FunctionalDependencyNode)
+        self.assertEqual(node.relation_name, "alpha")
+        self.assertIsInstance(node.child, RelationNode)
+
+    def test_mvd_with_select(self):
+        forest = self.build("mvd_{a1, a1} \\select_{a1 = a1} alpha;")
+        self.assertEqual(1, len(forest))
+        node = forest[0]
+        self.assertIsInstance(node, MultivaluedDependencyNode)
+        self.assertEqual(node.relation_name, "alpha")
+        self.assertIsInstance(node.child, SelectNode)
+
+    def test_fd_with_select(self):
+        forest = self.build("fd_{a1, a1} \\select_{a1 = a1} alpha;")
+        self.assertEqual(1, len(forest))
+        node = forest[0]
+        self.assertIsInstance(node, FunctionalDependencyNode)
+        self.assertEqual(node.relation_name, "alpha")
+        self.assertIsInstance(node.child, SelectNode)
+
+    def test_inc_equiv_simple(self):
+        forest = self.build("inc=_{a1, b1} (alpha, beta);")
+        self.assertEqual(1, len(forest))
+        node = forest[0]
+        self.assertIsInstance(node, InclusionEquivalenceNode)
+
+    def test_inc_subset_simple(self):
+        forest = self.build("inc⊆_{a1, b1} (alpha, beta);")
+        self.assertEqual(1, len(forest))
+        node = forest[0]
+        self.assertIsInstance(node, InclusionSubsumptionNode)
+
+    def test_dependency_mixed_with_ra(self):
+        forest = self.build("pk_{a1} alpha; alpha;")
+        self.assertEqual(2, len(forest))
+        self.assertIsInstance(forest[0], PrimaryKeyNode)
+        self.assertIsInstance(forest[1], RelationNode)
