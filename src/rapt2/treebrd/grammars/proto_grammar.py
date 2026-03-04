@@ -1,8 +1,17 @@
 from typing import Generic, TypeVar
 
-from pyparsing import (Combine, Optional, ParserElement, Regex, Word,
-                       alphanums, alphas, pyparsing_common, quotedString,
-                       removeQuotes)
+from pyparsing import (
+    Combine,
+    Optional,
+    ParserElement,
+    Regex,
+    Word,
+    alphanums,
+    alphas,
+    pyparsing_common,
+    quotedString,
+    removeQuotes,
+)
 
 from .syntax import BaseSyntax
 

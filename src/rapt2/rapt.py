@@ -35,7 +35,9 @@ class Rapt:
         grammar = self.configure_grammar(**config)
         self.builder = TreeBRD(grammar)
 
-    def to_syntax_tree(self, instring: str, schema: dict[str, list[str]]={}) -> list[Node]:
+    def to_syntax_tree(
+        self, instring: str, schema: dict[str, list[str]] = {}
+    ) -> list[Node]:
         """
         Return a list of syntax trees that represent the instring.
 

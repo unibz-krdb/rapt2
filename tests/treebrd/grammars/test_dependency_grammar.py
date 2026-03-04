@@ -1,11 +1,16 @@
 import pytest
 
 from src.rapt2.treebrd.grammars.dependency_grammar import DependencyGrammar
-from src.rapt2.treebrd.node import (FunctionalDependencyNode,
-                                    InclusionEquivalenceNode,
-                                    InclusionSubsumptionNode,
-                                    MultivaluedDependencyNode, Operator,
-                                    PrimaryKeyNode, RelationNode, SelectNode)
+from src.rapt2.treebrd.node import (
+    FunctionalDependencyNode,
+    InclusionEquivalenceNode,
+    InclusionSubsumptionNode,
+    MultivaluedDependencyNode,
+    Operator,
+    PrimaryKeyNode,
+    RelationNode,
+    SelectNode,
+)
 from src.rapt2.treebrd.treebrd import TreeBRD
 
 
@@ -115,7 +120,9 @@ class TestDependencyGrammar:
         assert result[0][2][1][0] == "s"
 
         # Test inclusion equivalence with select on both sides
-        result = self.grammar.parse("inc=_{a, b} (\\select_{a = 1} R, \\select_{x > 0} S);")
+        result = self.grammar.parse(
+            "inc=_{a, b} (\\select_{a = 1} R, \\select_{x > 0} S);"
+        )
         assert len(result) == 1
         assert result[0][0] == "inc="
         assert list(result[0][1]) == ["a", "b"]
@@ -309,7 +316,8 @@ class TestDependencyGrammarIntegration:
     def test_multiple_dependency_statements(self):
         """Test parsing multiple dependency statements into multiple nodes."""
         trees = self.builder.build(
-            "pk_{a} R; mvd_{x, y} \\select_{x > 0} S; fd_{id, name} \\select_{id > 0} T;", self.schema
+            "pk_{a} R; mvd_{x, y} \\select_{x > 0} S; fd_{id, name} \\select_{id > 0} T;",
+            self.schema,
         )
         assert len(trees) == 3
 
@@ -376,7 +384,8 @@ class TestDependencyGrammarWithRapt:
     def test_multiple_dependency_syntax_trees(self):
         """Test generation of multiple syntax trees for multiple dependency statements."""
         trees = self.rapt.to_syntax_tree(
-            "pk_{a} R; mvd_{x, y} \\select_{x > 0} S; fd_{id, name} \\select_{id > 0} T;", self.schema
+            "pk_{a} R; mvd_{x, y} \\select_{x > 0} S; fd_{id, name} \\select_{id > 0} T;",
+            self.schema,
         )
         assert len(trees) == 3
         assert isinstance(trees[0], PrimaryKeyNode)

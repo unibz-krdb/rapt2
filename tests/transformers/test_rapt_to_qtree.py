@@ -52,7 +52,9 @@ class TestProject(TestQTreeTransformer):
 class TestRename(TestQTreeTransformer):
     def test_rename_relation(self):
         ra = r"\rename_{Apex} alpha;"
-        expected = [r"\Tree[.${}_{{apex(a1,\,a2,\,a3)}}$ [.$alpha$ ] ]".format(RENAME_OP)]
+        expected = [
+            r"\Tree[.${}_{{apex(a1,\,a2,\,a3)}}$ [.$alpha$ ] ]".format(RENAME_OP)
+        ]
         actual = self.translate(ra)
         self.assertEqual(expected, actual)
 
@@ -336,9 +338,14 @@ class TestDependencyLatexTranslation:
         assert "\\Tree" in latex[0]
 
         # Test with select on both sides
-        latex = self.rapt.to_qtree("inc=_{a, b} (\\select_{a = 1} R, \\select_{x > 0} S);", self.schema)
+        latex = self.rapt.to_qtree(
+            "inc=_{a, b} (\\select_{a = 1} R, \\select_{x > 0} S);", self.schema
+        )
         assert len(latex) == 1
-        assert "\\sigma_{(a \\eq 1)} (r)[a] \\equiv \\sigma_{(x \\gt 0)} (s)[b]" in latex[0]
+        assert (
+            "\\sigma_{(a \\eq 1)} (r)[a] \\equiv \\sigma_{(x \\gt 0)} (s)[b]"
+            in latex[0]
+        )
         assert "\\Tree" in latex[0]
 
     def test_inclusion_subsumption_latex_translation(self):

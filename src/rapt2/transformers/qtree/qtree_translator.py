@@ -1,17 +1,34 @@
 from typing import List, Union
 
-from ...treebrd.node import (AssignNode, CrossJoinNode, DifferenceNode,
-                             FullOuterJoinNode, FunctionalDependencyNode,
-                             InclusionEquivalenceNode,
-                             InclusionSubsumptionNode, IntersectNode,
-                             LeftOuterJoinNode, MultivaluedDependencyNode,
-                             NaturalJoinNode, Node, PrimaryKeyNode,
-                             ProjectNode, RelationNode, RenameNode,
-                             RightOuterJoinNode, SelectNode, ThetaJoinNode,
-                             UnionNode)
-from ...treebrd.condition_node import (BinaryConditionNode, ConditionNode,
-                                       IdentityConditionNode, UnaryConditionNode,
-                                       UnaryConditionalOperator)
+from ...treebrd.node import (
+    AssignNode,
+    CrossJoinNode,
+    DifferenceNode,
+    FullOuterJoinNode,
+    FunctionalDependencyNode,
+    InclusionEquivalenceNode,
+    InclusionSubsumptionNode,
+    IntersectNode,
+    LeftOuterJoinNode,
+    MultivaluedDependencyNode,
+    NaturalJoinNode,
+    Node,
+    PrimaryKeyNode,
+    ProjectNode,
+    RelationNode,
+    RenameNode,
+    RightOuterJoinNode,
+    SelectNode,
+    ThetaJoinNode,
+    UnionNode,
+)
+from ...treebrd.condition_node import (
+    BinaryConditionNode,
+    ConditionNode,
+    IdentityConditionNode,
+    UnaryConditionNode,
+    UnaryConditionalOperator,
+)
 from ..base_translator import BaseTranslator
 from .operators import latex_operator, conditional_latex_operator
 
@@ -42,7 +59,7 @@ class QTreeTranslator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
-        return "[.${}$ ]".format(node.name.replace('_', r'\_') if node.name else '')
+        return "[.${}$ ]".format(node.name.replace("_", r"\_") if node.name else "")
 
     def select(self, node: SelectNode) -> str:
         """
@@ -82,7 +99,7 @@ class QTreeTranslator(BaseTranslator):
             attributes = "({})".format(r",\,".join(node.attributes.names))
         return "[.${op}_{{{name}{attributes}}}$ {child} ]".format(
             op=self._get_latex_operator(node.operator),
-            name=node.name.replace('_', r'\_') if node.name else '',
+            name=node.name.replace("_", r"\_") if node.name else "",
             attributes=attributes,
             child=child,
         )
@@ -98,7 +115,9 @@ class QTreeTranslator(BaseTranslator):
         if node.attributes:
             attributes = "({})".format(r",\,".join(node.attributes.names))
         return "[.${name}{attributes}$ {child} ]".format(
-            name=node.name.replace('_', r'\_') if node.name else '', attributes=attributes, child=child
+            name=node.name.replace("_", r"\_") if node.name else "",
+            attributes=attributes,
+            child=child,
         )
 
     def theta_join(self, node: ThetaJoinNode) -> str:
@@ -346,5 +365,6 @@ def translate(roots: List[Node], syntax=None) -> List[str]:
     :return:  a string representing a latex qtree rooted at root
     """
     return [
-        "\\Tree{root}".format(root=QTreeTranslator(syntax).translate(root)) for root in roots
+        "\\Tree{root}".format(root=QTreeTranslator(syntax).translate(root))
+        for root in roots
     ]

@@ -1,11 +1,21 @@
-from rapt2.treebrd.condition_node import (BinaryConditionalOperator,
-                                          BinaryConditionNode,
-                                          IdentityConditionNode)
+from rapt2.treebrd.condition_node import (
+    BinaryConditionalOperator,
+    BinaryConditionNode,
+    IdentityConditionNode,
+)
 from rapt2.treebrd.errors import AttributeReferenceError, InputError
-from rapt2.treebrd.node import (BinaryNode, CrossJoinNode, DifferenceNode,
-                                FullOuterJoinNode, IntersectNode,
-                                LeftOuterJoinNode, Operator,
-                                RightOuterJoinNode, ThetaJoinNode, UnionNode)
+from rapt2.treebrd.node import (
+    BinaryNode,
+    CrossJoinNode,
+    DifferenceNode,
+    FullOuterJoinNode,
+    IntersectNode,
+    LeftOuterJoinNode,
+    Operator,
+    RightOuterJoinNode,
+    ThetaJoinNode,
+    UnionNode,
+)
 from tests.treebrd.test_node import NodeTestCase
 
 
