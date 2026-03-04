@@ -54,6 +54,10 @@ class TreeBRD:
             grammar.syntax.left_outer_join_op: LeftOuterJoinNode,
             grammar.syntax.right_outer_join_op: RightOuterJoinNode,
         }
+        self._unary_dependency_types = {
+            grammar.syntax.mvd_op: MultivaluedDependencyNode,
+            grammar.syntax.fd_op: FunctionalDependencyNode,
+        }
 
     def build(self, instring, schema) -> list[Node]:
         """
@@ -291,48 +295,10 @@ class TreeBRD:
             return self._create_dependency_with_optional_select(exp, schema, operator)
 
         elif operator == self.grammar.syntax.inc_equiv_op:
-            # inc=_{attributes} (select_or_relation, select_or_relation)
-            attributes = exp[1]
-            relations_expr = exp[2]
-
-            if isinstance(relations_expr[0], str):
-                # Simple form: inc=_{attributes} (relation1, relation2)
-                relation_names = relations_expr
-                left_child = RelationNode(relation_names[0], schema)
-                right_child = RelationNode(relation_names[1], schema)
-            else:
-                # Complex form: inc=_{attributes} (select_or_relation, select_or_relation)
-                # relations_expr is [[left_expr], [right_expr]] where each can be relation or [select, conditions, relation]
-                left_expr = relations_expr[0]
-                right_expr = relations_expr[1]
-                left_child = self._create_cond_dep_expr_node(left_expr, schema)
-                right_child = self._create_cond_dep_expr_node(right_expr, schema)
-                relation_names = [left_child.name, right_child.name]
-            return InclusionEquivalenceNode(
-                relation_names, attributes, left_child, right_child
-            )
+            return self._create_inclusion_node(exp, schema, InclusionEquivalenceNode)
 
         elif operator == self.grammar.syntax.inc_subset_op:
-            # inc⊆_{attributes} (select_or_relation, select_or_relation)
-            attributes = exp[1]
-            relations_expr = exp[2]
-
-            if isinstance(relations_expr[0], str):
-                # Simple form: inc⊆_{attributes} (relation1, relation2)
-                relation_names = relations_expr
-                left_child = RelationNode(relation_names[0], schema)
-                right_child = RelationNode(relation_names[1], schema)
-            else:
-                # Complex form: inc⊆_{attributes} (select_or_relation, select_or_relation)
-                # relations_expr is [[left_expr], [right_expr]] where each can be relation or [select, conditions, relation]
-                left_expr = relations_expr[0]
-                right_expr = relations_expr[1]
-                left_child = self._create_cond_dep_expr_node(left_expr, schema)
-                right_child = self._create_cond_dep_expr_node(right_expr, schema)
-                relation_names = [left_child.name, right_child.name]
-            return InclusionSubsumptionNode(
-                relation_names, attributes, left_child, right_child
-            )
+            return self._create_inclusion_node(exp, schema, InclusionSubsumptionNode)
 
         else:
             raise ValueError(f"Unknown dependency operator: {operator}")
@@ -346,19 +312,13 @@ class TreeBRD:
         :param operator: The dependency operator (mvd_op or fd_op)
         :return: MultivaluedDependencyNode or FunctionalDependencyNode
         """
+        node_class = self._unary_dependency_types[operator]
         attributes = exp[1]
         if len(exp) == 3:
             # Simple form: {operator}_{attributes} relation
             relation_name = exp[2]
             relation_node = RelationNode(relation_name, schema)
-            if operator == self.grammar.syntax.mvd_op:
-                return MultivaluedDependencyNode(
-                    relation_name, attributes, relation_node
-                )
-            else:  # fd_op
-                return FunctionalDependencyNode(
-                    relation_name, attributes, relation_node
-                )
+            return node_class(relation_name, attributes, relation_node)
         else:
             # With conditions: {operator}_{attributes} \select_{conditions} relation
             # exp[2] = "\select", exp[3] = conditions, exp[4] = relation_name
@@ -367,10 +327,33 @@ class TreeBRD:
             condition_node = self.create_condition_node(conditions[0])
             base_relation = RelationNode(relation_name, schema)
             select_node = SelectNode(base_relation, condition_node)
-            if operator == self.grammar.syntax.mvd_op:
-                return MultivaluedDependencyNode(relation_name, attributes, select_node)
-            else:  # fd_op
-                return FunctionalDependencyNode(relation_name, attributes, select_node)
+            return node_class(relation_name, attributes, select_node)
+
+    def _create_inclusion_node(self, exp, schema, node_class):
+        """
+        Create an inclusion dependency node (equivalence or subsumption).
+
+        :param exp: Parsed expression containing attributes and relation expressions
+        :param schema: Schema for relation validation
+        :param node_class: InclusionEquivalenceNode or InclusionSubsumptionNode
+        :return: An inclusion dependency node
+        """
+        attributes = exp[1]
+        relations_expr = exp[2]
+
+        if isinstance(relations_expr[0], str):
+            # Simple form: inc_{attributes} (relation1, relation2)
+            relation_names = relations_expr
+            left_child = RelationNode(relation_names[0], schema)
+            right_child = RelationNode(relation_names[1], schema)
+        else:
+            # Complex form with select: inc_{attributes} (select_or_relation, select_or_relation)
+            left_expr = relations_expr[0]
+            right_expr = relations_expr[1]
+            left_child = self._create_cond_dep_expr_node(left_expr, schema)
+            right_child = self._create_cond_dep_expr_node(right_expr, schema)
+            relation_names = [left_child.name, right_child.name]
+        return node_class(relation_names, attributes, left_child, right_child)
 
     def _create_cond_dep_expr_node(self, expr, schema):
         """
