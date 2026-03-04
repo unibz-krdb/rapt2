@@ -1,8 +1,17 @@
 from typing import TypeVar
 
-from pyparsing import (CaselessKeyword, Group, Keyword, OneOrMore, Optional,
-                       Suppress, alphanums, delimitedList, infixNotation,
-                       opAssoc)
+from pyparsing import (
+    CaselessKeyword,
+    Group,
+    Keyword,
+    OneOrMore,
+    Optional,
+    Suppress,
+    alphanums,
+    delimitedList,
+    infixNotation,
+    opAssoc,
+)
 
 from .condition_grammar import ConditionGrammar
 from .syntax import CoreSyntax
@@ -36,6 +45,7 @@ class CoreGrammar(ConditionGrammar[TCoreSyntax]):
         :param instring: the RA expression string to parse.
         :return: a ParseResults containing one result per statement.
         """
+        # Convert to raw-string-safe form so backslash operators (e.g. \select) are preserved
         instring = r"" + instring
         return self.statements.parseString(instring, parseAll=True)
 

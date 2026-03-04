@@ -1,19 +1,37 @@
 from pyparsing import ParseResults
 
-from .condition_node import (BinaryConditionalOperator,
-                                          BinaryConditionNode, ConditionNode,
-                                          IdentityConditionNode,
-                                          UnaryConditionalOperator,
-                                          UnaryConditionNode)
+from .condition_node import (
+    BinaryConditionalOperator,
+    BinaryConditionNode,
+    ConditionNode,
+    IdentityConditionNode,
+    UnaryConditionalOperator,
+    UnaryConditionNode,
+)
 
 from .grammars.proto_grammar import ProtoGrammar
-from .node import (Node, AssignNode, CrossJoinNode, DifferenceNode,
-                   FullOuterJoinNode, FunctionalDependencyNode,
-                   InclusionEquivalenceNode, InclusionSubsumptionNode,
-                   IntersectNode, LeftOuterJoinNode, MultivaluedDependencyNode,
-                   NaturalJoinNode, PrimaryKeyNode, ProjectNode, RelationNode,
-                   RenameNode, RightOuterJoinNode, SelectNode, ThetaJoinNode,
-                   UnionNode)
+from .node import (
+    Node,
+    AssignNode,
+    CrossJoinNode,
+    DifferenceNode,
+    FullOuterJoinNode,
+    FunctionalDependencyNode,
+    InclusionEquivalenceNode,
+    InclusionSubsumptionNode,
+    IntersectNode,
+    LeftOuterJoinNode,
+    MultivaluedDependencyNode,
+    NaturalJoinNode,
+    PrimaryKeyNode,
+    ProjectNode,
+    RelationNode,
+    RenameNode,
+    RightOuterJoinNode,
+    SelectNode,
+    ThetaJoinNode,
+    UnionNode,
+)
 from .schema import Schema
 
 
@@ -105,7 +123,7 @@ class TreeBRD:
             )
 
         else:
-            raise ValueError
+            raise ValueError(f"Unrecognised expression: {list(exp)}")
 
         return node
 
@@ -143,7 +161,10 @@ class TreeBRD:
                 right=right_node,
             )
 
-        raise ValueError
+        raise ValueError(
+            f"Unrecognised condition structure (length {len(conditions)}): "
+            f"{list(conditions)}"
+        )
 
     def create_unary_node(
         self, operator, child, param: ParseResults | None = None, schema=None
@@ -180,7 +201,7 @@ class TreeBRD:
             node = AssignNode(child, name, attributes, schema)
 
         else:
-            raise ValueError
+            raise ValueError(f"Unknown unary operator: {operator}")
 
         return node
 
@@ -228,7 +249,7 @@ class TreeBRD:
             node = IntersectNode(left, right)
 
         else:
-            raise ValueError
+            raise ValueError(f"Unknown binary operator: {operator}")
 
         return node
 
@@ -244,15 +265,15 @@ class TreeBRD:
 
         # Check if the syntax has dependency operators
         dependency_ops = []
-        if hasattr(self.grammar.syntax, 'pk_op'):
+        if hasattr(self.grammar.syntax, "pk_op"):
             dependency_ops.append(self.grammar.syntax.pk_op)
-        if hasattr(self.grammar.syntax, 'mvd_op'):
+        if hasattr(self.grammar.syntax, "mvd_op"):
             dependency_ops.append(self.grammar.syntax.mvd_op)
-        if hasattr(self.grammar.syntax, 'fd_op'):
+        if hasattr(self.grammar.syntax, "fd_op"):
             dependency_ops.append(self.grammar.syntax.fd_op)
-        if hasattr(self.grammar.syntax, 'inc_equiv_op'):
+        if hasattr(self.grammar.syntax, "inc_equiv_op"):
             dependency_ops.append(self.grammar.syntax.inc_equiv_op)
-        if hasattr(self.grammar.syntax, 'inc_subset_op'):
+        if hasattr(self.grammar.syntax, "inc_subset_op"):
             dependency_ops.append(self.grammar.syntax.inc_subset_op)
 
         return exp[0] in dependency_ops
@@ -282,7 +303,7 @@ class TreeBRD:
             # inc=_{attributes} (select_or_relation, select_or_relation)
             attributes = exp[1]
             relations_expr = exp[2]
-            
+
             if isinstance(relations_expr[0], str):
                 # Simple form: inc=_{attributes} (relation1, relation2)
                 relation_names = relations_expr
@@ -296,13 +317,15 @@ class TreeBRD:
                 left_child = self._create_cond_dep_expr_node(left_expr, schema)
                 right_child = self._create_cond_dep_expr_node(right_expr, schema)
                 relation_names = [left_child.name, right_child.name]
-            return InclusionEquivalenceNode(relation_names, attributes, left_child, right_child)
+            return InclusionEquivalenceNode(
+                relation_names, attributes, left_child, right_child
+            )
 
         elif operator == self.grammar.syntax.inc_subset_op:
             # inc⊆_{attributes} (select_or_relation, select_or_relation)
             attributes = exp[1]
             relations_expr = exp[2]
-            
+
             if isinstance(relations_expr[0], str):
                 # Simple form: inc⊆_{attributes} (relation1, relation2)
                 relation_names = relations_expr
@@ -316,7 +339,9 @@ class TreeBRD:
                 left_child = self._create_cond_dep_expr_node(left_expr, schema)
                 right_child = self._create_cond_dep_expr_node(right_expr, schema)
                 relation_names = [left_child.name, right_child.name]
-            return InclusionSubsumptionNode(relation_names, attributes, left_child, right_child)
+            return InclusionSubsumptionNode(
+                relation_names, attributes, left_child, right_child
+            )
 
         else:
             raise ValueError(f"Unknown dependency operator: {operator}")
@@ -324,7 +349,7 @@ class TreeBRD:
     def _create_dependency_with_optional_select(self, exp, schema, operator):
         """
         Create a dependency node (MVD or FD) with optional select conditions.
-        
+
         :param exp: Parsed expression containing attributes and optional select
         :param schema: Schema for relation validation
         :param operator: The dependency operator (mvd_op or fd_op)
@@ -336,9 +361,13 @@ class TreeBRD:
             relation_name = exp[2]
             relation_node = RelationNode(relation_name, schema)
             if operator == self.grammar.syntax.mvd_op:
-                return MultivaluedDependencyNode(relation_name, attributes, relation_node)
+                return MultivaluedDependencyNode(
+                    relation_name, attributes, relation_node
+                )
             else:  # fd_op
-                return FunctionalDependencyNode(relation_name, attributes, relation_node)
+                return FunctionalDependencyNode(
+                    relation_name, attributes, relation_node
+                )
         else:
             # With conditions: {operator}_{attributes} \select_{conditions} relation
             # exp[2] = "\select", exp[3] = conditions, exp[4] = relation_name
@@ -355,7 +384,7 @@ class TreeBRD:
     def _create_cond_dep_expr_node(self, expr, schema):
         """
         Create a node from a cond_dep_expr (either relation_name or select with relation).
-        
+
         :param expr: Parsed expression (either relation_name or [select, conditions, relation_name])
         :param schema: Schema for relation validation
         :return: RelationNode or SelectNode

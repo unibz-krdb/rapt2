@@ -211,7 +211,7 @@ class SQLTranslator(BaseTranslator):
 
     def natural_join(self, node: NaturalJoinNode) -> SQLQuery:
         """
-        Translate an assign node into SQLQuery.
+        Translate a natural join node into SQLQuery.
         :param node: a treebrd node
         :return: a SQLQuery object for the tree rooted at node
         """
@@ -219,7 +219,7 @@ class SQLTranslator(BaseTranslator):
 
     def theta_join(self, node: ThetaJoinNode) -> SQLQuery:
         """
-        Translate an assign node into SQLQuery.
+        Translate a theta join node into SQLQuery.
         :param node: a treebrd node
         :return: a SQLQuery object for the tree rooted at node
         """
@@ -400,7 +400,7 @@ class SQLTranslator(BaseTranslator):
             case UnaryConditionalOperator.DEFINED:
                 return f"{self.translate_condition(node.child)} IS NOT NULL"
             case _:
-                raise ValueError
+                raise ValueError(f"Unknown unary condition operator: {node.op}")
 
     def binary_condition(self, node: BinaryConditionNode) -> str:
         """
@@ -426,7 +426,7 @@ class SQLTranslator(BaseTranslator):
             case BinaryConditionalOperator.GREATER_THAN_EQUAL:
                 return f"({self.translate_condition(node.left)} >= {self.translate_condition(node.right)})"
             case _:
-                raise ValueError
+                raise ValueError(f"Unknown binary condition operator: {node.op}")
 
     def primary_key(self, node: PrimaryKeyNode) -> SQLAlterTableQuery:
         """

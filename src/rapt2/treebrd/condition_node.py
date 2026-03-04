@@ -28,7 +28,7 @@ class UnaryConditionalOperator(Enum):
             case syntax.defined_op:
                 return cls.DEFINED
             case _:
-                raise ValueError
+                raise ValueError(f"Unknown unary conditional operator: {instring}")
 
 
 class BinaryConditionalOperator(Enum):
@@ -71,7 +71,7 @@ class BinaryConditionalOperator(Enum):
             case syntax.greater_than_equal_op:
                 return cls.GREATER_THAN_EQUAL
             case _:
-                raise ValueError
+                raise ValueError(f"Unknown binary conditional operator: {instring}")
 
 
 @dataclass(frozen=True)

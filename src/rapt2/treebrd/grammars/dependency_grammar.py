@@ -34,12 +34,15 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
         :param instring: the expression string to parse.
         :return: a ParseResults containing one result per statement.
         """
+        # Convert to raw-string-safe form so backslash operators (e.g. \select) are preserved
         instring = r"" + instring
         return self.statements.parseString(instring, parseAll=True)
 
     @property
     def pk(self):
         """
+        Primary key operator.
+
         pk ::= "pk"
         """
         return Literal(self.syntax.pk_op)
@@ -47,6 +50,8 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     @property
     def pk_dep(self):
         """
+        Primary key dependency statement.
+
         pk_dep ::= pk param_start attribute_list param_stop relation_name
         """
         return Group(self.pk + self.parameter(self.attribute_list) + self.relation_name)
@@ -54,6 +59,8 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     @property
     def mvd(self):
         """
+        Multivalued dependency operator.
+
         mvd ::= "mvd"
         """
         return Literal(self.syntax.mvd_op)
@@ -64,26 +71,28 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
         select_or_relation ::= (select param_start conditions param_stop relation_name) | relation_name
         """
         return (
-            (
-                Literal(self.syntax.select_op)
-                + self.parameter(self.conditions)
-                + self.relation_name
-            )
-            | self.relation_name
-        )
+            Literal(self.syntax.select_op)
+            + self.parameter(self.conditions)
+            + self.relation_name
+        ) | self.relation_name
 
     @property
     def cond_dep_expr(self):
         """
         cond_dep_expr ::= param_start attribute_name delim attribute_name param_stop select_or_relation
         """
-        return self.parameter(
-            self.attribute_name + Suppress(self.syntax.delim) + self.attribute_name
-        ) + self.select_or_relation
+        return (
+            self.parameter(
+                self.attribute_name + Suppress(self.syntax.delim) + self.attribute_name
+            )
+            + self.select_or_relation
+        )
 
     @property
     def mvd_dep(self):
         """
+        Multivalued dependency statement.
+
         mvd_dep ::= mvd cond_dep_expr
         """
         return Group(self.mvd + self.cond_dep_expr)
@@ -91,6 +100,8 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     @property
     def fd(self):
         """
+        Functional dependency operator.
+
         fd ::= "fd"
         """
         return Literal(self.syntax.fd_op)
@@ -98,6 +109,8 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     @property
     def fd_dep(self):
         """
+        Functional dependency statement.
+
         fd_dep ::= fd cond_dep_expr
         """
         return Group(self.fd + self.cond_dep_expr)
@@ -105,6 +118,8 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     @property
     def inc_eq(self):
         """
+        Inclusion equivalence operator.
+
         inc_eq ::= "inc="
         """
         return Literal(self.syntax.inc_equiv_op)
@@ -117,12 +132,16 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
         return self.parameter(
             self.attribute_name + Suppress(self.syntax.delim) + self.attribute_name
         ) + self.parenthesize(
-            Group(self.select_or_relation) + Suppress(self.syntax.delim) + Group(self.select_or_relation)
+            Group(self.select_or_relation)
+            + Suppress(self.syntax.delim)
+            + Group(self.select_or_relation)
         )
 
     @property
     def inc_eq_dep(self):
         """
+        Inclusion equivalence dependency statement.
+
         inc_eq_dep ::= inc_eq inc_expr
         """
         return Group(self.inc_eq + self.inc_expr)
@@ -130,6 +149,8 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     @property
     def inc_subs(self):
         """
+        Inclusion subsumption operator.
+
         inc_subs ::= "inc⊆"
         """
         return Literal(self.syntax.inc_subset_op)
@@ -137,6 +158,8 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
     @property
     def inc_subs_dep(self):
         """
+        Inclusion subsumption dependency statement.
+
         inc_subs_dep ::= inc_subs inc_expr
         """
         return Group(self.inc_subs + self.inc_expr)
