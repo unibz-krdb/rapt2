@@ -5,6 +5,11 @@ from rapt2.treebrd.schema import Schema
 
 
 class TestSchema(TestCase):
+    def test_default_init_is_empty(self):
+        schema = Schema()
+        self.assertFalse(schema.contains("anything"))
+        self.assertEqual({}, schema.to_dict())
+
     def test_contains_when_empty(self):
         self.assertFalse(Schema({}).contains("relation"))
 

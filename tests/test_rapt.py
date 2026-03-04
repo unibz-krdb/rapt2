@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from rapt2.rapt import Rapt
+from rapt2.treebrd.errors import RelationReferenceError
 from rapt2.treebrd.grammars.core_grammar import CoreGrammar
 from rapt2.treebrd.grammars.extended_grammar import ExtendedGrammar
 from rapt2.treebrd.grammars.dependency_grammar import DependencyGrammar
@@ -63,6 +64,23 @@ class TestToSyntaxTree(TestCase):
     def test_returns_list(self):
         result = self.rapt.to_syntax_tree("alpha;", self.schema)
         self.assertIsInstance(result, list)
+
+
+class TestDefaultSchema(TestCase):
+    def setUp(self):
+        self.rapt = Rapt(grammar="Core Grammar")
+
+    def test_to_syntax_tree_without_schema_raises(self):
+        with self.assertRaises(RelationReferenceError):
+            self.rapt.to_syntax_tree("alpha;")
+
+    def test_to_sql_without_schema_raises(self):
+        with self.assertRaises(RelationReferenceError):
+            self.rapt.to_sql("alpha;")
+
+    def test_to_qtree_without_schema_raises(self):
+        with self.assertRaises(RelationReferenceError):
+            self.rapt.to_qtree("alpha;")
 
 
 class TestToSql(TestCase):
