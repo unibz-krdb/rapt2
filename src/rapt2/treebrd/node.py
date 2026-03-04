@@ -17,6 +17,7 @@ class Node:
     """
 
     name: str | None
+    attributes: AttributeList | None
 
     def __init__(self, operator, name=None):
         """
