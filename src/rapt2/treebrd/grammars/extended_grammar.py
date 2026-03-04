@@ -126,14 +126,6 @@ class ExtendedGrammar(CoreGrammar[TExtendedSyntax]):
             rpar=self.syntax.paren_right,
         )
 
-    def is_unary(self, operator):
-        """Return True if *operator* is an extended unary operator."""
-        return operator in {
-            self.syntax.select_op,
-            self.syntax.project_op,
-            self.syntax.rename_op,
-        }
-
     def is_binary(self, operator):
         """Return True if *operator* is an extended or core binary operator."""
         return operator in {

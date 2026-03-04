@@ -103,12 +103,14 @@ class TreeBRD:
 
         # Binary operators.
         elif self.grammar.is_binary(exp[1]):
-            # Pyparsing will put different operators with the same precedence
-            # in the same list. This can be a problem when we mix operators with
-            # and without parameters (for example join). We avoid this below
-            # and build from right to left, to create the correct syntax tree.
+            # Pyparsing flattens same-precedence operators into one list, e.g.:
+            #   "A \join B \union C" → [A, \join, B, \union, C]
+            # We process from right to left so the rightmost operator binds first.
+            # The rightmost operand is always exp[-1]. The operator position
+            # depends on whether it has parameters:
+            #   Without params: [..., operator, right]       → op at -2
+            #   With params:    [..., operator, param, right] → op at -3
             if isinstance(exp[-2], str):
-                # Operator without parameters
                 op_pos = -2
                 param = None
             else:
