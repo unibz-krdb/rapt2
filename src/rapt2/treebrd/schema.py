@@ -10,28 +10,28 @@ class Schema:
     A Schema is a description of relational data.
     """
 
-    def __init__(self, definition: dict[str, list[str]] | None = None):
+    def __init__(self, definition: dict[str, list[str]] | None = None) -> None:
         """
         :param definition: a mapping of relation names to their attribute
             lists. Names and attributes are lowercased on storage.
         """
-        self._data = {}
+        self._data: dict[str, list[str]] = {}
         if definition is None:
             return
         for name, attributes in definition.items():
             self._data[name.lower()] = [attr.lower() for attr in attributes]
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if type(self) is not type(other):
             return False
-        if self.to_dict() != other.to_dict():
+        if self.to_dict() != other.to_dict():  # type: ignore[union-attr]
             return False
         return True
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-    def contains(self, name):
+    def contains(self, name: str) -> bool:
         """
         Return true if the Schema contains a relation with the specified name.
         :param name: A name of a relation.
@@ -39,14 +39,14 @@ class Schema:
         """
         return name in self._data
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, list[str]]:
         """
         Return a dictionary containing the name-attribute pairs in this Schema.
         :return: A dictionary of name-attribute pairs.
         """
         return copy.deepcopy(self._data)
 
-    def get_attributes(self, name: str):
+    def get_attributes(self, name: str) -> list[str]:
         """
         Return the list of attributes associated with the specified relation.
         :param name: A name of a relation in the Schema.
@@ -60,7 +60,7 @@ class Schema:
             )
         return attributes[:]
 
-    def add(self, name: str, attributes: list[str]):
+    def add(self, name: str, attributes: list[str] | AttributeList) -> None:
         """
         Add the relation to the Schema.
         :param name: The name of a relation.

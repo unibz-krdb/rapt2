@@ -1,32 +1,36 @@
 import itertools
-from collections import namedtuple
+from collections.abc import Iterator, Sequence
+from typing import Any, NamedTuple
 
 from .errors import AttributeReferenceError, InputError
 
 
-class Attribute(namedtuple("Attribute", ["name", "prefix"])):
+class Attribute(NamedTuple):
     """
     An Attribute is a relational algebra attribute. Attributes have optional
     prefixes which reference the relation they belong to.
     """
 
+    name: str
+    prefix: str | None
+
     @property
-    def prefixed(self):
+    def prefixed(self) -> str:
         """Return the attribute in 'prefix.name' form, or just 'name' if no prefix."""
         if self.prefix:
             return "{pr}.{nm}".format(pr=self.prefix, nm=self.name)
         else:
             return self.name
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if type(self) is type(other):
-            return self.prefixed == other.prefixed
+            return self.prefixed == other.prefixed  # type: ignore[union-attr]
         return False
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.prefixed)
 
 
@@ -38,7 +42,7 @@ class AttributeList:
     """
 
     @classmethod
-    def merge(cls, first, second):
+    def merge(cls, first: "AttributeList", second: "AttributeList") -> "AttributeList":
         """
         Return an AttributeList that is the result of merging first with second.
         """
@@ -52,55 +56,55 @@ class AttributeList:
         return merged
 
     @staticmethod
-    def has_duplicates(collection):
+    def has_duplicates(collection: Sequence[Any]) -> bool:
         """
         Return True if the collection has duplicate elements.
         """
         return len(set(collection)) != len(collection)
 
-    def __init__(self, names, prefix):
+    def __init__(self, names: list[str], prefix: str | None) -> None:
         """
         :param names: a list of attribute name strings.
         :param prefix: the relation prefix for all attributes, or None.
         """
-        self._contents = []
+        self._contents: list[Attribute] = []
         self.extend(names, prefix)
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return a comma delimitted string of prefixed attribute names.
         """
         return ", ".join(self.to_list())
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._contents)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if type(self) is type(other):
-            return self.to_list() == other.to_list()
+            return self.to_list() == other.to_list()  # type: ignore[union-attr]
         return False
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Attribute]:
         return iter(self._contents)
 
     @property
-    def contents(self):
+    def contents(self) -> list[Attribute]:
         """
         Return a list of the Attributes in the AttributeList.
         """
         return self._contents
 
     @property
-    def names(self):
+    def names(self) -> list[str]:
         """
         Return a list of the names of the Attributes in the AttributeList.
         """
         return [name for name, _ in self._contents]
 
-    def validate(self, references):
+    def validate(self, references: list[str]) -> None:
         """
         Check if all references exist and are unambiguous.
         """
@@ -114,7 +118,7 @@ class AttributeList:
         """
         return [attribute.prefixed for attribute in self._contents]
 
-    def get_attribute(self, reference):
+    def get_attribute(self, reference: str) -> Attribute:
         """
         Return the attribute that matches the reference. Raise an error if
         the attribute cannot be found, or if there is more then one match.
@@ -135,7 +139,7 @@ class AttributeList:
             return match
         raise AttributeReferenceError("Attribute does not exist: {}".format(reference))
 
-    def extend(self, attributes, prefix):
+    def extend(self, attributes: list[str], prefix: str | None) -> None:
         """
         Add the attributes with the specified prefix to the end of the attribute
         list.
@@ -143,7 +147,7 @@ class AttributeList:
 
         self._contents += [Attribute(attr, prefix) for attr in attributes]
 
-    def trim(self, restriction_list):
+    def trim(self, restriction_list: list[str]) -> None:
         """
         Trim and reorder the attributes to the specifications in a restriction
         list.
@@ -156,7 +160,7 @@ class AttributeList:
             raise AttributeReferenceError("Duplicate attribute reference.")
         self._contents = replacement
 
-    def rename(self, names, prefix):
+    def rename(self, names: list[str], prefix: str | None) -> None:
         """
         Rename the Attributes' names, prefixes, or both. If names or prefix
         evaluates to None, the old version is used.
