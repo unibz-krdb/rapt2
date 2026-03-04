@@ -19,7 +19,6 @@ from ...treebrd.node import (
 )
 from ...treebrd.condition_node import (
     BinaryConditionNode,
-    ConditionNode,
     IdentityConditionNode,
     UnaryConditionNode,
     BinaryConditionalOperator,
@@ -479,29 +478,6 @@ class SQLTranslator(BaseTranslator):
         """
         # TODO: Implement inclusion subsumption translation
         return None
-
-    def translate_condition(
-        self,
-        condition: Union[
-            ConditionNode,
-            BinaryConditionNode,
-            UnaryConditionNode,
-            IdentityConditionNode,
-        ],
-    ) -> str:
-        """
-        Translate a condition node into SQL.
-        :param condition: a condition node
-        :return: SQL representation of the condition
-        """
-        if isinstance(condition, IdentityConditionNode):
-            return self.identity_condition(condition)
-        elif isinstance(condition, UnaryConditionNode):
-            return self.unary_condition(condition)
-        elif isinstance(condition, BinaryConditionNode):
-            return self.binary_condition(condition)
-        else:
-            raise ValueError(f"Unknown condition node type: {type(condition)}")
 
 
 class SetTranslator(SQLTranslator):

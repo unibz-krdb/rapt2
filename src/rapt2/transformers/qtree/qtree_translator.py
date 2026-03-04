@@ -24,7 +24,6 @@ from ...treebrd.node import (
 )
 from ...treebrd.condition_node import (
     BinaryConditionNode,
-    ConditionNode,
     IdentityConditionNode,
     UnaryConditionNode,
     UnaryConditionalOperator,
@@ -243,51 +242,36 @@ class QTreeTranslator(BaseTranslator):
             return f"{self._get_latex_operator(child.operator)}_{{{self.translate_condition(child.conditions)}}} ({child.name})"
         return child.name
 
-    def multivalued_dependency(self, node: MultivaluedDependencyNode) -> str:
-        """
-        Translate a multivalued dependency node into a latex qtree node.
-        :param node: a dependency node
-        :return: a qtree subtree rooted at the node
-        """
+    def _unary_dependency(
+        self, node: Union[MultivaluedDependencyNode, FunctionalDependencyNode]
+    ) -> str:
+        """Translate a unary dependency node (MVD or FD) into a latex qtree node."""
         left_attr, right_attr = node.attributes
         op = self._get_latex_operator(node.operator)
         child_str = self._latex_child_str(node.child)
         return f"[.${child_str} : {left_attr} {op} {right_attr}$ ]"
+
+    def multivalued_dependency(self, node: MultivaluedDependencyNode) -> str:
+        return self._unary_dependency(node)
 
     def functional_dependency(self, node: FunctionalDependencyNode) -> str:
-        """
-        Translate a functional dependency node into a latex qtree node.
-        :param node: a dependency node
-        :return: a qtree subtree rooted at the node
-        """
-        left_attr, right_attr = node.attributes
+        return self._unary_dependency(node)
+
+    def _inclusion_dependency(
+        self, node: Union[InclusionEquivalenceNode, InclusionSubsumptionNode]
+    ) -> str:
+        """Translate an inclusion dependency node into a latex qtree node."""
+        attr1, attr2 = node.attributes
         op = self._get_latex_operator(node.operator)
-        child_str = self._latex_child_str(node.child)
-        return f"[.${child_str} : {left_attr} {op} {right_attr}$ ]"
+        left_str = self._latex_child_str(node.left_child)
+        right_str = self._latex_child_str(node.right_child)
+        return f"[.${left_str}[{attr1}] {op} {right_str}[{attr2}]$ ]"
 
     def inclusion_equivalence(self, node: InclusionEquivalenceNode) -> str:
-        """
-        Translate an inclusion equivalence dependency node into a latex qtree node.
-        :param node: a dependency node
-        :return: a qtree subtree rooted at the node
-        """
-        attr1, attr2 = node.attributes
-        op = self._get_latex_operator(node.operator)
-        left_str = self._latex_child_str(node.left_child)
-        right_str = self._latex_child_str(node.right_child)
-        return f"[.${left_str}[{attr1}] {op} {right_str}[{attr2}]$ ]"
+        return self._inclusion_dependency(node)
 
     def inclusion_subsumption(self, node: InclusionSubsumptionNode) -> str:
-        """
-        Translate an inclusion subsumption dependency node into a latex qtree node.
-        :param node: a dependency node
-        :return: a qtree subtree rooted at the node
-        """
-        attr1, attr2 = node.attributes
-        op = self._get_latex_operator(node.operator)
-        left_str = self._latex_child_str(node.left_child)
-        right_str = self._latex_child_str(node.right_child)
-        return f"[.${left_str}[{attr1}] {op} {right_str}[{attr2}]$ ]"
+        return self._inclusion_dependency(node)
 
     def identity_condition(self, node: IdentityConditionNode) -> str:
         """
@@ -317,21 +301,6 @@ class QTreeTranslator(BaseTranslator):
         """
         op = self._get_conditional_latex_operator(node.op)
         return f"({self.translate_condition(node.left)} {op} {self.translate_condition(node.right)})"
-
-    def translate_condition(self, condition: ConditionNode) -> str:
-        """
-        Translate a condition node into LaTeX.
-        :param condition: a condition node
-        :return: LaTeX representation of the condition
-        """
-        if isinstance(condition, IdentityConditionNode):
-            return self.identity_condition(condition)
-        elif isinstance(condition, UnaryConditionNode):
-            return self.unary_condition(condition)
-        elif isinstance(condition, BinaryConditionNode):
-            return self.binary_condition(condition)
-        else:
-            raise ValueError(f"Unknown condition node type: {type(condition)}")
 
 
 def translate(roots: List[Node], syntax=None) -> List[str]:

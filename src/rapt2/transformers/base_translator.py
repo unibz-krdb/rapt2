@@ -1,3 +1,9 @@
+from ..treebrd.condition_node import (
+    BinaryConditionNode,
+    ConditionNode,
+    IdentityConditionNode,
+    UnaryConditionNode,
+)
 from ..treebrd.grammars.syntax import Syntax
 from ..treebrd.node import Operator
 
@@ -99,6 +105,31 @@ class BaseTranslator:
 
     def inclusion_subsumption(self, node):
         raise NotImplementedError("Must be implemented by translation modules.")
+
+    def identity_condition(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def unary_condition(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def binary_condition(self, node):
+        raise NotImplementedError("Must be implemented by translation modules.")
+
+    def translate_condition(self, condition: ConditionNode):
+        """
+        Dispatch a condition node to the appropriate condition translator method.
+
+        :param condition: a condition node
+        :return: translated representation of the condition
+        """
+        if isinstance(condition, IdentityConditionNode):
+            return self.identity_condition(condition)
+        elif isinstance(condition, UnaryConditionNode):
+            return self.unary_condition(condition)
+        elif isinstance(condition, BinaryConditionNode):
+            return self.binary_condition(condition)
+        else:
+            raise ValueError(f"Unknown condition node type: {type(condition)}")
 
 
 def translate(roots):
