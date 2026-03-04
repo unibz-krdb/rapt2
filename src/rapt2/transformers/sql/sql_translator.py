@@ -351,14 +351,10 @@ class SQLTranslator(BaseTranslator):
             Operator.right_outer_join,
         }:
             # Only theta joins and outer joins have conditions
-            if (
-                hasattr(node, "conditions")
-                and getattr(node, "conditions", None) is not None
-            ):
-                conditions = getattr(node, "conditions")
+            if node.conditions is not None:
                 from_block = "{from_block} ON {conditions}".format(
                     from_block=from_block,
-                    conditions=self.translate_condition(conditions),
+                    conditions=self.translate_condition(node.conditions),
                 )
 
         return self.query(select_block, from_block, "")

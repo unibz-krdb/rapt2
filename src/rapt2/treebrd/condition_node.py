@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
 
+from pyparsing import ParseBaseException
+
 from .grammars.condition_grammar import ConditionGrammar
 from .grammars.syntax import Syntax
 
@@ -97,7 +99,7 @@ class IdentityConditionNode(ConditionNode):
         try:
             ConditionGrammar().attribute_reference.parse_string(self.ident)
             return [self.ident]
-        except Exception:
+        except ParseBaseException:
             return []
 
 
