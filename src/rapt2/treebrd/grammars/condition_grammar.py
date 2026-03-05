@@ -1,7 +1,6 @@
 from typing import TypeVar
 
-from pyparsing import CaselessKeyword, Group, oneOf, opAssoc
-from pyparsing.helpers import infix_notation
+from pyparsing import CaselessKeyword, Group, infixNotation, oneOf, opAssoc
 
 from .proto_grammar import ProtoGrammar
 from .syntax import ConditionSyntax
@@ -105,7 +104,7 @@ class ConditionGrammar(ProtoGrammar[TConditionSyntax]):
         conditions ::= condition | condition logical_binary_op conditions
         Note: By default lpar and rpar arguments are suppressed.
         """
-        return infix_notation(
+        return infixNotation(
             base_expr=self.condition,
             op_list=[
                 (self.not_op, 1, opAssoc.RIGHT),
