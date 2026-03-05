@@ -38,6 +38,7 @@ class TestTranslator(TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.drop_tables(cls.schema.keys())
+        cls.conn.close()
 
     @classmethod
     def setup_database(cls, schema, data):
@@ -77,10 +78,6 @@ class TestTranslator(TestCase):
         for statement in statements:
             cls.execute(statement)
         return cls.cur.fetchall()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.conn.close()
 
 
 class TestRelation(TestTranslator):

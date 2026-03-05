@@ -1,7 +1,20 @@
 import pytest
 
 from rapt2.rapt import Rapt
-from rapt2.transformers.qtree.constants import *
+from rapt2.transformers.qtree.constants import (
+    DIFFERENCE_OP,
+    FULL_OUTER_JOIN_OP,
+    INTERSECT_OP,
+    JOIN_OP,
+    LEFT_OUTER_JOIN_OP,
+    NATURAL_JOIN_OP,
+    PROJECT_OP,
+    RENAME_OP,
+    RIGHT_OUTER_JOIN_OP,
+    SELECT_OP,
+    THETA_JOIN_OP,
+    UNION_OP,
+)
 from rapt2.treebrd.grammars.dependency_grammar import DependencyGrammar
 from rapt2.treebrd.grammars.extended_grammar import ExtendedGrammar
 from rapt2.treebrd.treebrd import TreeBRD
