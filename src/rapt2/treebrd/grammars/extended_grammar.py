@@ -14,6 +14,12 @@ class ExtendedGrammar(CoreGrammar[TExtendedSyntax]):
 
     The rules are annotated with their BNF equivalents. For a complete
     specification refer to the associated grammar file.
+
+    Grammar composition uses pyparsing operators:
+
+    - ``^`` — Or (longest-match alternative; preferred over ``|``)
+    - ``|`` — MatchFirst (short-circuit on first match)
+    - ``+`` — And (sequence / concatenation)
     """
 
     syntax: TExtendedSyntax
@@ -47,7 +53,12 @@ class ExtendedGrammar(CoreGrammar[TExtendedSyntax]):
         return long ^ short
 
     def theta_parse_action(self, s, loc, t):
-        """Rewrite a short-form ``\\join_{cond}`` to ``\\theta_join``."""
+        """Rewrite a short-form ``\\join_{cond}`` to ``\\theta_join``.
+
+        pyparsing parse-action callback:
+        *s* is the original string, *loc* the match position, *t* the token
+        list where ``t[0]`` is the matched operator keyword.
+        """
         t[0] = self.syntax.theta_join_op
         return t
 

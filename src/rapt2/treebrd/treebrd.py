@@ -78,6 +78,11 @@ class TreeBRD:
             statements).
         :param schema: a dict mapping relation names to attribute name lists.
         :return: a list of root nodes, one per statement.
+
+        .. note::
+            Assignment statements (e.g. ``R := …``) mutate *schema* as a
+            side effect, registering the new relation so that later statements
+            can reference it.
         """
         ra = self.grammar.parse(instring)
         _schema = Schema(schema)
@@ -95,34 +100,35 @@ class TreeBRD:
         :return: A Node.
         """
 
-        # Check if this is a dependency statement
+        # Dependency statements (pk, mvd, fd, inc) start with a dependency
+        # operator keyword — check this first to avoid falling into RA dispatch.
         if self.is_dependency_statement(exp):
             return self.create_dependency_node(exp, schema)
 
-        # A relation node.
+        # Single string → bare relation name from schema.
         if len(exp) == 1 and isinstance(exp[0], str):
             name = exp[0]
             node = RelationNode(name=name, schema=schema)
 
-        # An expression.
+        # Single nested ParseResults → parenthesised sub-expression.
         elif len(exp) == 1 and isinstance(exp[0], ParseResults):
             node = self.to_node(exp[0], schema)
 
-        # Unary operators.
+        # Leading string that is a unary operator → [op, params, child…].
         elif isinstance(exp[0], str) and self.grammar.is_unary(exp[0]):
             child = self.to_node(exp[2:], schema)
             node = self.create_unary_node(
                 operator=exp[0], child=child, param=exp[1], schema=schema
             )
 
-        # Assignment.
+        # Second element is the assignment operator → [lhs, :=, child…].
         elif exp[1] is self.grammar.syntax.assign_op:
             child = self.to_node(exp[2:], schema)
             node = self.create_unary_node(
                 operator=exp[1], child=child, param=exp[0], schema=schema
             )
 
-        # Binary operators.
+        # Second element is a binary operator → [left, op, (param?,) right].
         elif self.grammar.is_binary(exp[1]):
             parts = self._extract_binary_parts(exp)
             left = self.to_node(parts.left, schema)

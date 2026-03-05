@@ -106,8 +106,7 @@ class CoreGrammar(ConditionGrammar[TCoreSyntax]):
     @property
     def unary_op(self):
         """
-        rename_expr ::= rename param_start rename_parameters param_stop
-            expression
+        unary_op ::= project | select | rename
         """
         return self.project | self.select | self.rename
 
