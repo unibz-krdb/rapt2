@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
+import re
 from dataclasses import dataclass
 from enum import Enum, auto
 
-from pyparsing import ParseBaseException
-
-from .grammars.condition_grammar import ConditionGrammar
 from .grammars.syntax import Syntax
 
 
@@ -95,12 +93,12 @@ class IdentityConditionNode(ConditionNode):
 
     ident: str
 
+    _ATTRIBUTE_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.]*$")
+
     def attribute_references(self) -> list[str]:
-        try:
-            ConditionGrammar().attribute_reference.parse_string(self.ident)
+        if self._ATTRIBUTE_RE.fullmatch(self.ident):
             return [self.ident]
-        except ParseBaseException:
-            return []
+        return []
 
 
 @dataclass(frozen=True)

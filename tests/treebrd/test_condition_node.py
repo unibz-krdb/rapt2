@@ -110,6 +110,34 @@ class TestBinaryConditionalOperatorFromSyntax(ConditionNodeTestCase):
             BinaryConditionalOperator.from_syntax(self.syntax, "invalid")
 
 
+class TestIdentityConditionNodeAttributeReferences(ConditionNodeTestCase):
+    def test_simple_identifier(self):
+        self.assertEqual(IdentityConditionNode("a1").attribute_references(), ["a1"])
+
+    def test_prefixed_identifier(self):
+        self.assertEqual(
+            IdentityConditionNode("alpha.a1").attribute_references(), ["alpha.a1"]
+        )
+
+    def test_underscore_identifier(self):
+        self.assertEqual(IdentityConditionNode("_foo").attribute_references(), ["_foo"])
+
+    def test_numeric_literal(self):
+        self.assertEqual(IdentityConditionNode("42").attribute_references(), [])
+
+    def test_decimal_literal(self):
+        self.assertEqual(IdentityConditionNode("3.14").attribute_references(), [])
+
+    def test_quoted_string(self):
+        self.assertEqual(IdentityConditionNode("'hello'").attribute_references(), [])
+
+    def test_double_quoted_string(self):
+        self.assertEqual(IdentityConditionNode('"world"').attribute_references(), [])
+
+    def test_empty_string(self):
+        self.assertEqual(IdentityConditionNode("").attribute_references(), [])
+
+
 class TestConditionNode(ConditionNodeTestCase):
     def test_identity_condition_node(self):
         node = IdentityConditionNode("alpha.a1")
