@@ -1,9 +1,12 @@
+from __future__ import annotations
+
 import copy
 from enum import Enum, auto
 
 from .attributes import AttributeList
 from .condition_node import ConditionNode
 from .errors import InputError, RelationReferenceError
+from .schema import Schema
 
 
 class Node:
@@ -19,7 +22,7 @@ class Node:
     name: str | None
     attributes: AttributeList | None
 
-    def __init__(self, operator, name=None):
+    def __init__(self, operator: Operator, name: str | None = None) -> None:
         """
         Construct a node.
         :param name: The name of the relation.
@@ -30,7 +33,7 @@ class Node:
         self.name = name
         self.attributes = None
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """
         Return true if other is a node with the same operator, name and
         attributes. Else return false.
@@ -47,7 +50,7 @@ class Node:
             return False
         return True
 
-    def __ne__(self, other):
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
 
@@ -56,11 +59,11 @@ class RelationNode(Node):
     A relation.
     """
 
-    def __init__(self, name: str, schema):
+    def __init__(self, name: str, schema: Schema) -> None:
         super().__init__(Operator.relation, name)
         self.attributes = AttributeList(schema.get_attributes(name), name)
 
-    def post_order(self):
+    def post_order(self) -> list[Node]:
         return [self]
 
 
@@ -69,7 +72,9 @@ class UnaryNode(Node):
     A Node with one child.
     """
 
-    def __init__(self, operator, child, name: str | None = None):
+    def __init__(
+        self, operator: Operator, child: Node, name: str | None = None
+    ) -> None:
         super().__init__(operator, name)
         self.child = child
 
@@ -78,10 +83,10 @@ class UnaryNode(Node):
 
         self.attributes = copy.copy(child.attributes)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return super().__eq__(other) and self.child.__eq__(other.child)
 
-    def post_order(self):
+    def post_order(self) -> list[Node]:
         return self.child.post_order() + [self]
 
 
@@ -90,12 +95,12 @@ class SelectNode(UnaryNode):
     A relation that results from the relation algebra select operator.
     """
 
-    def __init__(self, child, conditions: ConditionNode):
+    def __init__(self, child: Node, conditions: ConditionNode) -> None:
         super().__init__(Operator.select, child)
         self.attributes.validate(conditions.attribute_references())
         self.conditions = conditions
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self.conditions == other.conditions and super().__eq__(other)
 
 
@@ -104,7 +109,7 @@ class ProjectNode(UnaryNode):
     A relation that results from the relation algebra project operator.
     """
 
-    def __init__(self, child, attributes):
+    def __init__(self, child: Node, attributes: list[str]) -> None:
         super().__init__(Operator.project, child=child)
         self.attributes.trim(attributes)
 
@@ -114,7 +119,9 @@ class RenameNode(UnaryNode):
     A relation that results from the relation algebra rename operator.
     """
 
-    def __init__(self, child, name, attributes, schema):
+    def __init__(
+        self, child: Node, name: str | None, attributes: list[str], schema: Schema
+    ) -> None:
         """
         Construct a RenameNode.
         :param name: The new name for the relation.
@@ -135,7 +142,9 @@ class AssignNode(UnaryNode):
     A relation that results from the relation algebra assign operator.
     """
 
-    def __init__(self, child, name, attributes, schema):
+    def __init__(
+        self, child: Node, name: str | None, attributes: list[str], schema: Schema
+    ) -> None:
         """
         Construct an AssignNode.
         :param name: The new name for the relation.
@@ -159,19 +168,21 @@ class BinaryNode(Node):
     A Node with two children, a left and a right.
     """
 
-    def __init__(self, operator, left, right, name=None):
+    def __init__(
+        self, operator: Operator, left: Node, right: Node, name: str | None = None
+    ) -> None:
         super().__init__(operator, name)
         self.left = left
         self.right = right
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return (
             super().__eq__(other)
             and self.left.__eq__(other.left)
             and self.right.__eq__(other.right)
         )
 
-    def post_order(self):
+    def post_order(self) -> list[Node]:
         return self.left.post_order() + self.right.post_order() + [self]
 
 
@@ -180,7 +191,7 @@ class JoinNode(BinaryNode):
     A relation that results from the relation algebra cross join operator.
     """
 
-    def __init__(self, operator, left, right):
+    def __init__(self, operator: Operator, left: Node, right: Node) -> None:
         if left.name and right.name and left.name == right.name:
             raise RelationReferenceError("Ambiguous relation reference.")
         super().__init__(operator, left, right, None)
@@ -192,7 +203,7 @@ class CrossJoinNode(JoinNode):
     A relation that results from the relation algebra cross join operator.
     """
 
-    def __init__(self, left, right):
+    def __init__(self, left: Node, right: Node) -> None:
         super().__init__(Operator.cross_join, left, right)
 
 
@@ -201,7 +212,7 @@ class NaturalJoinNode(JoinNode):
     A relation that results from the relation algebra natural join operator.
     """
 
-    def __init__(self, left, right):
+    def __init__(self, left: Node, right: Node) -> None:
         super().__init__(Operator.natural_join, left, right)
         left_attributes = [attribute.prefixed for attribute in self.left.attributes]
         left_names = self.left.attributes.names
@@ -218,32 +229,34 @@ class ConditionalJoinNode(JoinNode):
     A join node with a condition (theta join, outer joins).
     """
 
-    def __init__(self, operator, left, right, conditions: ConditionNode):
+    def __init__(
+        self, operator: Operator, left: Node, right: Node, conditions: ConditionNode
+    ) -> None:
         super().__init__(operator, left, right)
         self.attributes.validate(conditions.attribute_references())
         self.conditions = conditions
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self.conditions == other.conditions and super().__eq__(other)
 
 
 class ThetaJoinNode(ConditionalJoinNode):
-    def __init__(self, left, right, conditions: ConditionNode):
+    def __init__(self, left: Node, right: Node, conditions: ConditionNode) -> None:
         super().__init__(Operator.theta_join, left, right, conditions)
 
 
 class FullOuterJoinNode(ConditionalJoinNode):
-    def __init__(self, left, right, conditions: ConditionNode):
+    def __init__(self, left: Node, right: Node, conditions: ConditionNode) -> None:
         super().__init__(Operator.full_outer_join, left, right, conditions)
 
 
 class LeftOuterJoinNode(ConditionalJoinNode):
-    def __init__(self, left, right, conditions: ConditionNode):
+    def __init__(self, left: Node, right: Node, conditions: ConditionNode) -> None:
         super().__init__(Operator.left_outer_join, left, right, conditions)
 
 
 class RightOuterJoinNode(ConditionalJoinNode):
-    def __init__(self, left, right, conditions: ConditionNode):
+    def __init__(self, left: Node, right: Node, conditions: ConditionNode) -> None:
         super().__init__(Operator.right_outer_join, left, right, conditions)
 
 
@@ -252,7 +265,7 @@ class SetOperatorNode(BinaryNode):
     An abstract class for binary nodes with set operators.
     """
 
-    def __init__(self, operator, left, right):
+    def __init__(self, operator: Operator, left: Node, right: Node) -> None:
         super().__init__(operator, left, right, None)
 
         names = left.attributes.names
@@ -267,7 +280,7 @@ class UnionNode(SetOperatorNode):
     A relation that results from the relation algebra union operator.
     """
 
-    def __init__(self, left, right):
+    def __init__(self, left: Node, right: Node) -> None:
         super().__init__(Operator.union, left, right)
 
 
@@ -276,7 +289,7 @@ class DifferenceNode(SetOperatorNode):
     A relation that results from the relation algebra difference operator.
     """
 
-    def __init__(self, left, right):
+    def __init__(self, left: Node, right: Node) -> None:
         super().__init__(Operator.difference, left, right)
 
 
@@ -285,7 +298,7 @@ class IntersectNode(SetOperatorNode):
     A relation that results from the relation algebra intersect operator.
     """
 
-    def __init__(self, left, right):
+    def __init__(self, left: Node, right: Node) -> None:
         super().__init__(Operator.intersect, left, right)
 
 
@@ -294,19 +307,21 @@ class DependencyNode(Node):
     Base class for dependency nodes.
     """
 
-    def __init__(self, operator, relation_name, attributes):
+    def __init__(
+        self, operator: Operator, relation_name: str | list[str], attributes: list[str]
+    ) -> None:
         super().__init__(operator)
         self.relation_name = relation_name
         self.attributes = attributes
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return (
             super().__eq__(other)
             and self.relation_name == other.relation_name
             and self.attributes == other.attributes
         )
 
-    def post_order(self):
+    def post_order(self) -> list[Node]:
         return [self]
 
 
@@ -328,7 +343,7 @@ class PrimaryKeyNode(UnaryDependencyNode):
     A node representing a primary key dependency.
     """
 
-    def __init__(self, relation_name, attributes):
+    def __init__(self, relation_name: str, attributes: list[str]) -> None:
         super().__init__(Operator.primary_key, relation_name, attributes)
 
 
@@ -339,11 +354,16 @@ class MultivaluedDependencyNode(UnaryDependencyNode):
 
     child: RelationNode | SelectNode
 
-    def __init__(self, relation_name, attributes, relation_node):
+    def __init__(
+        self,
+        relation_name: str,
+        attributes: list[str],
+        relation_node: RelationNode | SelectNode,
+    ) -> None:
         super().__init__(Operator.multivalued_dependency, relation_name, attributes)
         self.child = relation_node
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return super().__eq__(other) and self.child == other.child
 
 
@@ -354,11 +374,16 @@ class FunctionalDependencyNode(UnaryDependencyNode):
 
     child: RelationNode | SelectNode
 
-    def __init__(self, relation_name, attributes, relation_node):
+    def __init__(
+        self,
+        relation_name: str,
+        attributes: list[str],
+        relation_node: RelationNode | SelectNode,
+    ) -> None:
         super().__init__(Operator.functional_dependency, relation_name, attributes)
         self.child = relation_node
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return super().__eq__(other) and self.child == other.child
 
 
@@ -370,13 +395,19 @@ class InclusionEquivalenceNode(BinaryDependencyNode):
     left_child: RelationNode | SelectNode
     right_child: RelationNode | SelectNode
 
-    def __init__(self, relation_names, attributes, left_child, right_child):
+    def __init__(
+        self,
+        relation_names: list[str],
+        attributes: list[str],
+        left_child: RelationNode | SelectNode,
+        right_child: RelationNode | SelectNode,
+    ) -> None:
         super().__init__(Operator.inclusion_equivalence, relation_names, attributes)
         self.relation_names = relation_names
         self.left_child = left_child
         self.right_child = right_child
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return (
             super().__eq__(other)
             and self.relation_names == other.relation_names
@@ -393,13 +424,19 @@ class InclusionSubsumptionNode(BinaryDependencyNode):
     left_child: RelationNode | SelectNode
     right_child: RelationNode | SelectNode
 
-    def __init__(self, relation_names, attributes, left_child, right_child):
+    def __init__(
+        self,
+        relation_names: list[str],
+        attributes: list[str],
+        left_child: RelationNode | SelectNode,
+        right_child: RelationNode | SelectNode,
+    ) -> None:
         super().__init__(Operator.inclusion_subsumption, relation_names, attributes)
         self.relation_names = relation_names
         self.left_child = left_child
         self.right_child = right_child
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return (
             super().__eq__(other)
             and self.relation_names == other.relation_names
