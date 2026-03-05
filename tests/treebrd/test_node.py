@@ -8,6 +8,8 @@ from rapt2.treebrd.condition_node import (
 )
 from rapt2.treebrd.errors import RelationReferenceError
 from rapt2.treebrd.node import (
+    CONDITIONAL_JOIN_OPERATORS,
+    JOIN_OPERATORS,
     CrossJoinNode,
     Node,
     Operator,
@@ -157,3 +159,32 @@ class TestPostOrder(NodeTestCase):
         self.assertEqual(left_join, result[2])
         self.assertEqual(self.gamma, result[3])
         self.assertEqual(outer_join, result[4])
+
+
+class TestOperatorSets(TestCase):
+    def test_join_operators_contains_all_join_types(self):
+        expected = {
+            Operator.cross_join,
+            Operator.natural_join,
+            Operator.theta_join,
+            Operator.full_outer_join,
+            Operator.left_outer_join,
+            Operator.right_outer_join,
+        }
+        self.assertEqual(JOIN_OPERATORS, expected)
+
+    def test_conditional_join_operators_subset_of_join_operators(self):
+        self.assertTrue(CONDITIONAL_JOIN_OPERATORS < JOIN_OPERATORS)
+
+    def test_conditional_join_operators_contains_theta_and_outer_joins(self):
+        expected = {
+            Operator.theta_join,
+            Operator.full_outer_join,
+            Operator.left_outer_join,
+            Operator.right_outer_join,
+        }
+        self.assertEqual(CONDITIONAL_JOIN_OPERATORS, expected)
+
+    def test_cross_and_natural_join_not_conditional(self):
+        self.assertNotIn(Operator.cross_join, CONDITIONAL_JOIN_OPERATORS)
+        self.assertNotIn(Operator.natural_join, CONDITIONAL_JOIN_OPERATORS)

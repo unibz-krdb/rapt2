@@ -371,3 +371,42 @@ class TestCreateDependencyNode(DependencyTestCase):
         self.assertEqual(2, len(forest))
         self.assertIsInstance(forest[0], PrimaryKeyNode)
         self.assertIsInstance(forest[1], RelationNode)
+
+
+class TestExtractBinaryParts(TestCase):
+    """Tests for TreeBRD._extract_binary_parts static method."""
+
+    @classmethod
+    def setUpClass(cls):
+        from pyparsing import ParseResults
+
+        cls.ParseResults = ParseResults
+
+    def _make_pr(self, items):
+        """Create a ParseResults from a list of items."""
+        return self.ParseResults(items)
+
+    def test_without_params(self):
+        # [..., operator, right] → op at -2, no param
+        exp = self._make_pr(["A", "\\join", "B"])
+        parts = TreeBRD._extract_binary_parts(exp)
+        self.assertEqual(parts.operator, "\\join")
+        self.assertIsNone(parts.param)
+        self.assertEqual(list(parts.right), ["B"])
+
+    def test_with_params(self):
+        # [..., operator, param, right] → op at -3
+        param = self._make_pr(["cond"])
+        exp = self._make_pr(["A", "\\theta_join", param, "B"])
+        parts = TreeBRD._extract_binary_parts(exp)
+        self.assertEqual(parts.operator, "\\theta_join")
+        self.assertEqual(list(parts.param), ["cond"])
+        self.assertEqual(list(parts.right), ["B"])
+
+    def test_left_captures_everything_before_operator(self):
+        exp = self._make_pr(["A", "\\join", "B", "\\union", "C"])
+        parts = TreeBRD._extract_binary_parts(exp)
+        # Rightmost operator is \union at -2
+        self.assertEqual(parts.operator, "\\union")
+        self.assertEqual(list(parts.left), ["A", "\\join", "B"])
+        self.assertEqual(list(parts.right), ["C"])
