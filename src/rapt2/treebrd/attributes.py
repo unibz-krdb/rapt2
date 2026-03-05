@@ -48,8 +48,12 @@ class AttributeList:
         """
         merged = AttributeList([], None)
 
-        assert isinstance(first, AttributeList)
-        assert isinstance(second, AttributeList)
+        if not isinstance(first, AttributeList):
+            raise TypeError(f"first must be AttributeList, got {type(first).__name__}")
+        if not isinstance(second, AttributeList):
+            raise TypeError(
+                f"second must be AttributeList, got {type(second).__name__}"
+            )
         merged._contents = first._contents[:]
         merged._contents += second._contents[:]
 

@@ -155,6 +155,14 @@ class TestAttributeListMerge(TestCase):
         merged = AttributeList.merge(first, second)
         self.assertEqual(["alpha.a1"], merged.to_list())
 
+    def test_merge_rejects_non_attribute_list_first(self):
+        with self.assertRaises(TypeError):
+            AttributeList.merge("not_a_list", AttributeList([], None))
+
+    def test_merge_rejects_non_attribute_list_second(self):
+        with self.assertRaises(TypeError):
+            AttributeList.merge(AttributeList([], None), "not_a_list")
+
 
 class TestAttributeListValidate(TestCase):
     def test_validate_existing_attributes(self):

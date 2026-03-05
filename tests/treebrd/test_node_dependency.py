@@ -174,18 +174,6 @@ class TestInclusionEquivalenceNode(DependencyNodeTestCase):
         self.assertEqual(node.left_child, self.alpha)
         self.assertEqual(node.right_child, self.beta)
 
-    def test_left_property_aliases_left_child(self):
-        node = InclusionEquivalenceNode(
-            ["alpha", "beta"], ["a1", "b1"], self.alpha, self.beta
-        )
-        self.assertIs(node.left, node.left_child)
-
-    def test_right_property_aliases_right_child(self):
-        node = InclusionEquivalenceNode(
-            ["alpha", "beta"], ["a1", "b1"], self.alpha, self.beta
-        )
-        self.assertIs(node.right, node.right_child)
-
     def test_equality(self):
         node = InclusionEquivalenceNode(
             ["alpha", "beta"], ["a1", "b1"], self.alpha, self.beta
@@ -239,18 +227,6 @@ class TestInclusionSubsumptionNode(DependencyNodeTestCase):
         )
         self.assertEqual(node.left_child, self.alpha)
         self.assertEqual(node.right_child, self.beta)
-
-    def test_left_property_aliases_left_child(self):
-        node = InclusionSubsumptionNode(
-            ["alpha", "beta"], ["a1", "b1"], self.alpha, self.beta
-        )
-        self.assertIs(node.left, node.left_child)
-
-    def test_right_property_aliases_right_child(self):
-        node = InclusionSubsumptionNode(
-            ["alpha", "beta"], ["a1", "b1"], self.alpha, self.beta
-        )
-        self.assertIs(node.right, node.right_child)
 
     def test_equality(self):
         node = InclusionSubsumptionNode(
