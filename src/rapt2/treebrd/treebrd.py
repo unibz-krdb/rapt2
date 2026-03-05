@@ -1,3 +1,5 @@
+from typing import Any, NamedTuple
+
 from pyparsing import ParseResults
 
 from .condition_node import (
@@ -33,6 +35,15 @@ from .node import (
     UnionNode,
 )
 from .schema import Schema
+
+
+class _BinaryParts(NamedTuple):
+    """Components of a flattened binary expression extracted from ParseResults."""
+
+    left: ParseResults
+    operator: str
+    param: Any
+    right: Any
 
 
 class TreeBRD:
@@ -113,31 +124,43 @@ class TreeBRD:
 
         # Binary operators.
         elif self.grammar.is_binary(exp[1]):
-            # Pyparsing flattens same-precedence operators into one list, e.g.:
-            #   "A \join B \union C" → [A, \join, B, \union, C]
-            # We process from right to left so the rightmost operator binds first.
-            # The rightmost operand is always exp[-1]. The operator position
-            # depends on whether it has parameters:
-            #   Without params: [..., operator, right]       → op at -2
-            #   With params:    [..., operator, param, right] → op at -3
-            if isinstance(exp[-2], str):
-                op_pos = -2
-                param = None
-            else:
-                op_pos = -3
-                param = exp[-2]
-
-            operator = exp[op_pos]
-            left = self.to_node(exp[:op_pos], schema)
-            right = self.to_node(exp[-1], schema)
+            parts = self._extract_binary_parts(exp)
+            left = self.to_node(parts.left, schema)
+            right = self.to_node(parts.right, schema)
             node = self.create_binary_node(
-                operator=operator, left=left, right=right, param=param
+                operator=parts.operator, left=left, right=right, param=parts.param
             )
 
         else:
             raise ValueError(f"Unrecognised expression: {list(exp)}")
 
         return node
+
+    @staticmethod
+    def _extract_binary_parts(exp: ParseResults) -> _BinaryParts:
+        """Split a flattened binary expression into (left, operator, param, right).
+
+        Pyparsing flattens same-precedence operators into one list, e.g.:
+            "A \\join B \\union C" → [A, \\join, B, \\union, C]
+        We process from right to left so the rightmost operator binds first.
+        The rightmost operand is always exp[-1]. The operator position
+        depends on whether it has parameters:
+            Without params: [..., operator, right]       → op at -2
+            With params:    [..., operator, param, right] → op at -3
+        """
+        if isinstance(exp[-2], str):
+            op_pos = -2
+            param = None
+        else:
+            op_pos = -3
+            param = exp[-2]
+
+        return _BinaryParts(
+            left=exp[:op_pos],
+            operator=exp[op_pos],
+            param=param,
+            right=exp[-1],
+        )
 
     def create_condition_node(self, conditions: ParseResults) -> ConditionNode:
         """
@@ -263,15 +286,7 @@ class TreeBRD:
         if not exp or len(exp) < 2:
             return False
 
-        # Collect dependency operators present in the current syntax
-        dep_attr_names = ("pk_op", "mvd_op", "fd_op", "inc_equiv_op", "inc_subset_op")
-        dependency_ops = [
-            getattr(self.grammar.syntax, attr)
-            for attr in dep_attr_names
-            if hasattr(self.grammar.syntax, attr)
-        ]
-
-        return exp[0] in dependency_ops
+        return exp[0] in self.grammar.syntax.dependency_operators
 
     def create_dependency_node(self, exp: ParseResults, schema):
         """
@@ -307,6 +322,10 @@ class TreeBRD:
         """
         Create a dependency node (MVD or FD) with optional select conditions.
 
+        Parse layout:
+            Simple:      [op, attributes, relation]
+            With select: [op, attributes, \\select, conditions, relation]
+
         :param exp: Parsed expression containing attributes and optional select
         :param schema: Schema for relation validation
         :param operator: The dependency operator (mvd_op or fd_op)
@@ -314,20 +333,19 @@ class TreeBRD:
         """
         node_class = self._unary_dependency_types[operator]
         attributes = exp[1]
+
         if len(exp) == 3:
-            # Simple form: {operator}_{attributes} relation
+            # Simple: op_{attrs} relation
             relation_name = exp[2]
             relation_node = RelationNode(relation_name, schema)
-            return node_class(relation_name, attributes, relation_node)
         else:
-            # With conditions: {operator}_{attributes} \select_{conditions} relation
-            # exp[2] = "\select", exp[3] = conditions, exp[4] = relation_name
-            conditions = exp[3]
-            relation_name = exp[4]
+            # With select: op_{attrs} \select_{cond} relation
+            _, conditions, relation_name = exp[2], exp[3], exp[4]
             condition_node = self.create_condition_node(conditions[0])
             base_relation = RelationNode(relation_name, schema)
-            select_node = SelectNode(base_relation, condition_node)
-            return node_class(relation_name, attributes, select_node)
+            relation_node = SelectNode(base_relation, condition_node)
+
+        return node_class(relation_name, attributes, relation_node)
 
     def _create_inclusion_node(self, exp, schema, node_class):
         """
@@ -357,22 +375,22 @@ class TreeBRD:
 
     def _create_cond_dep_expr_node(self, expr, schema):
         """
-        Create a node from a cond_dep_expr (either relation_name or select with relation).
+        Create a node from a cond_dep_expr (either a bare relation or a select over a relation).
 
-        :param expr: Parsed expression (either relation_name or [select, conditions, relation_name])
+        Parse layout:
+            Bare relation:  "relation_name" or ["relation_name"]
+            With select:    [\\select, conditions, relation_name]
+
+        :param expr: Parsed expression
         :param schema: Schema for relation validation
         :return: RelationNode or SelectNode
         """
         if isinstance(expr, str):
-            # Simple relation name
             return RelationNode(expr, schema)
         elif len(expr) == 1 and isinstance(expr[0], str):
-            # Simple relation name wrapped in a list
             return RelationNode(expr[0], schema)
         else:
-            # Select with conditions: [select, conditions, relation_name]
-            conditions = expr[1]
-            relation_name = expr[2]
+            _, conditions, relation_name = expr[0], expr[1], expr[2]
             condition_node = self.create_condition_node(conditions[0])
             base_relation = RelationNode(relation_name, schema)
             return SelectNode(base_relation, condition_node)

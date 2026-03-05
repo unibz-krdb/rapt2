@@ -37,7 +37,8 @@ class ExtendedGrammar(CoreGrammar[TExtendedSyntax]):
     @property
     def theta_join(self):
         """
-        select_expr ::= select param_start conditions param_stop expression
+        theta_join_expr ::= expression theta_join param_start conditions param_stop expression
+                           | expression join param_start conditions param_stop expression
         """
         long = self.parametrize(self.syntax.theta_join_op, self.conditions)
         short = self.parametrize(self.syntax.join_op, self.conditions).setParseAction(
@@ -73,6 +74,8 @@ class ExtendedGrammar(CoreGrammar[TExtendedSyntax]):
 
     @property
     def binary_op_p1(self):
+        # ^ is pyparsing's Or (longest-match alternative); p1 = highest precedence
+        # tier (joins bind tighter than set operators in p2).
         return (
             super().binary_op_p1
             ^ self.natural_join

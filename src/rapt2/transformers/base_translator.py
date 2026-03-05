@@ -16,6 +16,11 @@ class BaseTranslator:
 
     def __init__(self, syntax: Syntax | None = None):
         self.syntax = syntax or Syntax()
+        self._condition_translate_functions: dict = {
+            IdentityConditionNode: self.identity_condition,
+            UnaryConditionNode: self.unary_condition,
+            BinaryConditionNode: self.binary_condition,
+        }
         self._translate_functions = {
             Operator.relation: self.relation,
             Operator.select: self.select,
@@ -122,14 +127,10 @@ class BaseTranslator:
         :param condition: a condition node
         :return: translated representation of the condition
         """
-        if isinstance(condition, IdentityConditionNode):
-            return self.identity_condition(condition)
-        elif isinstance(condition, UnaryConditionNode):
-            return self.unary_condition(condition)
-        elif isinstance(condition, BinaryConditionNode):
-            return self.binary_condition(condition)
-        else:
+        _translate = self._condition_translate_functions.get(type(condition))
+        if _translate is None:
             raise ValueError(f"Unknown condition node type: {type(condition)}")
+        return _translate(condition)
 
 
 def translate(roots):

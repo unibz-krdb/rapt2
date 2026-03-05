@@ -63,6 +63,7 @@ class QTreeTranslator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
+        # LaTeX: [.$relation\_name$ ]
         return "[.${}$ ]".format(self._escape_latex(node.name))
 
     def select(self, node: SelectNode) -> str:
@@ -72,6 +73,7 @@ class QTreeTranslator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         child = self.translate(node.child)
+        # LaTeX: [.$\sigma_{cond}$ child ]
         return "[.${op}_{{{conditions}}}$ {child} ]".format(
             op=self._get_latex_operator(node.operator),
             conditions=self.translate_condition(node.conditions),
@@ -85,6 +87,7 @@ class QTreeTranslator(BaseTranslator):
         :return: a qtree subtree rooted at the node
         """
         child = self.translate(node.child)
+        # LaTeX: [.$\pi_{a,\,b}$ child ]
         return "[.${op}_{{{attributes}}}$ {child} ]".format(
             op=self._get_latex_operator(node.operator),
             attributes=r",\,".join(node.attributes.names),
@@ -101,6 +104,7 @@ class QTreeTranslator(BaseTranslator):
         attributes = ""
         if node.attributes:
             attributes = "({})".format(r",\,".join(node.attributes.names))
+        # LaTeX: [.$\rho_{name(a,\,b)}$ child ]
         return "[.${op}_{{{name}{attributes}}}$ {child} ]".format(
             op=self._get_latex_operator(node.operator),
             name=self._escape_latex(node.name),
@@ -118,6 +122,7 @@ class QTreeTranslator(BaseTranslator):
         attributes = ""
         if node.attributes:
             attributes = "({})".format(r",\,".join(node.attributes.names))
+        # LaTeX: [.$name(a,\,b)$ child ]
         return "[.${name}{attributes}$ {child} ]".format(
             name=self._escape_latex(node.name),
             attributes=attributes,
@@ -131,6 +136,7 @@ class QTreeTranslator(BaseTranslator):
         ],
     ) -> str:
         """Translate a binary node with conditions into a LaTeX qtree node."""
+        # LaTeX: [.$\bowtie_{cond}$ left right ]
         return "[.${op}_{{{conditions}}}$ {left} {right} ]".format(
             op=self._get_latex_operator(node.operator),
             conditions=self.translate_condition(node.conditions),
@@ -221,6 +227,7 @@ class QTreeTranslator(BaseTranslator):
         :param node: a treebrd node
         :return: a qtree subtree rooted at the node
         """
+        # LaTeX: [.$\times$ left right ]
         return "[.${op}$ {left} {right} ]".format(
             op=self._get_latex_operator(node.operator),
             left=self.translate(node.left),

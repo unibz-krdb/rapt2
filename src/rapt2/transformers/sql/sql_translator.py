@@ -1,5 +1,7 @@
 from typing import Union
 from ...treebrd.node import (
+    CONDITIONAL_JOIN_OPERATORS,
+    JOIN_OPERATORS,
     Operator,
     AssignNode,
     CrossJoinNode,
@@ -164,9 +166,7 @@ class SQLTranslator(BaseTranslator):
         child_object = self.translate(node.child)
         where_block = self.translate_condition(node.conditions)
         if child_object.where_block:
-            where_block = "({0}) AND ({1})".format(
-                child_object.where_block, self.translate_condition(node.conditions)
-            )
+            where_block = f"({child_object.where_block}) AND ({where_block})"
         child_object.where_block = where_block
         if not child_object.select_block:
             child_object.select_block = str(node.attributes)
@@ -305,14 +305,7 @@ class SQLTranslator(BaseTranslator):
         named sub-queries.
         """
         sobject = self.translate(node)
-        if node.operator in {
-            Operator.cross_join,
-            Operator.natural_join,
-            Operator.theta_join,
-            Operator.full_outer_join,
-            Operator.left_outer_join,
-            Operator.right_outer_join,
-        }:
+        if node.operator in JOIN_OPERATORS:
             return sobject.from_block
         else:
             return "({subquery}) AS {name}".format(
@@ -343,12 +336,7 @@ class SQLTranslator(BaseTranslator):
             operator=self._get_sql_operator(node),
         )
 
-        if node.operator in {
-            Operator.theta_join,
-            Operator.full_outer_join,
-            Operator.left_outer_join,
-            Operator.right_outer_join,
-        }:
+        if node.operator in CONDITIONAL_JOIN_OPERATORS:
             # Only theta joins and outer joins have conditions
             if node.conditions is not None:
                 from_block = "{from_block} ON {conditions}".format(
@@ -397,31 +385,27 @@ class SQLTranslator(BaseTranslator):
             case _:
                 raise ValueError(f"Unknown unary condition operator: {node.op}")
 
+    _SQL_BINARY_OPS = {
+        BinaryConditionalOperator.AND: "AND",
+        BinaryConditionalOperator.OR: "OR",
+        BinaryConditionalOperator.EQUAL: "=",
+        BinaryConditionalOperator.NOT_EQUAL: "!=",
+        BinaryConditionalOperator.LESS_THAN: "<",
+        BinaryConditionalOperator.LESS_THAN_EQUAL: "<=",
+        BinaryConditionalOperator.GREATER_THAN: ">",
+        BinaryConditionalOperator.GREATER_THAN_EQUAL: ">=",
+    }
+
     def binary_condition(self, node: BinaryConditionNode) -> str:
         """
         Translate a binary condition node into SQL.
         :param node: a binary condition node
         :return: SQL representation of the condition
         """
-        match node.op:
-            case BinaryConditionalOperator.AND:
-                return f"({self.translate_condition(node.left)} AND {self.translate_condition(node.right)})"
-            case BinaryConditionalOperator.OR:
-                return f"({self.translate_condition(node.left)} OR {self.translate_condition(node.right)})"
-            case BinaryConditionalOperator.EQUAL:
-                return f"({self.translate_condition(node.left)} = {self.translate_condition(node.right)})"
-            case BinaryConditionalOperator.NOT_EQUAL:
-                return f"({self.translate_condition(node.left)} != {self.translate_condition(node.right)})"
-            case BinaryConditionalOperator.LESS_THAN:
-                return f"({self.translate_condition(node.left)} < {self.translate_condition(node.right)})"
-            case BinaryConditionalOperator.LESS_THAN_EQUAL:
-                return f"({self.translate_condition(node.left)} <= {self.translate_condition(node.right)})"
-            case BinaryConditionalOperator.GREATER_THAN:
-                return f"({self.translate_condition(node.left)} > {self.translate_condition(node.right)})"
-            case BinaryConditionalOperator.GREATER_THAN_EQUAL:
-                return f"({self.translate_condition(node.left)} >= {self.translate_condition(node.right)})"
-            case _:
-                raise ValueError(f"Unknown binary condition operator: {node.op}")
+        sql_op = self._SQL_BINARY_OPS.get(node.op)
+        if sql_op is None:
+            raise ValueError(f"Unknown binary condition operator: {node.op}")
+        return f"({self.translate_condition(node.left)} {sql_op} {self.translate_condition(node.right)})"
 
     def primary_key(self, node: PrimaryKeyNode) -> SQLAlterTableQuery:
         """
@@ -444,39 +428,19 @@ class SQLTranslator(BaseTranslator):
         )
 
     def multivalued_dependency(self, node) -> None:
-        """
-        Ignore multivalued dependency nodes during SQL translation.
-        :param node: a MultivaluedDependencyNode
-        :return: None
-        """
-        # TODO: Implement multivalued dependency translation
+        """Return None — MVDs have no SQL equivalent; callers should skip None results."""
         return None
 
     def functional_dependency(self, node) -> None:
-        """
-        Ignore functional dependency nodes during SQL translation.
-        :param node: a FunctionalDependencyNode
-        :return: None
-        """
-        # TODO: Implement functional dependency translation
+        """Return None — FDs have no SQL equivalent; callers should skip None results."""
         return None
 
     def inclusion_equivalence(self, node) -> None:
-        """
-        Ignore inclusion equivalence nodes during SQL translation.
-        :param node: an InclusionEquivalenceNode
-        :return: None
-        """
-        # TODO: Implement inclusion equivalence translation
+        """Return None — inclusion equivalences have no SQL equivalent; callers should skip None results."""
         return None
 
     def inclusion_subsumption(self, node) -> None:
-        """
-        Ignore inclusion subsumption nodes during SQL translation.
-        :param node: an InclusionSubsumptionNode
-        :return: None
-        """
-        # TODO: Implement inclusion subsumption translation
+        """Return None — inclusion subsumptions have no SQL equivalent; callers should skip None results."""
         return None
 
 

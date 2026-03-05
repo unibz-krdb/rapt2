@@ -19,6 +19,8 @@ def get_attribute_references(instring):
     :return: a list of attribute references.
     """
     parsed = ConditionGrammar().conditions.parseString(instring)
+    # A bare comparison parses as ['a', '=', 'b']; a compound expression wraps
+    # results in a nested list [[...]].  Check the first element to distinguish.
     result = parsed if isinstance(parsed[0], str) else parsed[0]
 
     attribute_refs = []
@@ -79,6 +81,8 @@ class ConditionGrammar(ProtoGrammar[TConditionSyntax]):
         """
         operand ::= identifier | string_literal | number
         """
+        # ("attribute_reference*") is pyparsing's result naming: the trailing *
+        # stores all matches as a named list accessible via hasattr/getattr.
         return (
             self.attribute_reference("attribute_reference*")
             | self.string_literal

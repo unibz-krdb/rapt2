@@ -1,3 +1,20 @@
+"""
+Syntax hierarchy for configurable operator symbols.
+
+Each syntax class pairs with a corresponding grammar class:
+
+    BaseSyntax        → (shared tokens: terminators, delimiters, parentheses)
+    ConditionSyntax   → ConditionGrammar  (logical/comparison operators)
+    CoreSyntax        → CoreGrammar       (select, project, rename, assign, join, set ops)
+    ExtendedSyntax    → ExtendedGrammar   (theta/outer joins, intersect, defined)
+    DependencySyntax  → DependencyGrammar (PK, MVD, FD, inclusion constraints)
+
+``Syntax`` is a backward-compatibility alias for ``DependencySyntax``, the
+most complete level.  Users can override any token via keyword arguments to
+``__init__``, or load overrides from a JSON config file.
+"""
+
+
 class BaseSyntax:
     """
     Base syntax class containing common tokens used by all grammars.
@@ -87,6 +104,13 @@ class DependencySyntax(ExtendedSyntax):
     fd_op = "fd"
     inc_equiv_op = "inc="
     inc_subset_op = "inc⊆"
+
+    _dependency_op_attrs = ("pk_op", "mvd_op", "fd_op", "inc_equiv_op", "inc_subset_op")
+
+    @property
+    def dependency_operators(self) -> tuple[str, ...]:
+        """Return the resolved dependency operator strings."""
+        return tuple(getattr(self, attr) for attr in self._dependency_op_attrs)
 
 
 # Backward compatibility alias

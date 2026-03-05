@@ -476,3 +476,24 @@ class Operator(Enum):
     functional_dependency = auto()
     inclusion_equivalence = auto()
     inclusion_subsumption = auto()
+
+
+JOIN_OPERATORS = frozenset(
+    {
+        Operator.cross_join,
+        Operator.natural_join,
+        Operator.theta_join,
+        Operator.full_outer_join,
+        Operator.left_outer_join,
+        Operator.right_outer_join,
+    }
+)
+
+CONDITIONAL_JOIN_OPERATORS = frozenset(
+    {
+        Operator.theta_join,
+        Operator.full_outer_join,
+        Operator.left_outer_join,
+        Operator.right_outer_join,
+    }
+)

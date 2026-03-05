@@ -120,8 +120,13 @@ class AttributeList:
 
     def get_attribute(self, reference: str) -> Attribute:
         """
-        Return the attribute that matches the reference. Raise an error if
-        the attribute cannot be found, or if there is more then one match.
+        Return the attribute that matches the reference.
+
+        Lookup rules:
+        - "name" matches any attribute with that name regardless of prefix.
+        - "prefix.name" requires an exact prefix match.
+
+        Raises AttributeReferenceError if zero or multiple attributes match.
         """
         prefix, _, name = reference.rpartition(".")
 
