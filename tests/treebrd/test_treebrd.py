@@ -425,7 +425,7 @@ class TestExtractBinaryParts(TestCase):
         exp = self._make_pr(["A", "\\join", "B"])
         parts = TreeBRD._extract_binary_parts(exp)
         self.assertEqual(parts.operator, "\\join")
-        self.assertIsNone(parts.param)
+        self.assertIsNone(parts.operator_params)
         self.assertEqual(list(parts.right), ["B"])
 
     def test_with_params(self):
@@ -434,7 +434,7 @@ class TestExtractBinaryParts(TestCase):
         exp = self._make_pr(["A", "\\theta_join", param, "B"])
         parts = TreeBRD._extract_binary_parts(exp)
         self.assertEqual(parts.operator, "\\theta_join")
-        self.assertEqual(list(parts.param), ["cond"])
+        self.assertEqual(list(parts.operator_params), ["cond"])
         self.assertEqual(list(parts.right), ["B"])
 
     def test_left_captures_everything_before_operator(self):

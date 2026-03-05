@@ -42,7 +42,7 @@ class _BinaryParts(NamedTuple):
 
     left: ParseResults
     operator: str
-    param: Any
+    operator_params: Any
     right: Any
 
 
@@ -118,14 +118,14 @@ class TreeBRD:
         elif isinstance(exp[0], str) and self.grammar.is_unary(exp[0]):
             child = self.to_node(exp[2:], schema)
             node = self.create_unary_node(
-                operator=exp[0], child=child, param=exp[1], schema=schema
+                operator=exp[0], child=child, operator_params=exp[1], schema=schema
             )
 
         # Second element is the assignment operator → [lhs, :=, child…].
         elif exp[1] is self.grammar.syntax.assign_op:
             child = self.to_node(exp[2:], schema)
             node = self.create_unary_node(
-                operator=exp[1], child=child, param=exp[0], schema=schema
+                operator=exp[1], child=child, operator_params=exp[0], schema=schema
             )
 
         # Second element is a binary operator → [left, op, (param?,) right].
@@ -134,7 +134,10 @@ class TreeBRD:
             left = self.to_node(parts.left, schema)
             right = self.to_node(parts.right, schema)
             node = self.create_binary_node(
-                operator=parts.operator, left=left, right=right, param=parts.param
+                operator=parts.operator,
+                left=left,
+                right=right,
+                operator_params=parts.operator_params,
             )
 
         else:
@@ -164,7 +167,7 @@ class TreeBRD:
         return _BinaryParts(
             left=exp[:op_pos],
             operator=exp[op_pos],
-            param=param,
+            operator_params=param,
             right=exp[-1],
         )
 
@@ -208,37 +211,43 @@ class TreeBRD:
         )
 
     def create_unary_node(
-        self, operator, child, param: ParseResults | None = None, schema=None
+        self,
+        operator,
+        child,
+        operator_params: ParseResults | None = None,
+        schema=None,
     ):
         """
         Return a Unary Node whose type depends on the specified operator.
 
-        :param schema:
-        :param child:
         :param operator: A relational algebra operator (see constants.py)
-        :param param: A list of parameters for the operator.
+        :param child: The child node.
+        :param operator_params: Parsed parameters whose shape depends on the
+            operator — conditions for select, attribute lists for project,
+            name/attributes for rename and assign.
+        :param schema: Schema for relation validation.
         :return: A Unary Node.
         """
 
         if operator == self.grammar.syntax.select_op:
-            condition = self.create_condition_node(param[0])
+            condition = self.create_condition_node(operator_params[0])
             node = SelectNode(child, condition)
 
         elif operator == self.grammar.syntax.project_op:
-            node = ProjectNode(child, param)
+            node = ProjectNode(child, operator_params)
 
         elif operator == self.grammar.syntax.rename_op:
             name = None
             attributes = []
-            if isinstance(param[0], str):
-                name = param.pop(0)
-            if param:
-                attributes = param[0]
+            if isinstance(operator_params[0], str):
+                name = operator_params.pop(0)
+            if operator_params:
+                attributes = operator_params[0]
             node = RenameNode(child, name, attributes, schema)
 
         elif operator == self.grammar.syntax.assign_op:
-            name = param[0]
-            attributes = [] if len(param) < 2 else param[1]
+            name = operator_params[0]
+            attributes = [] if len(operator_params) < 2 else operator_params[1]
             node = AssignNode(child, name, attributes)
             schema.add(name, node.attributes.names)
 
@@ -248,12 +257,15 @@ class TreeBRD:
         return node
 
     def create_binary_node(
-        self, operator, left, right, param: ParseResults | None = None
+        self, operator, left, right, operator_params: ParseResults | None = None
     ):
         """
         Return a Node whose type depends on the specified operator.
 
         :param operator: A relational algebra operator (see constants.py)
+        :param left: Left child node.
+        :param right: Right child node.
+        :param operator_params: Parsed parameters (e.g. join conditions).
         :return: A Node.
         """
 
@@ -265,7 +277,7 @@ class TreeBRD:
             node = NaturalJoinNode(left, right)
 
         elif operator in self._conditional_join_types:
-            condition = self.create_condition_node(param[0])
+            condition = self.create_condition_node(operator_params[0])
             node = self._conditional_join_types[operator](left, right, condition)
 
         # Set operators

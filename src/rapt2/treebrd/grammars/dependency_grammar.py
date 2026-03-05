@@ -116,11 +116,11 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
         return Group(self.fd + self.cond_dep_expr)
 
     @property
-    def inc_eq(self):
+    def inc_equiv(self):
         """
         Inclusion equivalence operator.
 
-        inc_eq ::= "inc="
+        inc_equiv ::= "inc="
         """
         return Literal(self.syntax.inc_equiv_op)
 
@@ -138,31 +138,31 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
         )
 
     @property
-    def inc_eq_dep(self):
+    def inc_equiv_dep(self):
         """
         Inclusion equivalence dependency statement.
 
-        inc_eq_dep ::= inc_eq inc_expr
+        inc_equiv_dep ::= inc_equiv inc_expr
         """
-        return Group(self.inc_eq + self.inc_expr)
+        return Group(self.inc_equiv + self.inc_expr)
 
     @property
-    def inc_subs(self):
+    def inc_subset(self):
         """
         Inclusion subsumption operator.
 
-        inc_subs ::= "inc⊆"
+        inc_subset ::= "inc⊆"
         """
         return Literal(self.syntax.inc_subset_op)
 
     @property
-    def inc_subs_dep(self):
+    def inc_subset_dep(self):
         """
         Inclusion subsumption dependency statement.
 
-        inc_subs_dep ::= inc_subs inc_expr
+        inc_subset_dep ::= inc_subset inc_expr
         """
-        return Group(self.inc_subs + self.inc_expr)
+        return Group(self.inc_subset + self.inc_expr)
 
     @property
     def dep(self):
@@ -173,8 +173,8 @@ class DependencyGrammar(ExtendedGrammar[TDependencySyntax]):
             self.pk_dep
             | self.mvd_dep
             | self.fd_dep
-            | self.inc_eq_dep
-            | self.inc_subs_dep
+            | self.inc_equiv_dep
+            | self.inc_subset_dep
         )
 
     @property
