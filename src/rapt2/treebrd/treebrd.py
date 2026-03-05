@@ -233,7 +233,8 @@ class TreeBRD:
         elif operator == self.grammar.syntax.assign_op:
             name = param[0]
             attributes = [] if len(param) < 2 else param[1]
-            node = AssignNode(child, name, attributes, schema)
+            node = AssignNode(child, name, attributes)
+            schema.add(name, node.attributes.names)
 
         else:
             raise ValueError(f"Unknown unary operator: {operator}")

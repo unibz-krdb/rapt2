@@ -373,6 +373,40 @@ class TestCreateDependencyNode(DependencyTestCase):
         self.assertIsInstance(forest[1], RelationNode)
 
 
+class TestAssignmentSchemaUpdate(TreeBRDTestCase):
+    """Verify that assignment through TreeBRD.build() updates the schema."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.definition = {
+            "alpha": ["a1"],
+            "beta": ["b1", "b2"],
+        }
+
+    def test_schema_updated_after_assign(self):
+        builder = TreeBRD(DependencyGrammar())
+        forest = builder.build("omega := beta;", dict(self.definition))
+        node = forest[0]
+        self.assertEqual(node.name, "omega")
+        self.assertEqual(node.attributes.names, ["b1", "b2"])
+
+    def test_schema_updated_with_renamed_attributes(self):
+        builder = TreeBRD(DependencyGrammar())
+        forest = builder.build("omega(x, y) := beta;", dict(self.definition))
+        node = forest[0]
+        self.assertEqual(node.name, "omega")
+        self.assertEqual(node.attributes.names, ["x", "y"])
+
+    def test_assigned_relation_usable_in_subsequent_statement(self):
+        builder = TreeBRD(DependencyGrammar())
+        schema = dict(self.definition)
+        forest = builder.build("omega := alpha; omega;", schema)
+        self.assertEqual(2, len(forest))
+        self.assertIsInstance(forest[1], RelationNode)
+        self.assertEqual(forest[1].name, "omega")
+
+
 class TestExtractBinaryParts(TestCase):
     """Tests for TreeBRD._extract_binary_parts static method."""
 

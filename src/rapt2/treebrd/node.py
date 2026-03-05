@@ -142,9 +142,7 @@ class AssignNode(UnaryNode):
     A relation that results from the relation algebra assign operator.
     """
 
-    def __init__(
-        self, child: Node, name: str | None, attributes: list[str], schema: Schema
-    ) -> None:
+    def __init__(self, child: Node, name: str | None, attributes: list[str]) -> None:
         """
         Construct an AssignNode.
         :param name: The new name for the relation.
@@ -160,7 +158,6 @@ class AssignNode(UnaryNode):
 
         super().__init__(Operator.assign, child, name)
         self.attributes.rename(attributes, name)
-        schema.add(name, self.attributes.names)
 
 
 class BinaryNode(Node):

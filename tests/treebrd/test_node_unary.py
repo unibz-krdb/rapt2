@@ -313,52 +313,42 @@ class TestRename(TestUnaryNode):
 
 class TestAssignment(TestUnaryNode):
     def test_operator_is_correct(self):
-        actual = AssignNode(self.alpha, "omega", [], self.schema).operator
+        actual = AssignNode(self.alpha, "omega", []).operator
         self.assertEqual(Operator.assign, actual)
 
     def test_name_when_given(self):
-        actual = AssignNode(self.alpha, "omega", [], self.schema).name
+        actual = AssignNode(self.alpha, "omega", []).name
         self.assertEqual("omega", actual)
 
     def test_attributes_when_renamed(self):
-        node = AssignNode(self.beta, "omega", ["a", "b"], self.schema)
+        node = AssignNode(self.beta, "omega", ["a", "b"])
         expected = ["omega.a", "omega.b"]
         self.assertEqual(expected, node.attributes.to_list())
 
     def test_ambiguous_attributes_in_child(self):
-        node = AssignNode(self.ambiguous, "omega", ["a", "b"], self.schema)
+        node = AssignNode(self.ambiguous, "omega", ["a", "b"])
         expected = ["omega.a", "omega.b"]
         self.assertEqual(expected, node.attributes.to_list())
 
-    def test_schema_is_updated_after_assign_with_no_explicit_attributes(self):
-        AssignNode(self.beta, "omega", [], self.schema)
-        self.assertTrue(self.schema.contains("omega"))
-        self.assertEqual(
-            self.schema.get_attributes("beta"), self.schema.get_attributes("omega")
-        )
+    def test_attributes_names_with_no_explicit_attributes(self):
+        node = AssignNode(self.beta, "omega", [])
+        self.assertEqual(["b1", "b2"], node.attributes.names)
 
-    def test_schema_is_updated_after_assign_with_attributes(self):
-        AssignNode(self.gamma, "omega", ["a", "b", "c"], self.schema)
-        self.assertTrue(self.schema.contains("omega"))
-        self.assertEqual(["a", "b", "c"], self.schema.get_attributes("omega"))
+    def test_attributes_names_with_explicit_attributes(self):
+        node = AssignNode(self.gamma, "omega", ["a", "b", "c"])
+        self.assertEqual(["a", "b", "c"], node.attributes.names)
 
     def test_exception_when_missing_name(self):
-        self.assertRaises(InputError, AssignNode, self.alpha, None, ["a"], self.schema)
+        self.assertRaises(InputError, AssignNode, self.alpha, None, ["a"])
 
     def test_exception_when_too_few_attributes(self):
-        self.assertRaises(
-            InputError, AssignNode, self.beta, "omega", ["a"], self.schema
-        )
+        self.assertRaises(InputError, AssignNode, self.beta, "omega", ["a"])
 
     def test_exception_when_too_many_attributes(self):
-        self.assertRaises(
-            InputError, AssignNode, self.beta, "omega", ["a", "b", "c"], self.schema
-        )
+        self.assertRaises(InputError, AssignNode, self.beta, "omega", ["a", "b", "c"])
 
     def test_when_ambiguous_attributes(self):
-        self.assertRaises(
-            InputError, AssignNode, self.beta, "omega", ["o1", "o1"], self.schema
-        )
+        self.assertRaises(InputError, AssignNode, self.beta, "omega", ["o1", "o1"])
 
     def test_exception_when_name_conflicts(self):
         self.assertRaises(
