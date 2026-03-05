@@ -302,7 +302,14 @@ class IntersectNode(SetOperatorNode):
 class DependencyNode(Node):
     """
     Base class for dependency nodes.
+
+    Unlike RA nodes whose ``attributes`` is an ``AttributeList`` tracking
+    prefixed attribute metadata, dependency nodes use a plain ``list[str]``
+    because they reference raw attribute *names* from a schema constraint
+    rather than scoped query columns.
     """
+
+    attributes: list[str]  # type: ignore[assignment]
 
     def __init__(
         self, operator: Operator, relation_name: str | list[str], attributes: list[str]
@@ -333,6 +340,14 @@ class BinaryDependencyNode(DependencyNode):
 
     left_child: RelationNode | SelectNode
     right_child: RelationNode | SelectNode
+
+    @property
+    def left(self) -> RelationNode | SelectNode:
+        return self.left_child
+
+    @property
+    def right(self) -> RelationNode | SelectNode:
+        return self.right_child
 
 
 class PrimaryKeyNode(UnaryDependencyNode):
