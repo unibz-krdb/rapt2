@@ -70,3 +70,5 @@ coverage.xml
 
 # Sphinx documentation
 docs/_build/
+# claude-squad local data
+.claude-squad/
