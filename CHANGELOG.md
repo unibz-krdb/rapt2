@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.5.1] - 2026-03-19
+
+### Changed
+- Updated architecture documentation and added gotchas section to CLAUDE.md
+- Added claude-squad local data to gitignore
+- CI now skips SQL translator tests that require PostgreSQL
+
 ## [0.5.0] - 2026-03-05
 
 ### Added
