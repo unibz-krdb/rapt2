@@ -1,7 +1,14 @@
 import functools
+import unittest
 from unittest import TestCase
 
-import psycopg2
+try:
+    import psycopg2
+
+    _PSYCOPG2_AVAILABLE = True
+except ImportError:
+    psycopg2 = None
+    _PSYCOPG2_AVAILABLE = False
 
 from rapt2 import Rapt
 
@@ -9,9 +16,14 @@ from rapt2 import Rapt
 class TestTranslator(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.conn = psycopg2.connect(
-            database="rapt_test_db", user="raptor", password="raptolicious"
-        )
+        if not _PSYCOPG2_AVAILABLE:
+            raise unittest.SkipTest("psycopg2 not installed")
+        try:
+            cls.conn = psycopg2.connect(
+                database="rapt_test_db", user="raptor", password="raptolicious"
+            )
+        except Exception as e:
+            raise unittest.SkipTest(f"PostgreSQL not available: {e}")
         cls.cur = cls.conn.cursor()
         cls.execute = cls.cur.execute
 
