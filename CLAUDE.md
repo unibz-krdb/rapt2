@@ -15,6 +15,7 @@ uv sync --all-groups    # Install all dependencies (including dev)
 pytest                  # Run all tests
 pytest tests/treebrd/   # Run a test subdirectory
 pytest tests/treebrd/test_node.py -k test_name  # Run a single test
+pytest --ignore=tests/transformers/sql_translator/test_translator.py  # Run tests without PostgreSQL
 ruff check .            # Lint
 ruff format .           # Format
 ```
@@ -46,10 +47,21 @@ Three-layer pipeline: **Grammar/Parser → AST → Translators**
 
 ## Testing
 
-Tests use `unittest.TestCase`. Test files mirror source structure under `tests/`. Common pattern: `setUpClass` creates a shared `Schema` and `TreeBRD` builder, then tests parse expressions and assert on the resulting node trees or translated output.
+Tests use `unittest.TestCase`. Test files mirror source structure under `tests/`. Common pattern: `setUpClass` creates a shared `Schema` and `TreeBRD` builder, then tests parse expressions and assert on the resulting node trees or translated output. `tests/treebrd/grammars/grammar_test_case.py` provides a `GrammarTestCase` base class for grammar-level tests.
+
+## Code Style
+
+- Type hints on all function signatures and return types
+- PascalCase classes, snake_case functions/variables
+- Docstrings on all classes and public methods
 
 ## Gotchas
 
-- **SQL translator tests need PostgreSQL** — `tests/transformers/sql_translator/test_translator.py` requires a running PostgreSQL instance (`setup_db.sql`/`teardown_db.sql`). CI skips this file via `--ignore`.
+- **SQL translator tests need PostgreSQL** — `tests/transformers/sql_translator/test_translator.py` requires a running PostgreSQL instance. Setup/teardown is handled internally via `setUpClass`/`tearDownClass`. CI skips this file via `--ignore`.
 - **`psycopg2-binary` dependency** — requires PostgreSQL client libraries on the host.
 - **Broken CLI entry point** — `pyproject.toml` defines `rapt = "rapt2.rapt:main"` but `main()` does not exist in `rapt.py`.
+
+## CI
+
+- **ci.yml**: Runs `ruff format --check .`, `ruff check .`, and `pytest` (with `--ignore` for SQL translator tests). Includes a PostgreSQL service for integration tests.
+- **release.yml**: On tagged releases, publishes to PyPI and creates a GitHub release with a git-cliff changelog.
